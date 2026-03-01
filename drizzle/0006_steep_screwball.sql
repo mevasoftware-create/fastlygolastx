@@ -1,0 +1,1 @@
+ALTER TABLE `couriers` ADD `isDemo` boolean DEFAULT false NOT NULL;

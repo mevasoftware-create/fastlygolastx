@@ -1,0 +1,1 @@
+ALTER TABLE `favoriteAddresses` ADD `isDefault` enum('0','1') DEFAULT '0' NOT NULL;

@@ -471,8 +471,13 @@ export function injectSeoTags(html: string, url: string): string {
   
   return html;
 }
-// Main SEO middleware
-export function seoMiddleware(req: Request, res: Response, next: NextFunction) {
+// Main SEO middleware - DISABLED by user request
+export function seoMiddleware(_req: Request, _res: Response, next: NextFunction) {
+  return next();
+}
+
+// Original seoMiddleware (disabled)
+function _seoMiddlewareOriginal(req: Request, res: Response, next: NextFunction) {
   // Only process HTML requests (not API, assets, etc.)
   const url = req.originalUrl || req.url;
   

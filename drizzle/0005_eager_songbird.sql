@@ -1,0 +1,1 @@
+ALTER TABLE `orders` MODIFY COLUMN `orderType` enum('restaurant','market','pharmacy','individual','express') NOT NULL;

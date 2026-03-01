@@ -5,7 +5,8 @@ import { nanoid } from "nanoid";
 import path from "path";
 import { createServer as createViteServer } from "vite";
 import viteConfig from "../../vite.config";
-import { injectSeoTags } from "./seoMiddleware";
+// SEO disabled by user request
+// import { injectSeoTags } from "./seoMiddleware";
 
 export async function setupVite(app: Express, server: Server) {
   const serverPort = parseInt(process.env.PORT || "3000");
@@ -51,8 +52,8 @@ export async function setupVite(app: Express, server: Server) {
         `src="/src/main.tsx?v=${nanoid()}"`
       );
       let page = await vite.transformIndexHtml(url, template);
-      // Inject SEO tags server-side before sending to client
-      page = injectSeoTags(page, url);
+      // SEO injection disabled by user request
+      // page = injectSeoTags(page, url);
       res.status(200).set({ "Content-Type": "text/html" }).end(page);
     } catch (e) {
       vite.ssrFixStacktrace(e as Error);
@@ -82,10 +83,10 @@ export function serveStatic(app: Express) {
         res.sendFile(indexPath);
         return;
       }
-      // Inject SEO tags server-side
+      // SEO injection disabled by user request
       const url = req.originalUrl || req.url;
-      const injectedHtml = injectSeoTags(html, url);
-      res.status(200).set({ "Content-Type": "text/html" }).end(injectedHtml);
+      void url; // suppress unused variable warning
+      res.status(200).set({ "Content-Type": "text/html" }).end(html);
     });
   });
 }

@@ -1,0 +1,1 @@
+ALTER TABLE `users` ADD `emailPreferences` json DEFAULT ('{"orderConfirmation":true,"courierAssigned":true,"deliveryCompleted":true,"promotions":true}');

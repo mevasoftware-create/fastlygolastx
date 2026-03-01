@@ -1,0 +1,1 @@
+ALTER TABLE `couriers` ADD `gender` enum('male','female','other');

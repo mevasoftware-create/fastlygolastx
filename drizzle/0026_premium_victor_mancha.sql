@@ -1,0 +1,1 @@
+ALTER TABLE `orders` MODIFY COLUMN `priorityLevel` enum('normal','fast','urgent','express') DEFAULT 'normal';

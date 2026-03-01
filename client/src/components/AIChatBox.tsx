@@ -65,7 +65,8 @@ import { DefaultChatTransport } from "ai";
 // import them directly from "ai" package in your consuming code.
 // ============================================================================
 
-import type { UIMessage, UIMessagePart, UIToolInvocation } from "ai";
+import type { UIMessage, UIToolInvocation } from "ai";
+type UIMessagePart = UIMessage['parts'][number];
 
 /**
  * Tool invocation state derived from AI SDK's UIToolInvocation type.
@@ -245,7 +246,7 @@ function MessageBubble({
             }
             return (
               <div key={i} className="prose prose-sm dark:prose-invert max-w-none">
-                <Markdown mode={isStreaming ? "typewriter" : "static"} typewriterSpeed={50}>
+                <Markdown mode={isStreaming ? "streaming" : "static"}>
                   {part.text}
                 </Markdown>
               </div>

@@ -156,8 +156,8 @@ async function startServer() {
 
 
 
-  // SEO Middleware - inject meta tags server-side for Google indexing
-  app.use(seoMiddleware);
+  // SEO Middleware - disabled by user request
+  // app.use(seoMiddleware);
 
   // Temporary debug endpoint - remove after diagnosis
   app.get('/api/debug-headers', (req, res) => {
@@ -173,57 +173,19 @@ async function startServer() {
     });
   });
 
-  // robots.txt - serve from public folder or generate dynamically
+  // robots.txt - SEO disabled by user request
   app.get('/robots.txt', (req, res) => {
     res.type('text/plain');
-    res.send(`User-agent: *
-Allow: /
-Allow: /areas
-Allow: /services
-Allow: /how-it-works
-Allow: /about-us
-Allow: /contact
-Allow: /courier/register
-Allow: /business/register
-Allow: /terms-of-service
-Allow: /privacy-policy
-Allow: /categories/
-Allow: /areas/
-
-# Private / auth pages - do not index
-Disallow: /admin
-Disallow: /admin/
-Disallow: /admin/*
-Disallow: /login
-Disallow: /register
-Disallow: /verify-email
-Disallow: /forgot-password
-Disallow: /reset-password
-Disallow: /pending-approval
-Disallow: /profile
-Disallow: /my-orders
-Disallow: /order-history
-Disallow: /new-order
-Disallow: /notifications
-Disallow: /notification-settings
-Disallow: /settings
-Disallow: /track/*
-Disallow: /courier-dashboard
-Disallow: /courier/dashboard
-Disallow: /courier/payments
-Disallow: /courier/map
-Disallow: /business/dashboard
-Disallow: /business-dashboard
-
-# API endpoints
-Disallow: /api/
-Disallow: /trpc/
-
-Sitemap: https://fastlygo.mk/sitemap.xml`);
+    res.send('User-agent: *\nDisallow: /');
   });
 
-  // sitemap.xml - generate dynamically with only public indexable pages
+  // sitemap.xml - SEO disabled by user request
   app.get('/sitemap.xml', (req, res) => {
+    res.status(404).send('Not found');
+    return;
+  });
+  // sitemap.xml - original (disabled)
+  app.get('/sitemap-disabled.xml', (req, res) => {
     const BASE = 'https://fastlygo.mk';
     const now = new Date().toISOString();
     const publicPages = [

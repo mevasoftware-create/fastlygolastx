@@ -1,0 +1,1 @@
+ALTER TABLE `businesses` ADD `email` varchar(255) NOT NULL;
