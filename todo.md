@@ -70,3 +70,4 @@
 - [x] Veritabanı şema migrasyonu: tüm tablolar oluşturuldu (31 tablo)
 - [x] SEO özelliklerini devre dışı bırakıldı (seoMiddleware ve vite.ts)
 - [x] TiDB Cloud'dan Manus veritabanına veri aktarımı (252 kayıt)
+- [x] Manus veritabanı şeması TiDB Cloud eski şemasıyla uyarlandı (279 kayıt aktarıldı)

@@ -211,6 +211,13 @@
       "when": 1766366513868,
       "tag": "0029_sudden_spiral",
       "breakpoints": true
+    },
+    {
+      "idx": 30,
+      "version": "5",
+      "when": 1772405167915,
+      "tag": "0030_past_tinkerer",
+      "breakpoints": true
     }
   ]
 }
