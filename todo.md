@@ -69,3 +69,4 @@
 ## Hata Düzeltmeleri
 - [x] Veritabanı şema migrasyonu: tüm tablolar oluşturuldu (31 tablo)
 - [x] SEO özelliklerini devre dışı bırakıldı (seoMiddleware ve vite.ts)
+- [x] TiDB Cloud'dan Manus veritabanına veri aktarımı (252 kayıt)
