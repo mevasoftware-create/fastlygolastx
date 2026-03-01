@@ -1,0 +1,9 @@
+# FastlyGo Redirects
+# www → non-www redirect (301 permanent)
+
+# www.fastlygo.mk → fastlygo.mk
+https://www.fastlygo.mk/*  https://fastlygo.mk/:splat  301!
+
+# HTTP → HTTPS redirect
+http://fastlygo.mk/*  https://fastlygo.mk/:splat  301!
+http://www.fastlygo.mk/*  https://fastlygo.mk/:splat  301!

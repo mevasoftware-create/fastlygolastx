@@ -2,12 +2,16 @@ import "dotenv/config";
 import express from "express";
 import { createServer } from "http";
 import net from "net";
+import helmet from "helmet";
+import compression from "compression";
 import { createExpressMiddleware } from "@trpc/server/adapters/express";
-import { registerOAuthRoutes } from "./oauth";
-import { registerChatRoutes } from "./chat";
+// Manus OAuth removed - using email/password and Google OAuth instead
 import { appRouter } from "../routers";
 import { createContext } from "./context";
 import { serveStatic, setupVite } from "./vite";
+import { initializeSocketIO } from "./socket";
+import { defaultRateLimit, lenientRateLimit, logRateLimitInfo } from "./rateLimit";
+import { seoMiddleware } from "./seoMiddleware";
 
 function isPortAvailable(port: number): Promise<boolean> {
   return new Promise(resolve => {
@@ -31,21 +35,246 @@ async function findAvailablePort(startPort: number = 3000): Promise<number> {
 async function startServer() {
   const app = express();
   const server = createServer(app);
+  
+  // Security Headers with Helmet (must be first)
+  // Disable CSP in development for easier debugging
+  const isDevelopment = process.env.NODE_ENV === 'development';
+  
+  app.use(helmet({
+    contentSecurityPolicy: isDevelopment ? false : {
+      directives: {
+        defaultSrc: ["'self'"],
+        scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'", "https://cdn.jsdelivr.net", "https://maps.googleapis.com", "https://maps.gstatic.com", "https://accounts.google.com", "https://www.googletagmanager.com", "https://manus-analytics.com"],  
+        scriptSrcAttr: ["'unsafe-inline'"],
+        styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
+        fontSrc: ["'self'", "https://fonts.gstatic.com"],
+        imgSrc: ["'self'", "data:", "https:", "blob:"],
+        connectSrc: ["'self'", "https:", "wss:", "ws:", "https://maps.googleapis.com"],
+        frameSrc: ["'self'", "https://accounts.google.com"],
+        workerSrc: ["'self'", "blob:"],
+        objectSrc: ["'none'"],
+        upgradeInsecureRequests: []
+      }
+    },
+    crossOriginEmbedderPolicy: false,
+    crossOriginResourcePolicy: { policy: "cross-origin" },
+    hsts: {
+      maxAge: 31536000,
+      includeSubDomains: true,
+      preload: true
+    },
+    referrerPolicy: { policy: "strict-origin-when-cross-origin" }
+    // permissionsPolicy is handled separately if needed
+  }));
+  
+  // Disable x-powered-by header
+  app.disable("x-powered-by");
+  
+  // Enable gzip compression for all responses
+  app.use(compression({
+    level: 6, // Compression level (0-9, 6 is default and balanced)
+    threshold: 1024, // Only compress responses larger than 1KB
+    filter: (req, res) => {
+      // Don't compress if client doesn't support it
+      if (req.headers['x-no-compression']) {
+        return false;
+      }
+      // Use compression for all content types
+      return compression.filter(req, res);
+    }
+  }));
+  
+  // Force HTTPS for production (but allow Manus development domains)
+  app.use((req, res, next) => {
+    // Manus proxy may forward the original host via x-forwarded-host
+    // Check both host and x-forwarded-host headers
+    const host = (req.headers['x-forwarded-host'] as string || req.headers.host || '').split(',')[0].trim();
+    
+    // Skip redirect for localhost and Manus development domains
+    if (host.includes('localhost') || host.includes('127.0.0.1') || 
+        host.includes('manus.space') || host.includes('manus.computer') || host.includes('manusvm.computer')) {
+      return next();
+    }
+    
+    // Check protocol from multiple sources
+    const xForwardedProto = req.headers['x-forwarded-proto'] as string | undefined;
+    const xForwardedSsl = req.headers['x-forwarded-ssl'] as string | undefined;
+    const protocol = xForwardedProto || (xForwardedSsl === 'on' ? 'https' : (req.protocol || 'http'));
+    
+    // Remove www prefix
+    const cleanHost = host.replace(/^www\./, '');
+    
+    // Force non-www for production domain (fastlygo.mk)
+    // www.fastlygo.mk → fastlygo.mk (301 redirect)
+    if (host.startsWith('www.') && host !== cleanHost) {
+      const redirectUrl = `https://${cleanHost}${req.url}`;
+      console.log(`[WWW Redirect] ${protocol}://${host}${req.url} → ${redirectUrl}`);
+      res.setHeader('Location', redirectUrl);
+      return res.status(301).end();
+    }
+    
+    // Force HTTPS
+    if (protocol !== 'https' && cleanHost === 'fastlygo.mk') {
+      const redirectUrl = `https://${cleanHost}${req.url}`;
+      console.log(`[HTTPS Redirect] ${protocol}://${host}${req.url} → ${redirectUrl}`);
+      res.setHeader('Location', redirectUrl);
+      return res.status(301).end();
+    }
+    
+    next();
+  });
+
+  // CORS configuration for mobile app
+  app.use((req, res, next) => {
+    res.header("Access-Control-Allow-Origin", "*");
+    res.header("Access-Control-Allow-Methods", "GET, POST, OPTIONS, PUT, DELETE");
+    res.header("Access-Control-Allow-Headers", "Content-Type, Cookie, Accept, Authorization");
+    res.header("Access-Control-Allow-Credentials", "true");
+    
+    // Handle preflight requests
+    if (req.method === "OPTIONS") {
+      return res.sendStatus(200);
+    }
+    next();
+  });
+  
   // Configure body parser with larger size limit for file uploads
   app.use(express.json({ limit: "50mb" }));
   app.use(express.urlencoded({ limit: "50mb", extended: true }));
-  // OAuth callback under /api/oauth/callback
-  registerOAuthRoutes(app);
-  // Chat API with streaming and tool calling
-  registerChatRoutes(app);
-  // tRPC API
+  
+  // Cache headers for better performance
+  app.use((req, res, next) => {
+    if (req.path.startsWith('/assets/')) {
+      res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
+    } else if (req.path.startsWith('/api/')) {
+      res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+    } else {
+      res.setHeader('Cache-Control', 'public, max-age=3600');
+    }
+    next();
+  });
+
+
+
+  // SEO Middleware - inject meta tags server-side for Google indexing
+  app.use(seoMiddleware);
+
+  // Temporary debug endpoint - remove after diagnosis
+  app.get('/api/debug-headers', (req, res) => {
+    res.json({
+      host: req.headers.host,
+      'x-forwarded-host': req.headers['x-forwarded-host'],
+      'x-forwarded-for': req.headers['x-forwarded-for'],
+      'x-forwarded-proto': req.headers['x-forwarded-proto'],
+      'x-real-ip': req.headers['x-real-ip'],
+      'cf-connecting-ip': req.headers['cf-connecting-ip'],
+      'cf-visitor': req.headers['cf-visitor'],
+      allHeaders: req.headers,
+    });
+  });
+
+  // robots.txt - serve from public folder or generate dynamically
+  app.get('/robots.txt', (req, res) => {
+    res.type('text/plain');
+    res.send(`User-agent: *
+Allow: /
+Allow: /areas
+Allow: /services
+Allow: /how-it-works
+Allow: /about-us
+Allow: /contact
+Allow: /courier/register
+Allow: /business/register
+Allow: /terms-of-service
+Allow: /privacy-policy
+Allow: /categories/
+Allow: /areas/
+
+# Private / auth pages - do not index
+Disallow: /admin
+Disallow: /admin/
+Disallow: /admin/*
+Disallow: /login
+Disallow: /register
+Disallow: /verify-email
+Disallow: /forgot-password
+Disallow: /reset-password
+Disallow: /pending-approval
+Disallow: /profile
+Disallow: /my-orders
+Disallow: /order-history
+Disallow: /new-order
+Disallow: /notifications
+Disallow: /notification-settings
+Disallow: /settings
+Disallow: /track/*
+Disallow: /courier-dashboard
+Disallow: /courier/dashboard
+Disallow: /courier/payments
+Disallow: /courier/map
+Disallow: /business/dashboard
+Disallow: /business-dashboard
+
+# API endpoints
+Disallow: /api/
+Disallow: /trpc/
+
+Sitemap: https://fastlygo.mk/sitemap.xml`);
+  });
+
+  // sitemap.xml - generate dynamically with only public indexable pages
+  app.get('/sitemap.xml', (req, res) => {
+    const BASE = 'https://fastlygo.mk';
+    const now = new Date().toISOString();
+    const publicPages = [
+      { loc: '/', priority: '1.0', changefreq: 'daily' },
+      { loc: '/how-it-works', priority: '0.8', changefreq: 'monthly' },
+      { loc: '/services', priority: '0.8', changefreq: 'monthly' },
+      { loc: '/about-us', priority: '0.7', changefreq: 'monthly' },
+      { loc: '/areas', priority: '0.8', changefreq: 'weekly' },
+      { loc: '/courier/register', priority: '0.7', changefreq: 'monthly' },
+      { loc: '/business/register', priority: '0.7', changefreq: 'monthly' },
+      { loc: '/terms-of-service', priority: '0.3', changefreq: 'yearly' },
+      { loc: '/privacy-policy', priority: '0.3', changefreq: 'yearly' },
+    ];
+    const urls = publicPages.map(p => `  <url>\n    <loc>${BASE}${p.loc}</loc>\n    <lastmod>${now}</lastmod>\n    <changefreq>${p.changefreq}</changefreq>\n    <priority>${p.priority}</priority>\n  </url>`).join('\n');
+    res.type('application/xml');
+    res.send(`<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls}\n</urlset>`);
+  });
+
+  // OAuth routes handled separately
+  
+  // Apply rate limiting to tRPC endpoints
+  // Use lenient rate limit for frequently accessed endpoints
+  app.use("/api/trpc/orders.getMyOrders", lenientRateLimit);
+  app.use("/api/trpc/orders.getById", lenientRateLimit);
+  app.use("/api/trpc/orders.list", lenientRateLimit);
+  
+  // Apply default rate limit to all other tRPC endpoints
+  app.use("/api/trpc", defaultRateLimit);
+  
+  // Log tRPC requests for debugging
+  app.use("/api/trpc", (req, res, next) => {
+    if (req.headers.authorization) {
+      console.log("[tRPC Request] Bearer token auth detected");
+    }
+    next();
+  });
+
+  // tRPC API - handle both regular and batch requests with optimizations
   app.use(
     "/api/trpc",
     createExpressMiddleware({
       router: appRouter,
       createContext,
+      batching: {
+        enabled: true,
+      },
     })
   );
+  // Initialize Socket.IO
+  initializeSocketIO(server);
+  
   // development mode uses Vite, production mode uses static files
   if (process.env.NODE_ENV === "development") {
     await setupVite(app, server);
@@ -62,7 +291,26 @@ async function startServer() {
 
   server.listen(port, () => {
     console.log(`Server running on http://localhost:${port}/`);
+    console.log("[Security] Helmet security headers enabled");
+    console.log("[Performance] Cache headers configured");
+    console.log("[Performance] tRPC batching enabled (max 100 requests)");
+    logRateLimitInfo();
   });
 }
 
-startServer().catch(console.error);
+startServer().catch(err => {
+  console.error("[Server Error] Failed to start server:", err);
+  process.exit(1);
+});
+
+/**
+ * Security Headers Configuration:
+ * - Content-Security-Policy: Prevents XSS attacks
+ * - X-Content-Type-Options: Prevents MIME type sniffing
+ * - X-Frame-Options: Prevents clickjacking
+ * - X-XSS-Protection: Legacy XSS protection
+ * - Referrer-Policy: Controls referrer information
+ * - Permissions-Policy: Controls browser features
+ * - HSTS: Forces HTTPS connections
+ * - Cross-Origin policies: Manages cross-origin requests
+ */

@@ -1,0 +1,216 @@
+{
+  "version": "7",
+  "dialect": "mysql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "5",
+      "when": 1762169823082,
+      "tag": "0000_friendly_jackpot",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "5",
+      "when": 1762169919190,
+      "tag": "0001_flashy_loa",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "5",
+      "when": 1762172941554,
+      "tag": "0002_foamy_jackpot",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "5",
+      "when": 1762173794425,
+      "tag": "0003_silly_micromacro",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "5",
+      "when": 1762174710989,
+      "tag": "0004_amused_mimic",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "5",
+      "when": 1762366289809,
+      "tag": "0005_eager_songbird",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "5",
+      "when": 1762383767777,
+      "tag": "0006_steep_screwball",
+      "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "5",
+      "when": 1762559760242,
+      "tag": "0007_stiff_jasper_sitwell",
+      "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "5",
+      "when": 1762559991903,
+      "tag": "0008_colossal_the_hunter",
+      "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "5",
+      "when": 1762561736214,
+      "tag": "0009_curious_metal_master",
+      "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "5",
+      "when": 1762803865751,
+      "tag": "0010_peaceful_wasp",
+      "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "5",
+      "when": 1762815092649,
+      "tag": "0011_charming_mandrill",
+      "breakpoints": true
+    },
+    {
+      "idx": 12,
+      "version": "5",
+      "when": 1763325289560,
+      "tag": "0012_wooden_iron_monger",
+      "breakpoints": true
+    },
+    {
+      "idx": 13,
+      "version": "5",
+      "when": 1763922293931,
+      "tag": "0013_right_sentinels",
+      "breakpoints": true
+    },
+    {
+      "idx": 14,
+      "version": "5",
+      "when": 1763926349026,
+      "tag": "0014_mute_master_mold",
+      "breakpoints": true
+    },
+    {
+      "idx": 15,
+      "version": "5",
+      "when": 1763927420001,
+      "tag": "0015_flippant_sabretooth",
+      "breakpoints": true
+    },
+    {
+      "idx": 16,
+      "version": "5",
+      "when": 1764689935223,
+      "tag": "0016_wise_emma_frost",
+      "breakpoints": true
+    },
+    {
+      "idx": 17,
+      "version": "5",
+      "when": 1765290165925,
+      "tag": "0017_dear_may_parker",
+      "breakpoints": true
+    },
+    {
+      "idx": 18,
+      "version": "5",
+      "when": 1765483715997,
+      "tag": "0018_low_jigsaw",
+      "breakpoints": true
+    },
+    {
+      "idx": 19,
+      "version": "5",
+      "when": 1765483817979,
+      "tag": "0019_normal_clint_barton",
+      "breakpoints": true
+    },
+    {
+      "idx": 20,
+      "version": "5",
+      "when": 1765642830474,
+      "tag": "0020_abnormal_franklin_storm",
+      "breakpoints": true
+    },
+    {
+      "idx": 21,
+      "version": "5",
+      "when": 1765642863080,
+      "tag": "0021_flippant_the_stranger",
+      "breakpoints": true
+    },
+    {
+      "idx": 22,
+      "version": "5",
+      "when": 1765740579257,
+      "tag": "0022_odd_luckman",
+      "breakpoints": true
+    },
+    {
+      "idx": 23,
+      "version": "5",
+      "when": 1765743177551,
+      "tag": "0023_chief_gambit",
+      "breakpoints": true
+    },
+    {
+      "idx": 24,
+      "version": "5",
+      "when": 1765743518845,
+      "tag": "0024_eminent_inhumans",
+      "breakpoints": true
+    },
+    {
+      "idx": 25,
+      "version": "5",
+      "when": 1765937773268,
+      "tag": "0025_cool_wither",
+      "breakpoints": true
+    },
+    {
+      "idx": 26,
+      "version": "5",
+      "when": 1765966510389,
+      "tag": "0026_premium_victor_mancha",
+      "breakpoints": true
+    },
+    {
+      "idx": 27,
+      "version": "5",
+      "when": 1766009957242,
+      "tag": "0027_premium_maverick",
+      "breakpoints": true
+    },
+    {
+      "idx": 28,
+      "version": "5",
+      "when": 1766111596292,
+      "tag": "0028_sweet_jackpot",
+      "breakpoints": true
+    },
+    {
+      "idx": 29,
+      "version": "5",
+      "when": 1766366513868,
+      "tag": "0029_sudden_spiral",
+      "breakpoints": true
+    }
+  ]
+}

@@ -1,0 +1,385 @@
+{
+  "tr": {
+    "howItWorksHeroTitle": "Teslimat Bu Kadar Kolay",
+    "howItWorksHeroSubtitle": "4 Basit Adımda Teslimat",
+    "howItWorksHeroDesc": "Sipariş ver, kurye gelsin, paketini al. Tek tıkla profesyonel teslimat hizmeti.",
+    
+    "processTitle": "Nasıl Çalışır?",
+    "processSubtitle": "4 basit adımda teslimatınız kapınızda",
+    
+    "step1Title": "Sipariş Ver",
+    "step1Desc": "Alış ve teslimat adreslerini girin, paket detaylarını belirleyin",
+    
+    "step2Title": "Kurye Eşleşme",
+    "step2Desc": "Sistem size en yakın uygun kuryeyi otomatik bulur",
+    
+    "step3Title": "Canlı Takip",
+    "step3Desc": "Kuryenizi harita üzerinde gerçek zamanlı takip edin",
+    
+    "step4Title": "Teslim Al",
+    "step4Desc": "Paketiniz güvenle kapınıza teslim edilir",
+    
+    "featuresTitle": "Özellikler",
+    "featuresSubtitle": "Size en iyi deneyimi sunuyoruz",
+    
+    "featureInstantMatch": "Anlık Eşleşme",
+    "featureInstantMatchDesc": "Yapay zeka destekli sistem, size en yakın ve uygun kurye ile saniyeler içinde eşleştirir",
+    
+    "featureLiveTracking": "Gerçek Zamanlı Takip",
+    "featureLiveTrackingDesc": "Kuryenizin konumunu harita üzerinde canlı olarak izleyin",
+    
+    "featureSecureDelivery": "Güvenli Teslimat",
+    "featureSecureDeliveryDesc": "Tüm teslimatlar sigortalı, kuryelerimiz doğrulanmış",
+    
+    "featureFlexiblePayment": "Esnek Ödeme",
+    "featureFlexiblePaymentDesc": "Kredi kartı, banka kartı veya nakit ödeme seçenekleri",
+    
+    "featureInstantNotifications": "Anlık Bildirimler",
+    "featureInstantNotificationsDesc": "Sipariş durumu değişikliklerinde anında bildirim alın",
+    
+    "featureCourierChat": "Kurye İletişimi",
+    "featureCourierChatDesc": "Uygulama içi mesajlaşma ile kuryenizle doğrudan iletişim",
+    
+    "userTypesTitle": "Kim Kullanabilir?",
+    "userTypesSubtitle": "Herkese özel çözümler",
+    
+    "userTypeIndividual": "Bireysel Kullanıcılar",
+    "userTypeIndividualDesc": "Evden eve teslimat, alışveriş, evrak gönderimi",
+    "userTypeIndividualFeature1": "Tek seferlik siparişler",
+    "userTypeIndividualFeature2": "Anlık fiyat hesaplama",
+    "userTypeIndividualFeature3": "Nakit veya kart ödeme",
+    
+    "userTypeBusiness": "İşletmeler",
+    "userTypeBusinessDesc": "Restoran, market, eczane ve perakende teslimatları",
+    "userTypeBusinessFeature1": "Toplu sipariş indirimi",
+    "userTypeBusinessFeature2": "Aylık faturalama",
+    "userTypeBusinessFeature3": "API entegrasyonu",
+    
+    "userTypeCourier": "Kuryeler",
+    "userTypeCourierDesc": "Esnek çalışma, yüksek kazanç fırsatı",
+    "userTypeCourierFeature1": "Günlük/haftalık ödeme",
+    "userTypeCourierFeature2": "Kendi aracınla çalış",
+    "userTypeCourierFeature3": "Sigorta desteği",
+    
+    "statsAvgDelivery": "Ortalama Teslimat",
+    "statsActiveCouriers": "Aktif Kurye",
+    "statsSatisfaction": "Memnuniyet",
+    "statsSupport": "Destek",
+    
+    "faqTitle": "Sıkça Sorulan Sorular",
+    "faqSubtitle": "Merak ettiğiniz her şeyin cevabı burada",
+    
+    "faq1Q": "Teslimat ücreti nasıl hesaplanır?",
+    "faq1A": "Mesafe, paket boyutu ve teslimat önceliğine göre otomatik hesaplanır. Sipariş vermeden önce net ücreti görürsünüz.",
+    
+    "faq2Q": "Ödeme seçenekleri nelerdir?",
+    "faq2A": "Kredi kartı, banka kartı ve nakit ödeme kabul ediyoruz. İşletmeler için aylık faturalama seçeneği de mevcut.",
+    
+    "faq3Q": "Teslimat süresi ne kadar?",
+    "faq3A": "Ortalama teslimat süremiz 15 dakikadır. Yoğun saatlerde bu süre biraz uzayabilir.",
+    
+    "faq4Q": "Paketim kaybolursa ne olur?",
+    "faq4A": "Tüm teslimatlarımız sigortalıdır. Herhangi bir sorun yaşarsanız 7/24 destek ekibimiz yardımcı olur.",
+    
+    "ctaTitle": "Teslimatınızı Şimdi Başlatın",
+    "ctaSubtitle": "Binlerce müşteri ve yüzlerce kurye ile büyüyen ailemize katılın",
+    "ctaDesc": "İlk siparişinizde %10 indirim fırsatını kaçırmayın!",
+    "ctaCallCourier": "Kurye Çağır",
+    "ctaBecomeCourier": "Kurye Ol",
+    
+    "trustBadgeInsured": "Sigortalı Teslimat",
+    "trustBadgeSatisfaction": "%98 Memnuniyet",
+    "trustBadgeSupport": "7/24 Destek",
+    
+    "startNow": "Hemen Başla",
+    "becomeCourier": "Kurye Ol"
+  },
+  
+  "en": {
+    "howItWorksHeroTitle": "Delivery Made Easy",
+    "howItWorksHeroSubtitle": "Delivery in 4 Simple Steps",
+    "howItWorksHeroDesc": "Order, courier arrives, receive your package. Professional delivery service with one click.",
+    
+    "processTitle": "How It Works?",
+    "processSubtitle": "Your delivery at your door in 4 simple steps",
+    
+    "step1Title": "Place Order",
+    "step1Desc": "Enter pickup and delivery addresses, specify package details",
+    
+    "step2Title": "Courier Matching",
+    "step2Desc": "System automatically finds the nearest available courier",
+    
+    "step3Title": "Live Tracking",
+    "step3Desc": "Track your courier in real-time on the map",
+    
+    "step4Title": "Receive Delivery",
+    "step4Desc": "Your package is safely delivered to your door",
+    
+    "featuresTitle": "Features",
+    "featuresSubtitle": "We provide you the best experience",
+    
+    "featureInstantMatch": "Instant Matching",
+    "featureInstantMatchDesc": "AI-powered system matches you with the nearest available courier in seconds",
+    
+    "featureLiveTracking": "Real-Time Tracking",
+    "featureLiveTrackingDesc": "Watch your courier's location live on the map",
+    
+    "featureSecureDelivery": "Secure Delivery",
+    "featureSecureDeliveryDesc": "All deliveries are insured, our couriers are verified",
+    
+    "featureFlexiblePayment": "Flexible Payment",
+    "featureFlexiblePaymentDesc": "Credit card, debit card or cash payment options",
+    
+    "featureInstantNotifications": "Instant Notifications",
+    "featureInstantNotificationsDesc": "Get instant notifications on order status changes",
+    
+    "featureCourierChat": "Courier Communication",
+    "featureCourierChatDesc": "Direct communication with your courier via in-app messaging",
+    
+    "userTypesTitle": "Who Can Use?",
+    "userTypesSubtitle": "Solutions for everyone",
+    
+    "userTypeIndividual": "Individual Users",
+    "userTypeIndividualDesc": "Home to home delivery, shopping, document sending",
+    "userTypeIndividualFeature1": "One-time orders",
+    "userTypeIndividualFeature2": "Instant price calculation",
+    "userTypeIndividualFeature3": "Cash or card payment",
+    
+    "userTypeBusiness": "Businesses",
+    "userTypeBusinessDesc": "Restaurant, grocery, pharmacy and retail deliveries",
+    "userTypeBusinessFeature1": "Bulk order discount",
+    "userTypeBusinessFeature2": "Monthly invoicing",
+    "userTypeBusinessFeature3": "API integration",
+    
+    "userTypeCourier": "Couriers",
+    "userTypeCourierDesc": "Flexible work, high earning opportunity",
+    "userTypeCourierFeature1": "Daily/weekly payment",
+    "userTypeCourierFeature2": "Work with your vehicle",
+    "userTypeCourierFeature3": "Insurance support",
+    
+    "statsAvgDelivery": "Avg. Delivery",
+    "statsActiveCouriers": "Active Couriers",
+    "statsSatisfaction": "Satisfaction",
+    "statsSupport": "Support",
+    
+    "faqTitle": "Frequently Asked Questions",
+    "faqSubtitle": "Answers to everything you're curious about",
+    
+    "faq1Q": "How is delivery fee calculated?",
+    "faq1A": "Automatically calculated based on distance, package size and delivery priority. You see the exact fee before placing order.",
+    
+    "faq2Q": "What are the payment options?",
+    "faq2A": "We accept credit card, debit card and cash payment. Monthly invoicing option is also available for businesses.",
+    
+    "faq3Q": "How long does delivery take?",
+    "faq3A": "Our average delivery time is 15 minutes. This may extend slightly during busy hours.",
+    
+    "faq4Q": "What if my package is lost?",
+    "faq4A": "All our deliveries are insured. If you experience any issues, our 24/7 support team will help.",
+    
+    "ctaTitle": "Start Your Delivery Now",
+    "ctaSubtitle": "Join our growing family with thousands of customers and hundreds of couriers",
+    "ctaDesc": "Don't miss 10% discount on your first order!",
+    "ctaCallCourier": "Call Courier",
+    "ctaBecomeCourier": "Become Courier",
+    
+    "trustBadgeInsured": "Insured Delivery",
+    "trustBadgeSatisfaction": "98% Satisfaction",
+    "trustBadgeSupport": "24/7 Support",
+    
+    "startNow": "Start Now",
+    "becomeCourier": "Become Courier"
+  },
+  
+  "mk": {
+    "howItWorksHeroTitle": "Достава Направена Лесна",
+    "howItWorksHeroSubtitle": "Достава во 4 Едноставни Чекори",
+    "howItWorksHeroDesc": "Нарачајте, куриерот пристигнува, примете го пакетот. Професионална достава со еден клик.",
+    
+    "processTitle": "Како Функционира?",
+    "processSubtitle": "Вашата достава на вашата врата во 4 едноставни чекори",
+    
+    "step1Title": "Нарачајте",
+    "step1Desc": "Внесете адреси за подигнување и достава, наведете детали за пакетот",
+    
+    "step2Title": "Поврзување со Куриер",
+    "step2Desc": "Системот автоматски го наоѓа најблискиот достапен куриер",
+    
+    "step3Title": "Следење Во Живо",
+    "step3Desc": "Следете го вашиот куриер во реално време на мапата",
+    
+    "step4Title": "Примете Достава",
+    "step4Desc": "Вашиот пакет е безбедно доставен на вашата врата",
+    
+    "featuresTitle": "Карактеристики",
+    "featuresSubtitle": "Ви обезбедуваме најдобро искуство",
+    
+    "featureInstantMatch": "Инстантно Поврзување",
+    "featureInstantMatchDesc": "Систем со вештачка интелигенција ве поврзува со најблискиот достапен куриер за секунди",
+    
+    "featureLiveTracking": "Следење Во Реално Време",
+    "featureLiveTrackingDesc": "Гледајте ја локацијата на вашиот куриер во живо на мапата",
+    
+    "featureSecureDelivery": "Безбедна Достава",
+    "featureSecureDeliveryDesc": "Сите достави се осигурани, нашите куриери се верификувани",
+    
+    "featureFlexiblePayment": "Флексибилно Плаќање",
+    "featureFlexiblePaymentDesc": "Опции за плаќање со кредитна картичка, дебитна картичка или готовина",
+    
+    "featureInstantNotifications": "Инстантни Известувања",
+    "featureInstantNotificationsDesc": "Добивајте инстантни известувања за промени во статусот на нарачката",
+    
+    "featureCourierChat": "Комуникација со Куриер",
+    "featureCourierChatDesc": "Директна комуникација со вашиот куриер преку пораки во апликацијата",
+    
+    "userTypesTitle": "Кој Може Да Користи?",
+    "userTypesSubtitle": "Решенија за сите",
+    
+    "userTypeIndividual": "Индивидуални Корисници",
+    "userTypeIndividualDesc": "Достава од дом до дом, купување, испраќање документи",
+    "userTypeIndividualFeature1": "Еднократни нарачки",
+    "userTypeIndividualFeature2": "Инстантна калкулација на цена",
+    "userTypeIndividualFeature3": "Плаќање во готовина или со картичка",
+    
+    "userTypeBusiness": "Бизниси",
+    "userTypeBusinessDesc": "Ресторан, продавница, аптека и малопродажни достави",
+    "userTypeBusinessFeature1": "Попуст за групни нарачки",
+    "userTypeBusinessFeature2": "Месечно фактурирање",
+    "userTypeBusinessFeature3": "API интеграција",
+    
+    "userTypeCourier": "Куриери",
+    "userTypeCourierDesc": "Флексибилна работа, висока можност за заработка",
+    "userTypeCourierFeature1": "Дневно/неделно плаќање",
+    "userTypeCourierFeature2": "Работете со вашето возило",
+    "userTypeCourierFeature3": "Поддршка за осигурување",
+    
+    "statsAvgDelivery": "Просечна Достава",
+    "statsActiveCouriers": "Активни Куриери",
+    "statsSatisfaction": "Задоволство",
+    "statsSupport": "Поддршка",
+    
+    "faqTitle": "Често Поставувани Прашања",
+    "faqSubtitle": "Одговори на сè што ве интересира",
+    
+    "faq1Q": "Како се пресметува таксата за достава?",
+    "faq1A": "Автоматски се пресметува врз основа на растојание, големина на пакетот и приоритет на достава. Ја гледате точната такса пред да нарачате.",
+    
+    "faq2Q": "Кои се опциите за плаќање?",
+    "faq2A": "Прифаќаме кредитна картичка, дебитна картичка и готовинско плаќање. Опција за месечно фактурирање е достапна и за бизниси.",
+    
+    "faq3Q": "Колку време трае достава?",
+    "faq3A": "Нашето просечно време на достава е 15 минути. Ова може малку да се продолжи за време на зафатени часови.",
+    
+    "faq4Q": "Што ако мојот пакет се изгуби?",
+    "faq4A": "Сите наши достави се осигурани. Ако имате проблеми, нашиот тим за поддршка 24/7 ќе помогне.",
+    
+    "ctaTitle": "Започнете Ја Вашата Достава Сега",
+    "ctaSubtitle": "Придружете се на нашето растечко семејство со илјадници клиенти и стотици куриери",
+    "ctaDesc": "Не пропуштајте 10% попуст на вашата прва нарачка!",
+    "ctaCallCourier": "Повикај Куриер",
+    "ctaBecomeCourier": "Стани Куриер",
+    
+    "trustBadgeInsured": "Осигурана Достава",
+    "trustBadgeSatisfaction": "98% Задоволство",
+    "trustBadgeSupport": "24/7 Поддршка",
+    
+    "startNow": "Започни Сега",
+    "becomeCourier": "Стани Куриер"
+  },
+  
+  "sq": {
+    "howItWorksHeroTitle": "Dërgesa e Bërë e Lehtë",
+    "howItWorksHeroSubtitle": "Dërgesa në 4 Hapa të Thjeshtë",
+    "howItWorksHeroDesc": "Porosit, korieri mbërrin, merr paketën. Shërbim profesional dërgese me një klik.",
+    
+    "processTitle": "Si Funksionon?",
+    "processSubtitle": "Dërgesa juaj në derën tuaj në 4 hapa të thjeshtë",
+    
+    "step1Title": "Bëni Porosi",
+    "step1Desc": "Vendosni adresat e marrjes dhe dërgimit, specifikoni detajet e paketës",
+    
+    "step2Title": "Lidhja me Korier",
+    "step2Desc": "Sistemi automatikisht gjen korierit më të afërt të disponueshëm",
+    
+    "step3Title": "Gjurmimi Live",
+    "step3Desc": "Gjurmoni korierit tuaj në kohë reale në hartë",
+    
+    "step4Title": "Merrni Dërgimin",
+    "step4Desc": "Paketa juaj dërgohet me siguri në derën tuaj",
+    
+    "featuresTitle": "Karakteristikat",
+    "featuresSubtitle": "Ju ofrojmë përvojën më të mirë",
+    
+    "featureInstantMatch": "Lidhje e Menjëhershme",
+    "featureInstantMatchDesc": "Sistemi me inteligjencë artificiale ju lidh me korierit më të afërt të disponueshëm në sekonda",
+    
+    "featureLiveTracking": "Gjurmim në Kohë Reale",
+    "featureLiveTrackingDesc": "Shikoni vendndodhjen e korierit tuaj live në hartë",
+    
+    "featureSecureDelivery": "Dërgim i Sigurt",
+    "featureSecureDeliveryDesc": "Të gjitha dërgesat janë të siguruara, korierët tanë janë të verifikuar",
+    
+    "featureFlexiblePayment": "Pagesë Fleksibël",
+    "featureFlexiblePaymentDesc": "Opsione pagese me kartë krediti, kartë debiti ose para në dorë",
+    
+    "featureInstantNotifications": "Njoftime të Menjëhershme",
+    "featureInstantNotificationsDesc": "Merrni njoftime të menjëhershme për ndryshimet e statusit të porosisë",
+    
+    "featureCourierChat": "Komunikim me Korier",
+    "featureCourierChatDesc": "Komunikim i drejtpërdrejtë me korierit tuaj përmes mesazheve në aplikacion",
+    
+    "userTypesTitle": "Kush Mund të Përdorë?",
+    "userTypesSubtitle": "Zgjidhje për të gjithë",
+    
+    "userTypeIndividual": "Përdorues Individualë",
+    "userTypeIndividualDesc": "Dërgim nga shtëpia në shtëpi, blerje, dërgim dokumentesh",
+    "userTypeIndividualFeature1": "Porosi një herë",
+    "userTypeIndividualFeature2": "Llogaritje e menjëhershme e çmimit",
+    "userTypeIndividualFeature3": "Pagesë me para në dorë ose me kartë",
+    
+    "userTypeBusiness": "Biznese",
+    "userTypeBusinessDesc": "Dërgesa restorantesh, dyqanesh ushqimore, farmacish dhe shitjes me pakicë",
+    "userTypeBusinessFeature1": "Zbritje për porosi në sasi të madhe",
+    "userTypeBusinessFeature2": "Faturim mujor",
+    "userTypeBusinessFeature3": "Integrimi API",
+    
+    "userTypeCourier": "Korierë",
+    "userTypeCourierDesc": "Punë fleksibël, mundësi e lartë fitimi",
+    "userTypeCourierFeature1": "Pagesë ditore/javore",
+    "userTypeCourierFeature2": "Punoni me automjetin tuaj",
+    "userTypeCourierFeature3": "Mbështetje sigurimesh",
+    
+    "statsAvgDelivery": "Dërgim Mesatar",
+    "statsActiveCouriers": "Korierë Aktivë",
+    "statsSatisfaction": "Kënaqësi",
+    "statsSupport": "Mbështetje",
+    
+    "faqTitle": "Pyetje të Shpeshta",
+    "faqSubtitle": "Përgjigje për gjithçka që ju intereson",
+    
+    "faq1Q": "Si llogaritet tarifa e dërgimit?",
+    "faq1A": "Llogaritet automatikisht bazuar në distancë, madhësi pakete dhe prioritet dërgimi. E shihni tarifën e saktë para se të bëni porosinë.",
+    
+    "faq2Q": "Cilat janë opsionet e pagesës?",
+    "faq2A": "Pranojmë kartë krediti, kartë debiti dhe pagesë me para në dorë. Opsioni i faturimit mujor është gjithashtu i disponueshëm për bizneset.",
+    
+    "faq3Q": "Sa kohë zgjat dërgimi?",
+    "faq3A": "Koha jonë mesatare e dërgimit është 15 minuta. Kjo mund të zgjatet pak gjatë orëve të ngarkuara.",
+    
+    "faq4Q": "Çfarë ndodh nëse paketa ime humbet?",
+    "faq4A": "Të gjitha dërgesat tona janë të siguruara. Nëse hasni probleme, ekipi ynë i mbështetjes 24/7 do të ndihmojë.",
+    
+    "ctaTitle": "Filloni Dërgimin Tuaj Tani",
+    "ctaSubtitle": "Bashkohuni me familjen tonë në rritje me mijëra klientë dhe qindra korierë",
+    "ctaDesc": "Mos humbisni 10% zbritje në porosinë tuaj të parë!",
+    "ctaCallCourier": "Thirr Korier",
+    "ctaBecomeCourier": "Bëhu Korier",
+    
+    "trustBadgeInsured": "Dërgim i Siguruar",
+    "trustBadgeSatisfaction": "98% Kënaqësi",
+    "trustBadgeSupport": "Mbështetje 24/7",
+    
+    "startNow": "Fillo Tani",
+    "becomeCourier": "Bëhu Korier"
+  }
+}

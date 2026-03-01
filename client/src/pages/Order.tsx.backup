@@ -1,0 +1,618 @@
+import { useAuth } from "@/_core/hooks/useAuth";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
+import Header from "@/components/Header";
+import Footer from "@/components/Footer";
+import { getLoginUrl } from "@/const";
+import { trpc } from "@/lib/trpc";
+import { Bike, MapPin, Package, Truck, ArrowRight, CheckCircle, Clock, DollarSign, Box, Zap, AlertCircle, ChevronDown } from "lucide-react";
+import { useState, useEffect } from "react";
+import { useLocation } from "wouter";
+import { toast } from "sonner";
+import { useTranslation } from "@/lib/i18n";
+import { useLanguage } from "@/contexts/LanguageContext";
+import { useCanonical } from "@/hooks/useCanonical";
+import { updatePageSEO } from "@/lib/pageSeo";
+import { Star } from "lucide-react";
+import PricePreview from "@/components/PricePreview";
+import { AddressMapPicker } from "@/components/AddressMapPicker";
+
+export default function Order() {
+  const { t } = useTranslation();
+  const { language, isLoading: languageLoading } = useLanguage();
+  const { user, isAuthenticated, loading: authLoading } = useAuth();
+
+  // Canonical URL for SEO
+  useCanonical('https://fastlygo.mk/new-order');
+
+  // Update SEO meta tags
+  useEffect(() => {
+    updatePageSEO('order', language);
+  }, [language, languageLoading]);
+  const [, navigate] = useLocation();
+
+  const [showFavorites, setShowFavorites] = useState(false);
+  const [selectedFavoriteFor, setSelectedFavoriteFor] = useState<'pickup' | 'delivery' | null>(null);
+
+  // Get favorite addresses
+  const { data: favoriteAddresses = [] } = trpc.favoriteAddress.list.useQuery(undefined, {
+    enabled: !!user && !authLoading,
+    retry: false,
+  });
+
+  const [formData, setFormData] = useState({
+    orderType: "restaurant" as "restaurant" | "market" | "individual" | "express",
+    pickupAddress: "",
+    deliveryAddress: "",
+    pickupLatitude: "0",
+    pickupLongitude: "0",
+    deliveryLatitude: "0",
+    deliveryLongitude: "0",
+    vehicleType: "any" as "bicycle" | "motorcycle" | "car" | "any",
+    packageSize: "medium" as "small" | "medium" | "large",
+    priority: "normal" as "normal" | "fast" | "urgent",
+    packageDescription: "",
+    specialInstructions: "",
+    pricingScenario: "A" as "A" | "B" | "C",
+    paymentType: "sender_pays" as "sender_pays" | "receiver_pays",
+    paymentMethod: "cash" as "cash" | "card" | "wallet",
+    deliveryTimeType: "now" as "now" | "scheduled",
+    scheduledDeliveryDate: "",
+    scheduledTimeSlot: "",
+  });
+
+  const [promoCode, setPromoCode] = useState("");
+  const [discount, setDiscount] = useState(0);
+  const [estimatedFee] = useState(5.00);
+
+  const createOrderMutation = trpc.orders.create.useMutation({
+    onSuccess: (data) => {
+      toast.success(`${t('orderCreated')} ${data.orderNumber}`);
+      navigate("/my-orders");
+    },
+    onError: (error) => {
+      toast.error(`Hata: ${error.message}`);
+    },
+  });
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!isAuthenticated) {
+      window.location.href = "/login";
+      return;
+    }
+
+    if (!formData.pickupAddress || !formData.deliveryAddress) {
+      toast.error(t('pleaseEnterAddresses'));
+      return;
+    }
+
+    createOrderMutation.mutate(formData);
+  };
+
+  return (
+    <div className="min-h-screen bg-gradient-to-b from-orange-50/30 via-white to-orange-50/20">
+      <Header />
+
+      {/* Hero Section - Modern Gradient */}
+      <section className="relative overflow-hidden py-12 md:py-20 lg:py-28">
+        {/* Gradient Background */}
+        <div className="absolute inset-0 bg-gradient-to-br from-orange-500 via-orange-600 to-amber-600" />
+        <div className="absolute top-20 right-20 w-96 h-96 bg-white/10 rounded-full blur-3xl" />
+        <div className="absolute bottom-20 left-20 w-96 h-96 bg-white/10 rounded-full blur-3xl" />
+        
+        <div className="container relative">
+          <div className="max-w-4xl mx-auto text-center text-white space-y-6">
+            <div className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-white/20 backdrop-blur-sm border border-white/30 text-white text-sm font-semibold shadow-lg">
+              <Package className="w-5 h-5" />
+              <span>{t('newOrder')}</span>
+            </div>
+            <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold leading-tight">
+              {t('placeOrderTitle')}
+            </h1>
+            <p className="text-xl md:text-2xl opacity-95 max-w-3xl mx-auto leading-relaxed">
+              {t('placeOrderDesc')}
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <div className="container mx-auto px-4 md:px-6 py-8 md:py-16 -mt-8 md:-mt-12">
+        <div className="grid lg:grid-cols-3 gap-8">
+          {/* Main Form */}
+          <div className="lg:col-span-2">
+            <Card className="shadow-2xl border-none bg-white rounded-3xl overflow-hidden">
+              <CardHeader className="bg-gradient-to-r from-orange-50 via-orange-100/50 to-orange-50 border-b border-orange-200/50 p-4 md:p-6 lg:p-8">
+                <CardTitle className="text-2xl md:text-3xl font-bold text-gray-900">{t('orderDetails')}</CardTitle>
+                <CardDescription className="text-gray-600 text-base md:text-lg mt-2">
+                  {t('orderDetailsDesc')}
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="p-4 md:p-6 lg:p-8 xl:p-10 space-y-6 md:space-y-8 lg:space-y-10">
+                <form onSubmit={handleSubmit} className="space-y-6 md:space-y-8 lg:space-y-10">
+                  {/* Order Type */}
+                  <div className="space-y-5">
+                    <Label className="text-lg md:text-xl font-bold text-gray-900 flex items-center gap-2 md:gap-3">
+                      <div className="w-8 h-8 md:w-10 md:h-10 rounded-xl md:rounded-2xl bg-gradient-to-br from-orange-500 to-orange-600 flex items-center justify-center shadow-lg">
+                        <Package className="h-5 w-5 text-white" />
+                      </div>
+                      {t('deliveryType')}
+                    </Label>
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
+                      {[
+                        { value: "restaurant", label: t('restaurant'), icon: "🍽️", color: "from-orange-500 to-orange-600" },
+                        { value: "market", label: t('market'), icon: "🛒", color: "from-blue-500 to-blue-600" },
+                        { value: "individual", label: t('individual'), icon: "📦", color: "from-green-500 to-green-600" },
+                        { value: "express", label: t('express'), icon: "⚡", color: "from-purple-500 to-purple-600" },
+                      ].map((type) => (
+                        <button
+                          key={type.value}
+                          type="button"
+                          onClick={() => setFormData({ ...formData, orderType: type.value as any })}
+                          className={`group relative p-4 md:p-5 lg:p-6 rounded-xl md:rounded-2xl border-2 transition-all duration-300 text-center transform hover:scale-105 ${
+                            formData.orderType === type.value
+                              ? "border-orange-500 bg-gradient-to-br from-orange-50 to-orange-100 shadow-xl"
+                              : "border-gray-200 hover:border-orange-300 bg-white hover:shadow-lg"
+                          }`}
+                        >
+                          <div className="text-5xl mb-3">{type.icon}</div>
+                          <div className="font-bold text-base text-gray-900">{type.label}</div>
+                          {formData.orderType === type.value && (
+                            <div className="absolute top-2 right-2 w-6 h-6 rounded-full bg-gradient-to-br from-orange-500 to-orange-600 flex items-center justify-center shadow-lg">
+                              <CheckCircle className="w-4 h-4 text-white" />
+                            </div>
+                          )}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Favorite Addresses */}
+                  {isAuthenticated && favoriteAddresses.length > 0 && (
+                    <div className="p-6 bg-gradient-to-br from-orange-50/50 to-amber-50/50 rounded-2xl border border-orange-100">
+                      <button
+                        type="button"
+                        onClick={() => setShowFavorites(!showFavorites)}
+                        className="w-full flex items-center justify-between text-left group"
+                      >
+                        <div className="flex items-center gap-3">
+                          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-orange-500 to-orange-600 flex items-center justify-center shadow-md">
+                            <Star className="h-5 w-5 text-white fill-white" />
+                          </div>
+                          <div>
+                            <h3 className="font-bold text-gray-900 text-lg">{t('favoriteAddresses')}</h3>
+                            <p className="text-sm text-gray-600">{t('clickToSelect')}</p>
+                          </div>
+                        </div>
+                        <ChevronDown className={`h-5 w-5 text-gray-600 transition-transform ${showFavorites ? 'rotate-180' : ''}`} />
+                      </button>
+                      
+                      {showFavorites && (
+                        <div className="mt-4 space-y-3 max-h-64 overflow-y-auto">
+                          {favoriteAddresses.map((addr) => (
+                            <div key={addr.id} className="p-4 bg-white rounded-xl border border-orange-100 hover:border-orange-300 transition-all">
+                              <div className="flex items-start gap-3 mb-3">
+                                <MapPin className="h-5 w-5 text-orange-600 flex-shrink-0 mt-0.5" />
+                                <div className="flex-1 min-w-0">
+                                  <h4 className="font-semibold text-gray-900 mb-1">{addr.label}</h4>
+                                  <p className="text-sm text-gray-600 line-clamp-2">{addr.address}</p>
+                                </div>
+                              </div>
+                              <div className="flex gap-2">
+                                <Button
+                                  type="button"
+                                  size="sm"
+                                  variant="outline"
+                                  className="flex-1 text-xs border-orange-200 hover:bg-orange-50 hover:border-orange-400 transition-all rounded-xl"
+                                  onClick={() => setFormData({ 
+                                    ...formData, 
+                                    pickupAddress: addr.address,
+                                    pickupLatitude: addr.latitude || "0",
+                                    pickupLongitude: addr.longitude || "0"
+                                  })}
+                                >
+                                  {t('useAsPickup')}
+                                </Button>
+                                <Button
+                                  type="button"
+                                  size="sm"
+                                  variant="outline"
+                                  className="flex-1 text-xs border-orange-200 hover:bg-orange-50 hover:border-orange-400 transition-all rounded-xl"
+                                  onClick={() => setFormData({ 
+                                    ...formData, 
+                                    deliveryAddress: addr.address,
+                                    deliveryLatitude: addr.latitude || "0",
+                                    deliveryLongitude: addr.longitude || "0"
+                                  })}
+                                >
+                                  {t('useAsDelivery')}
+                                </Button>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  {/* Addresses */}
+                  <div className="space-y-5">
+                    <Label className="text-lg md:text-xl font-bold text-gray-900 flex items-center gap-2 md:gap-3">
+                      <div className="w-8 h-8 md:w-10 md:h-10 rounded-xl md:rounded-2xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center shadow-lg">
+                        <MapPin className="h-5 w-5 text-white" />
+                      </div>
+                      {t('addresses')}
+                    </Label>
+                    <div className="grid md:grid-cols-2 gap-6">
+                      <AddressMapPicker
+                        label={t('pickupAddress')}
+                        value={formData.pickupAddress}
+                        onChange={(address, lat, lng) => setFormData({ 
+                          ...formData, 
+                          pickupAddress: address,
+                          pickupLatitude: String(lat),
+                          pickupLongitude: String(lng)
+                        })}
+                        placeholder={t('pickupAddressPlaceholder')}
+                      />
+
+                      <AddressMapPicker
+                        label={t('deliveryAddress')}
+                        value={formData.deliveryAddress}
+                        onChange={(address, lat, lng) => setFormData({ 
+                          ...formData, 
+                          deliveryAddress: address,
+                          deliveryLatitude: String(lat),
+                          deliveryLongitude: String(lng)
+                        })}
+                        placeholder={t('deliveryAddressPlaceholder')}
+                      />
+                    </div>
+                  </div>
+
+                  {/* Package Size - NEW */}
+                  <div className="space-y-5">
+                    <Label className="text-lg md:text-xl font-bold text-gray-900 flex items-center gap-2 md:gap-3">
+                      <div className="w-8 h-8 md:w-10 md:h-10 rounded-xl md:rounded-2xl bg-gradient-to-br from-green-500 to-green-600 flex items-center justify-center shadow-lg">
+                        <Box className="h-5 w-5 text-white" />
+                      </div>
+                      {t('packageSize')}
+                    </Label>
+                    <div className="grid grid-cols-3 gap-4">
+                      {[
+                        { value: "small", label: t('small'), icon: "📦", size: "< 5kg", color: "from-green-500 to-green-600" },
+                        { value: "medium", label: t('medium'), icon: "📦", size: "5-15kg", color: "from-blue-500 to-blue-600" },
+                        { value: "large", label: t('large'), icon: "📦", size: "> 15kg", color: "from-orange-500 to-orange-600" },
+                      ].map((size) => (
+                        <button
+                          key={size.value}
+                          type="button"
+                          onClick={() => setFormData({ ...formData, packageSize: size.value as any })}
+                          className={`group relative p-4 md:p-5 lg:p-6 rounded-xl md:rounded-2xl border-2 transition-all duration-300 text-center transform hover:scale-105 ${
+                            formData.packageSize === size.value
+                              ? "border-orange-500 bg-gradient-to-br from-orange-50 to-orange-100 shadow-xl"
+                              : "border-gray-200 hover:border-orange-300 bg-white hover:shadow-lg"
+                          }`}
+                        >
+                          <div className="text-4xl mb-3">{size.icon}</div>
+                          <div className="font-bold text-base text-gray-900 mb-1">{size.label}</div>
+                          <div className="text-sm text-gray-600">{size.size}</div>
+                          {formData.packageSize === size.value && (
+                            <div className="absolute top-2 right-2 w-6 h-6 rounded-full bg-gradient-to-br from-orange-500 to-orange-600 flex items-center justify-center shadow-lg">
+                              <CheckCircle className="w-4 h-4 text-white" />
+                            </div>
+                          )}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Priority Level - NEW */}
+                  <div className="space-y-5">
+                    <Label className="text-lg md:text-xl font-bold text-gray-900 flex items-center gap-2 md:gap-3">
+                      <div className="w-8 h-8 md:w-10 md:h-10 rounded-xl md:rounded-2xl bg-gradient-to-br from-purple-500 to-purple-600 flex items-center justify-center shadow-lg">
+                        <Zap className="h-5 w-5 text-white" />
+                      </div>
+                      {t('priority')}
+                    </Label>
+                    <div className="grid grid-cols-3 gap-4">
+                      {[
+                        { value: "normal", label: t('normal'), icon: "🟢", time: "+30 min", color: "from-green-500 to-green-600" },
+                        { value: "fast", label: t('fast'), icon: "🟡", time: "+15 min", color: "from-yellow-500 to-yellow-600" },
+                        { value: "urgent", label: t('urgent'), icon: "🔴", time: "ASAP", color: "from-red-500 to-red-600" },
+                      ].map((priority) => (
+                        <button
+                          key={priority.value}
+                          type="button"
+                          onClick={() => setFormData({ ...formData, priority: priority.value as any })}
+                          className={`group relative p-4 md:p-5 lg:p-6 rounded-xl md:rounded-2xl border-2 transition-all duration-300 text-center transform hover:scale-105 ${
+                            formData.priority === priority.value
+                              ? "border-orange-500 bg-gradient-to-br from-orange-50 to-orange-100 shadow-xl"
+                              : "border-gray-200 hover:border-orange-300 bg-white hover:shadow-lg"
+                          }`}
+                        >
+                          <div className="text-4xl mb-3">{priority.icon}</div>
+                          <div className="font-bold text-base text-gray-900 mb-1">{priority.label}</div>
+                          <div className="text-sm text-gray-600">{priority.time}</div>
+                          {formData.priority === priority.value && (
+                            <div className="absolute top-2 right-2 w-6 h-6 rounded-full bg-gradient-to-br from-orange-500 to-orange-600 flex items-center justify-center shadow-lg">
+                              <CheckCircle className="w-4 h-4 text-white" />
+                            </div>
+                          )}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Vehicle Type */}
+                  <div className="space-y-5">
+                    <Label className="text-lg md:text-xl font-bold text-gray-900 flex items-center gap-2 md:gap-3">
+                      <div className="w-8 h-8 md:w-10 md:h-10 rounded-xl md:rounded-2xl bg-gradient-to-br from-indigo-500 to-indigo-600 flex items-center justify-center shadow-lg">
+                        <Bike className="h-5 w-5 text-white" />
+                      </div>
+                      {t('vehiclePreference')}
+                    </Label>
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
+                      {[
+                        { value: "bicycle", label: t('bicycle'), icon: <Bike className="h-8 w-8" />, color: "from-green-500 to-green-600" },
+                        { value: "motorcycle", label: t('motorcycle'), icon: <Bike className="h-8 w-8" />, color: "from-blue-500 to-blue-600" },
+                        { value: "car", label: t('car'), icon: <Truck className="h-8 w-8" />, color: "from-orange-500 to-orange-600" },
+                        { value: "any", label: t('anyVehicle'), icon: <Package className="h-8 w-8" />, color: "from-purple-500 to-purple-600" },
+                      ].map((vehicle) => (
+                        <button
+                          key={vehicle.value}
+                          type="button"
+                          onClick={() => setFormData({ ...formData, vehicleType: vehicle.value as any })}
+                          className={`group relative p-4 md:p-5 lg:p-6 rounded-xl md:rounded-2xl border-2 transition-all duration-300 flex flex-col items-center gap-3 transform hover:scale-105 ${
+                            formData.vehicleType === vehicle.value
+                              ? "border-orange-500 bg-gradient-to-br from-orange-50 to-orange-100 shadow-xl"
+                              : "border-gray-200 hover:border-orange-300 bg-white hover:shadow-lg"
+                          }`}
+                        >
+                          <div className="text-orange-600">{vehicle.icon}</div>
+                          <div className="font-bold text-sm text-gray-900">{vehicle.label}</div>
+                          {formData.vehicleType === vehicle.value && (
+                            <div className="absolute top-2 right-2 w-6 h-6 rounded-full bg-gradient-to-br from-orange-500 to-orange-600 flex items-center justify-center shadow-lg">
+                              <CheckCircle className="w-4 h-4 text-white" />
+                            </div>
+                          )}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Payment Type */}
+                  <div className="space-y-5">
+                    <Label className="text-lg md:text-xl font-bold text-gray-900 flex items-center gap-2 md:gap-3">
+                      <div className="w-8 h-8 md:w-10 md:h-10 rounded-xl md:rounded-2xl bg-gradient-to-br from-amber-500 to-amber-600 flex items-center justify-center shadow-lg">
+                        <DollarSign className="h-5 w-5 text-white" />
+                      </div>
+                      {t('paymentType')}
+                    </Label>
+                    <div className="grid grid-cols-2 gap-4">
+                      <button
+                        type="button"
+                        onClick={() => setFormData({ ...formData, paymentType: "sender_pays" })}
+                        className={`group relative p-5 md:p-6 lg:p-8 rounded-xl md:rounded-2xl border-2 transition-all duration-300 text-center transform hover:scale-105 ${
+                          formData.paymentType === "sender_pays"
+                            ? "border-orange-500 bg-gradient-to-br from-orange-50 to-orange-100 shadow-xl"
+                            : "border-gray-200 hover:border-orange-300 bg-white hover:shadow-lg"
+                        }`}
+                      >
+                        <div className="text-5xl mb-4">👤</div>
+                        <div className="font-bold text-lg mb-2 text-gray-900">{t('senderPays')}</div>
+                        <div className="text-sm text-gray-600">{t('senderPaysDesc')}</div>
+                        {formData.paymentType === "sender_pays" && (
+                          <div className="absolute top-3 right-3 w-7 h-7 rounded-full bg-gradient-to-br from-orange-500 to-orange-600 flex items-center justify-center shadow-lg">
+                            <CheckCircle className="w-5 h-5 text-white" />
+                          </div>
+                        )}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setFormData({ ...formData, paymentType: "receiver_pays" })}
+                        className={`group relative p-5 md:p-6 lg:p-8 rounded-xl md:rounded-2xl border-2 transition-all duration-300 text-center transform hover:scale-105 ${
+                          formData.paymentType === "receiver_pays"
+                            ? "border-orange-500 bg-gradient-to-br from-orange-50 to-orange-100 shadow-xl"
+                            : "border-gray-200 hover:border-orange-300 bg-white hover:shadow-lg"
+                        }`}
+                      >
+                        <div className="text-5xl mb-4">📦</div>
+                        <div className="font-bold text-lg mb-2 text-gray-900">{t('receiverPays')}</div>
+                        <div className="text-sm text-gray-600">{t('receiverPaysDesc')}</div>
+                        {formData.paymentType === "receiver_pays" && (
+                          <div className="absolute top-3 right-3 w-7 h-7 rounded-full bg-gradient-to-br from-orange-500 to-orange-600 flex items-center justify-center shadow-lg">
+                            <CheckCircle className="w-5 h-5 text-white" />
+                          </div>
+                        )}
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Payment Method */}
+                  <div className="space-y-5">
+                    <Label className="text-lg md:text-xl font-bold text-gray-900 flex items-center gap-2 md:gap-3">
+                      <div className="w-8 h-8 md:w-10 md:h-10 rounded-xl md:rounded-2xl bg-gradient-to-br from-pink-500 to-pink-600 flex items-center justify-center shadow-lg">
+                        <DollarSign className="h-5 w-5 text-white" />
+                      </div>
+                      {t('paymentMethod')}
+                    </Label>
+                    <div className="grid grid-cols-3 gap-4">
+                      {[
+                        { value: "cash", label: t('cash'), icon: "💵" },
+                        { value: "card", label: t('card'), icon: "💳" },
+                        { value: "wallet", label: t('wallet'), icon: "👛" },
+                      ].map((method) => (
+                        <button
+                          key={method.value}
+                          type="button"
+                          onClick={() => setFormData({ ...formData, paymentMethod: method.value as any })}
+                          className={`group relative p-4 md:p-5 lg:p-6 rounded-xl md:rounded-2xl border-2 transition-all duration-300 text-center transform hover:scale-105 ${
+                            formData.paymentMethod === method.value
+                              ? "border-orange-500 bg-gradient-to-br from-orange-50 to-orange-100 shadow-xl"
+                              : "border-gray-200 hover:border-orange-300 bg-white hover:shadow-lg"
+                          }`}
+                        >
+                          <div className="text-4xl mb-3">{method.icon}</div>
+                          <div className="font-bold text-sm text-gray-900">{method.label}</div>
+                          {formData.paymentMethod === method.value && (
+                            <div className="absolute top-2 right-2 w-6 h-6 rounded-full bg-gradient-to-br from-orange-500 to-orange-600 flex items-center justify-center shadow-lg">
+                              <CheckCircle className="w-4 h-4 text-white" />
+                            </div>
+                          )}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Delivery Time */}
+                  <div className="space-y-5">
+                    <Label className="text-lg md:text-xl font-bold text-gray-900 flex items-center gap-2 md:gap-3">
+                      <div className="w-8 h-8 md:w-10 md:h-10 rounded-xl md:rounded-2xl bg-gradient-to-br from-cyan-500 to-cyan-600 flex items-center justify-center shadow-lg">
+                        <Clock className="h-5 w-5 text-white" />
+                      </div>
+                      {t('deliveryTime')}
+                    </Label>
+                    <div className="grid grid-cols-2 gap-4">
+                      <button
+                        type="button"
+                        onClick={() => setFormData({ ...formData, deliveryTimeType: "now" })}
+                        className={`group relative p-5 md:p-6 lg:p-7 rounded-xl md:rounded-2xl border-2 transition-all duration-300 text-center transform hover:scale-105 ${
+                          formData.deliveryTimeType === "now"
+                            ? "border-orange-500 bg-gradient-to-br from-orange-50 to-orange-100 shadow-xl"
+                            : "border-gray-200 hover:border-orange-300 bg-white hover:shadow-lg"
+                        }`}
+                      >
+                        <div className="text-4xl mb-3">⚡</div>
+                        <div className="font-bold text-lg text-gray-900">{t('deliveryNow')}</div>
+                        {formData.deliveryTimeType === "now" && (
+                          <div className="absolute top-3 right-3 w-7 h-7 rounded-full bg-gradient-to-br from-orange-500 to-orange-600 flex items-center justify-center shadow-lg">
+                            <CheckCircle className="w-5 h-5 text-white" />
+                          </div>
+                        )}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setFormData({ ...formData, deliveryTimeType: "scheduled" })}
+                        className={`group relative p-5 md:p-6 lg:p-7 rounded-xl md:rounded-2xl border-2 transition-all duration-300 text-center transform hover:scale-105 ${
+                          formData.deliveryTimeType === "scheduled"
+                            ? "border-orange-500 bg-gradient-to-br from-orange-50 to-orange-100 shadow-xl"
+                            : "border-gray-200 hover:border-orange-300 bg-white hover:shadow-lg"
+                        }`}
+                      >
+                        <div className="text-4xl mb-3">📅</div>
+                        <div className="font-bold text-lg text-gray-900">{t('deliveryScheduled')}</div>
+                        {formData.deliveryTimeType === "scheduled" && (
+                          <div className="absolute top-3 right-3 w-7 h-7 rounded-full bg-gradient-to-br from-orange-500 to-orange-600 flex items-center justify-center shadow-lg">
+                            <CheckCircle className="w-5 h-5 text-white" />
+                          </div>
+                        )}
+                      </button>
+                    </div>
+
+                    {formData.deliveryTimeType === "scheduled" && (
+                      <div className="grid md:grid-cols-2 gap-4 mt-4 p-6 bg-gradient-to-br from-orange-50/50 to-amber-50/50 rounded-2xl border border-orange-100">
+                        <div className="space-y-2">
+                          <Label className="text-sm font-semibold text-gray-700">{t('selectDate')}</Label>
+                          <Input
+                            type="date"
+                            value={formData.scheduledDeliveryDate}
+                            onChange={(e) => setFormData({ ...formData, scheduledDeliveryDate: e.target.value })}
+                            className="border-orange-200 focus:border-orange-400 focus:ring-orange-400 rounded-xl"
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label className="text-sm font-semibold text-gray-700">{t('selectTime')}</Label>
+                          <Select
+                            value={formData.scheduledTimeSlot}
+                            onValueChange={(value) => setFormData({ ...formData, scheduledTimeSlot: value })}
+                          >
+                            <SelectTrigger className="border-orange-200 focus:border-orange-400 focus:ring-orange-400 rounded-xl">
+                              <SelectValue placeholder={t('selectTimeSlot')} />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="09:00-12:00">09:00 - 12:00</SelectItem>
+                              <SelectItem value="12:00-15:00">12:00 - 15:00</SelectItem>
+                              <SelectItem value="15:00-18:00">15:00 - 18:00</SelectItem>
+                              <SelectItem value="18:00-21:00">18:00 - 21:00</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Package Description */}
+                  <div className="space-y-4">
+                    <Label className="text-lg font-bold text-gray-900">{t('packageDescription')}</Label>
+                    <Textarea
+                      placeholder={t('packageDescription')}
+                      value={formData.packageDescription}
+                      onChange={(e) => setFormData({ ...formData, packageDescription: e.target.value })}
+                      rows={4}
+                      className="resize-none border-orange-200 focus:border-orange-400 focus:ring-orange-400 rounded-2xl text-base"
+                    />
+                  </div>
+
+                  {/* Special Instructions */}
+                  <div className="space-y-4">
+                    <Label className="text-lg font-bold text-gray-900">{t('specialInstructions')}</Label>
+                    <Textarea
+                      placeholder={t('specialInstructionsPlaceholder')}
+                      value={formData.specialInstructions}
+                      onChange={(e) => setFormData({ ...formData, specialInstructions: e.target.value })}
+                      rows={4}
+                      className="resize-none border-orange-200 focus:border-orange-400 focus:ring-orange-400 rounded-2xl text-base"
+                    />
+                  </div>
+
+                  {/* Submit Button */}
+                  <div className="pt-6">
+                    <Button
+                      type="submit"
+                      disabled={createOrderMutation.isPending}
+                      className="w-full bg-gradient-to-r from-orange-500 via-orange-600 to-amber-600 hover:from-orange-600 hover:via-orange-700 hover:to-amber-700 text-white font-bold py-7 rounded-2xl shadow-2xl hover:shadow-3xl transition-all duration-300 transform hover:scale-105 text-xl"
+                    >
+                      {createOrderMutation.isPending ? (
+                        <span className="flex items-center justify-center gap-3">
+                          <div className="w-6 h-6 border-3 border-white border-t-transparent rounded-full animate-spin" />
+                          {t('processing')}...
+                        </span>
+                      ) : (
+                        <span className="flex items-center justify-center gap-3">
+                          <CheckCircle className="h-6 w-6" />
+                          {t('confirmOrder')}
+                          <ArrowRight className="h-6 w-6" />
+                        </span>
+                      )}
+                    </Button>
+                  </div>
+                </form>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Sidebar - Price Preview */}
+          <div className="lg:col-span-1">
+            <div className="sticky top-24">
+              <PricePreview
+                orderType={formData.orderType}
+                vehicleType={formData.vehicleType}
+                pickupAddress={formData.pickupAddress}
+                deliveryAddress={formData.deliveryAddress}
+                isUrgent={formData.deliveryTimeType === 'now'}
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <Footer />
+    </div>
+  );
+}

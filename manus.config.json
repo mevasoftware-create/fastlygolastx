@@ -1,0 +1,12 @@
+{
+  "seo": {
+    "generateSitemap": false,
+    "generateRobots": false
+  },
+  "build": {
+    "excludeFiles": [
+      "sitemap.xml",
+      "robots.txt"
+    ]
+  }
+}

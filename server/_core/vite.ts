@@ -5,11 +5,23 @@ import { nanoid } from "nanoid";
 import path from "path";
 import { createServer as createViteServer } from "vite";
 import viteConfig from "../../vite.config";
+import { injectSeoTags } from "./seoMiddleware";
 
 export async function setupVite(app: Express, server: Server) {
+  const serverPort = parseInt(process.env.PORT || "3000");
   const serverOptions = {
-    middlewareMode: true,
-    hmr: { server },
+    // Spread viteConfig.server first so allowedHosts etc. are preserved
+    ...(viteConfig.server as Record<string, unknown> || {}),
+    middlewareMode: true as const,
+    // port must match Express server port so Vite builds correct serverHost for HMR WebSocket
+    port: serverPort,
+    // HMR: attach to Express HTTP server so Vite does NOT fall back to port 24678
+    // Manus proxy does not support WebSocket upgrade, so connections will fail silently
+    // overlay: false suppresses the error overlay in the browser
+    hmr: {
+      server,
+      overlay: false,
+    },
     allowedHosts: true as const,
   };
 
@@ -38,7 +50,9 @@ export async function setupVite(app: Express, server: Server) {
         `src="/src/main.tsx"`,
         `src="/src/main.tsx?v=${nanoid()}"`
       );
-      const page = await vite.transformIndexHtml(url, template);
+      let page = await vite.transformIndexHtml(url, template);
+      // Inject SEO tags server-side before sending to client
+      page = injectSeoTags(page, url);
       res.status(200).set({ "Content-Type": "text/html" }).end(page);
     } catch (e) {
       vite.ssrFixStacktrace(e as Error);
@@ -61,7 +75,17 @@ export function serveStatic(app: Express) {
   app.use(express.static(distPath));
 
   // fall through to index.html if the file doesn't exist
-  app.use("*", (_req, res) => {
-    res.sendFile(path.resolve(distPath, "index.html"));
+  app.use("*", (req, res) => {
+    const indexPath = path.resolve(distPath, "index.html");
+    fs.readFile(indexPath, "utf-8", (err, html) => {
+      if (err) {
+        res.sendFile(indexPath);
+        return;
+      }
+      // Inject SEO tags server-side
+      const url = req.originalUrl || req.url;
+      const injectedHtml = injectSeoTags(html, url);
+      res.status(200).set({ "Content-Type": "text/html" }).end(injectedHtml);
+    });
   });
 }
