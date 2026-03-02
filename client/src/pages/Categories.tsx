@@ -58,9 +58,9 @@ export default function Categories() {
   return (
     <>
       <SEOHead
-        title={pageSeo.title || 'Delivery Categories | FastlyGo'}
-        description={pageSeo.description || 'Browse all delivery categories. Food delivery, groceries, pharmacy, flowers, and more. Fast delivery in Skopje, Macedonia.'}
-        keywords={pageSeo.keywords || 'delivery categories, food delivery, grocery delivery, pharmacy delivery'}
+        title={isSeoLoading ? '' : (pageSeo.title || 'Delivery Categories | FastlyGo')}
+        description={isSeoLoading ? '' : (pageSeo.description || 'Browse all delivery categories. Food delivery, groceries, pharmacy, flowers, and more. Fast delivery in Skopje, Macedonia.')}
+        keywords={isSeoLoading ? '' : (pageSeo.keywords || 'delivery categories, food delivery, grocery delivery, pharmacy delivery')}
       />
       <div className="min-h-screen bg-gradient-to-b from-orange-50 via-white to-orange-50">
         <Header />

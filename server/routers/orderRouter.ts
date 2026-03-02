@@ -408,7 +408,7 @@ export const orderRouter = router({
           .set({
             courierId: ctx.user.id,
             status: "accepted",
-            acceptedAt: new Date(),
+            acceptedAt: sql`NOW()`,
           })
           .where(eq(orders.id, input.orderId));
 

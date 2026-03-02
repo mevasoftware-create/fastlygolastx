@@ -4,7 +4,7 @@ import { TRPCError } from "@trpc/server";
 import * as db from "../db";
 import { getDb } from "../db";
 import { users } from "../../drizzle/schema";
-import { eq } from "drizzle-orm";
+import { eq, sql } from "drizzle-orm";
 import bcryptjs from "bcryptjs";
 
 export const userRouter = router({
@@ -35,7 +35,7 @@ export const userRouter = router({
           name: input.name,
           phone: input.phone,
           avatarUrl: input.avatarUrl,
-          updatedAt: new Date(),
+          updatedAt: sql`NOW()`,
         })
         .where(eq(users.id, ctx.user.id));
 
@@ -121,7 +121,7 @@ export const userRouter = router({
       
       await dbInstance
         .update(users)
-        .set({ avatarUrl: url, updatedAt: new Date() })
+        .set({ avatarUrl: url, updatedAt: sql`NOW()` })
         .where(eq(users.id, ctx.user.id));
       
       return { success: true, avatarUrl: url };

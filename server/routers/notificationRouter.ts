@@ -158,7 +158,7 @@ export const notificationRouter = router({
             p256dh: input.p256dh,
             auth: input.auth,
             isActive: true,
-            lastUsedAt: new Date(),
+            lastUsedAt: sql`NOW()`,
           })
           .where(eq(pushTokens.endpoint, input.endpoint));
       } else {

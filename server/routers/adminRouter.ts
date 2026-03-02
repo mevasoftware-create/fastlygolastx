@@ -912,7 +912,7 @@ export const adminRouter = router({
 
       await dbInstance
         .update(paymentRequests)
-        .set({ status: "approved", processedAt: new Date(), notes: input.notes, processedBy: 1 })
+        .set({ status: "approved", processedAt: sql`NOW()`, notes: input.notes, processedBy: 1 })
         .where(eq(paymentRequests.id, input.requestId));
 
       return { success: true };
@@ -944,7 +944,7 @@ export const adminRouter = router({
 
       await dbInstance
         .update(paymentRequests)
-        .set({ status: "rejected", processedAt: new Date(), rejectionReason: input.reason, processedBy: 1 })
+        .set({ status: "rejected", processedAt: sql`NOW()`, rejectionReason: input.reason, processedBy: 1 })
         .where(eq(paymentRequests.id, input.requestId));
 
       return { success: true };
@@ -1119,7 +1119,7 @@ export const adminRouter = router({
         targetAudience: input.targetAudience,
         sentCount: tokens.length,
         failedCount: 0,
-        sentAt: new Date(),
+        sentAt: sql`NOW()`,
         createdBy: ctx.user?.id || 0,
       });
 

@@ -87,9 +87,9 @@ export const courierRouter = router({
           name: userName,
           role: "courier",
           loginMethod: "email",
-          createdAt: new Date(),
-          updatedAt: new Date(),
-          lastSignedIn: new Date(),
+          createdAt: sql`NOW()`,
+          updatedAt: sql`NOW()`,
+          lastSignedIn: sql`NOW()`,
         });
         
         // Get the last inserted user ID from database
@@ -410,7 +410,7 @@ export const courierRouter = router({
         .set({
           courierId: courier[0].id,
           status: "accepted",
-          acceptedAt: new Date(),
+          acceptedAt: sql`NOW()`,
         })
         .where(eq(orders.id, input.orderId));
 

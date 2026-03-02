@@ -93,9 +93,9 @@ export default function Areas() {
   return (
     <>
       <SEOHead
-        title={seoData.title || t('areas') + ' - FastlyGo'}
-        description={seoData.description || 'Explore our delivery coverage areas across North Macedonia. Fast delivery in Skopje and beyond.'}
-        keywords={seoData.keywords || 'delivery areas, Skopje delivery, courier service areas'}
+        title={isSeoLoading ? '' : (seoData.title || t('areas') + ' - FastlyGo')}
+        description={isSeoLoading ? '' : (seoData.description || 'Explore our delivery coverage areas across North Macedonia. Fast delivery in Skopje and beyond.')}
+        keywords={isSeoLoading ? '' : (seoData.keywords || 'delivery areas, Skopje delivery, courier service areas')}
       />
 
       <div className="min-h-screen flex flex-col bg-white">

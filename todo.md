@@ -112,3 +112,6 @@
 - [x] SEOHead'deki boş string gelince title tag render edilmiyor (index.html başlığı korunuyor)
 - [x] Services.tsx, AboutUs.tsx, HowItWorks.tsx isSeoLoading guard eklendi
 - [x] about-us, how-it-works, services sayfaları test edildi - başlık tek seferde doğru değere geçiyor
+
+## Kurye Sipariş Kabul Hatası (03.03.2026)
+- [ ] acceptedAt datetime format hatası düzeltilecek (Failed query: update orders set acceptedAt)

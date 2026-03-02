@@ -1,7 +1,7 @@
 import { router, publicProcedure, protectedProcedure } from "../_core/trpc";
 import { getDb } from "../db";
 import { businesses, users } from "../../drizzle/schema";
-import { eq } from "drizzle-orm";
+import { eq, sql } from "drizzle-orm";
 import { z } from "zod";
 import bcryptjs from "bcryptjs";
 
@@ -69,9 +69,9 @@ export const businessRouter = router({
             name: input.contactPerson || input.businessName,
             role: "business",
             loginMethod: "email",
-            createdAt: new Date(),
-            updatedAt: new Date(),
-            lastSignedIn: new Date(),
+            createdAt: sql`NOW()`,
+            updatedAt: sql`NOW()`,
+            lastSignedIn: sql`NOW()`,
           });
           
           // Get the last inserted user ID from database
@@ -93,8 +93,8 @@ export const businessRouter = router({
           balance: 0,
           totalDebt: 0,
           isVerified: false,
-          createdAt: new Date(),
-          updatedAt: new Date(),
+          createdAt: sql`NOW()`,
+          updatedAt: sql`NOW()`,
         });
 
         return {

@@ -196,7 +196,7 @@ export const referralRouter = router({
         .set({
           status: "rewarded",
           rewardAmount: REFERRAL_REWARD,
-          rewardedAt: new Date(),
+          rewardedAt: sql`NOW()`,
         })
         .where(eq(referrals.id, input.referralId));
 
