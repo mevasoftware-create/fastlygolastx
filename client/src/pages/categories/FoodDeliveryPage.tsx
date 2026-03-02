@@ -20,7 +20,7 @@ export default function FoodDeliveryPage() {
     refetchOnWindowFocus: false,
   });
 
-  const translations = category ? JSON.parse(category.seoMeta) : {};
+  const translations = category?.seoMeta ? (typeof category.seoMeta === 'string' ? JSON.parse(category.seoMeta) : category.seoMeta as Record<string, any>) : {};
   const content = translations[language] || translations.en || {};
   const seoData = useSeoFromDatabase(category?.seoMeta);
 

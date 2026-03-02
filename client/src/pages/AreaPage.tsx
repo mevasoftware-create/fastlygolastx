@@ -205,7 +205,7 @@ export default function AreaPage() {
   const currentUrl = language !== 'en' 
     ? `${BASE_URL}/areas/${slug}?lang=${language}`
     : `${BASE_URL}/areas/${slug}`;
-  const seoMeta = area?.seoMeta ? JSON.parse(area.seoMeta) : null;
+  const seoMeta = area?.seoMeta ? (typeof area.seoMeta === 'object' ? area.seoMeta as Record<string, any> : null) : null;
   const content = seoMeta ? (seoMeta[language] || seoMeta.en || {}) : {};
   const finalTitle = seoData.title || content.title || '';
   const finalDescription = seoData.description || content.description || '';

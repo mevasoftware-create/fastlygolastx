@@ -228,27 +228,27 @@ export default function Services() {
     return translations[lang]?.[key] || translations.en[key] || key;
   };
 
-  const getCategoryName = (cat: { shortName: string }) => {
+  const getCategoryName = (cat: { shortName: any }) => {
     try {
-      const parsed = JSON.parse(cat.shortName);
+      const parsed = typeof cat.shortName === 'string' ? JSON.parse(cat.shortName) : cat.shortName;
       return parsed[lang] || parsed.en || "";
     } catch {
-      return cat.shortName;
+      return typeof cat.shortName === 'string' ? cat.shortName : "";
     }
   };
 
-  const getCategoryDescription = (cat: { seoMeta: string }) => {
+  const getCategoryDescription = (cat: { seoMeta: any }) => {
     try {
-      const parsed = JSON.parse(cat.seoMeta);
+      const parsed = typeof cat.seoMeta === 'string' ? JSON.parse(cat.seoMeta) : cat.seoMeta;
       return parsed[lang]?.description || parsed.en?.description || "";
     } catch {
       return "";
     }
   };
 
-  const getCategorySubtitle = (cat: { seoMeta: string }) => {
+  const getCategorySubtitle = (cat: { seoMeta: any }) => {
     try {
-      const parsed = JSON.parse(cat.seoMeta);
+      const parsed = typeof cat.seoMeta === 'string' ? JSON.parse(cat.seoMeta) : cat.seoMeta;
       return parsed[lang]?.subtitle || parsed.en?.subtitle || "";
     } catch {
       return "";

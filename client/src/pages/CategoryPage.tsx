@@ -414,7 +414,8 @@ export default function CategoryPage() {
   });
 
   // Call all hooks BEFORE any conditional returns (React Rules of Hooks)
-  const seoData = useSeoFromDatabase(category?.seoMeta || '{}');
+  // seoMeta comes as a JS object from tRPC (superjson), no JSON.parse needed
+  const seoData = useSeoFromDatabase(category?.seoMeta || {});
 
   // Redirect to 404 if category not found - DISABLED FOR GOOGLE INDEXING TEST
   // useEffect(() => {
@@ -425,7 +426,8 @@ export default function CategoryPage() {
 
   // Prepare SEO data BEFORE conditional return (for Google bot)
   const currentUrl = `${BASE_URL}/categories/${slug}`;
-  const seoMeta = category?.seoMeta ? JSON.parse(category.seoMeta) : null;
+  // seoMeta is already a JS object from tRPC - never JSON.parse it
+  const seoMeta = (category?.seoMeta && typeof category.seoMeta === 'object') ? category.seoMeta as Record<string, any> : null;
   const content = seoMeta ? (seoMeta[language] || seoMeta.en || {}) : {};
   const finalTitle = seoData.title || content.title || '';
   const finalDescription = seoData.description || content.description || '';
@@ -490,7 +492,7 @@ export default function CategoryPage() {
                 </div>
                 
                 <h1 className="text-4xl md:text-5xl font-bold text-gray-800 leading-tight">
-                  {category?.shortName ? JSON.parse(category.shortName)[language] : content.title}
+                  {category?.shortName ? (typeof category.shortName === 'object' ? (category.shortName as Record<string, string>)[language] || (category.shortName as Record<string, string>).en : content.title) : content.title}
                 </h1>
                 
                 <p className="text-lg md:text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
