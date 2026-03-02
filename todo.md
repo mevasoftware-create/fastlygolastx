@@ -96,3 +96,19 @@
 
 ## Bildirim Sistemi Düzeltmesi (02.03.2026)
 - [x] Admin panelinden bildirim gönderme hatası düzeltildi (push_notifications ve push_tokens tabloları oluşturuldu)
+
+## Web Push Bildirimi Entegrasyonu (02.03.2026)
+- [ ] VAPID anahtarları oluşturulacak
+- [ ] Service Worker (sw.js) yazılacak - push event dinleyicisi
+- [ ] Frontend: tarayıcıdan bildirim izni isteme akışı
+- [ ] Backend: push_tokens tablosuna token kaydetme endpoint'i
+- [ ] Backend: web-push kütüphanesiyle gerçek push gönderme servisi
+- [ ] Admin paneli: bildirimi gerçekten cihazlara iletecek şekilde güncelle
+
+## Tablo Temizliği (02.03.2026)
+- [x] restaurantTransactions tablosu veritabanından ve şemadan silindi
+
+## Başlık Titremesi Kalıcı Düzeltme (03.03.2026)
+- [x] SEOHead'deki boş string gelince title tag render edilmiyor (index.html başlığı korunuyor)
+- [x] Services.tsx, AboutUs.tsx, HowItWorks.tsx isSeoLoading guard eklendi
+- [x] about-us, how-it-works, services sayfaları test edildi - başlık tek seferde doğru değere geçiyor

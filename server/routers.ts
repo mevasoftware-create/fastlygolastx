@@ -29,7 +29,7 @@ import bcryptjs from "bcryptjs";
 import * as db from "./db";
 import { getDb } from "./db";
 import { TRPCError } from "@trpc/server";
-import { users, orders, businesses, restaurantTransactions, couriers, pricingConfig, paymentRequests, notifications } from "../drizzle/schema";
+import { users, orders, businesses, couriers, pricingConfig, paymentRequests, notifications } from "../drizzle/schema";
 import { sql, eq, desc, and, gte, lte } from "drizzle-orm";
 import { calculatePrice, calculateDistance as calcDist, estimateDeliveryTime, isPeakHour } from "./pricing";
 
@@ -1864,22 +1864,9 @@ export const appRouter = router({
       return restaurant[0];
     }),
 
-    // Get transaction history
-    getTransactions: protectedProcedure.query(async ({ ctx }) => {
-      const dbInstance = await getDb();
-      if (!dbInstance) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database not available" });
-
-      const restaurant = await dbInstance.select().from(businesses).where(eq(businesses.userId, ctx.user.id)).limit(1);
-      if (restaurant.length === 0) {
-        throw new TRPCError({ code: "NOT_FOUND", message: "Business not found" });
-      }
-
-      const transactions = await dbInstance.select().from(restaurantTransactions)
-        .where(eq(restaurantTransactions.restaurantId, restaurant[0].id))
-        .orderBy(desc(restaurantTransactions.createdAt))
-        .limit(50);
-      
-      return transactions;
+    // Get transaction history (deprecated - restaurantTransactions table removed)
+    getTransactions: protectedProcedure.query(async () => {
+      return [];
     }),
 
     // Get reports for date range

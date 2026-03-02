@@ -46,9 +46,10 @@ export default function Home() {
   const { t } = useTranslation();
 
    // Fetch home page SEO data from database
-  const { data: pageData } = trpc.pages.getBySlug.useQuery({ slug: 'home' }, {
+  const { data: pageData, isLoading: isSeoLoading } = trpc.pages.getBySlug.useQuery({ slug: 'home' }, {
     retry: false,
     refetchOnWindowFocus: false,
+    staleTime: 1000 * 60 * 60,
   });
   const seoData = useSeoFromDatabase(pageData?.seoMeta);
   // Fetch public statss
@@ -68,9 +69,9 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-orange-50/30 via-white to-amber-50/20">
       <SEOHead 
-        title={seoData.title || undefined}
-        description={seoData.description || undefined}
-        keywords={seoData.keywords || undefined}
+        title={isSeoLoading ? "" : (seoData.title || undefined)}
+        description={isSeoLoading ? "" : (seoData.description || undefined)}
+        keywords={isSeoLoading ? "" : (seoData.keywords || undefined)}
         titleKey="seoTitle"
         descriptionKey="seoDescription"
         keywordsKey="seoKeywords"

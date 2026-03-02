@@ -281,24 +281,6 @@ export const paymentRequests = mysqlTable("paymentRequests", {
 export type PaymentRequest = typeof paymentRequests.$inferSelect;
 export type InsertPaymentRequest = typeof paymentRequests.$inferInsert;
 
-/**
- * Restaurant transactions - balance top-ups and order charges
- */
-export const restaurantTransactions = mysqlTable("restaurantTransactions", {
-  id: int("id").autoincrement().primaryKey(),
-  restaurantId: int("restaurantId").notNull(),
-  type: mysqlEnum("type", ["topup", "order_charge", "refund", "adjustment"]).notNull(),
-  amount: int("amount").notNull(), // in cents, positive for topup/refund, negative for charges
-  balanceBefore: int("balanceBefore").notNull(), // in cents
-  balanceAfter: int("balanceAfter").notNull(), // in cents
-  relatedOrderId: int("relatedOrderId"), // for order_charge type
-  description: text("description"),
-  createdAt: timestamp("createdAt").defaultNow().notNull(),
-  createdBy: int("createdBy"), // admin user ID for manual adjustments
-});
-
-export type RestaurantTransaction = typeof restaurantTransactions.$inferSelect;
-export type InsertRestaurantTransaction = typeof restaurantTransactions.$inferInsert;
 
 /**
  * Favorite addresses for users
@@ -752,7 +734,10 @@ export type InsertPage = typeof pages.$inferInsert;
 export const pushTokens = mysqlTable("push_tokens", {
   id: int("id").autoincrement().primaryKey(),
   userId: int("userId"), // NULL for anonymous web users
-  token: text("token").notNull(), // FCM/Expo Push token or web push subscription
+  token: text("token").notNull().default(''), // FCM/Expo Push token (mobile)
+  endpoint: text("endpoint"), // Web Push subscription endpoint
+  p256dh: text("p256dh"), // Web Push p256dh key
+  auth: text("auth"), // Web Push auth secret
   platform: mysqlEnum("platform", ["web", "ios", "android"]).notNull(),
   deviceInfo: json("deviceInfo"), // Device details (browser, OS, device model, etc.)
   isActive: boolean("isActive").default(true).notNull(),
@@ -762,7 +747,6 @@ export const pushTokens = mysqlTable("push_tokens", {
 }, (table) => ({
   userIdIdx: index("pushToken_userId_idx").on(table.userId),
   platformIdx: index("pushToken_platform_idx").on(table.platform),
-  tokenIdx: index("pushToken_token_idx").on(table.token),
 }));
 
 export type PushToken = typeof pushTokens.$inferSelect;

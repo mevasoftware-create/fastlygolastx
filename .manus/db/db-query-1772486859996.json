@@ -1,0 +1,42 @@
+{
+  "query": "SELECT slug, CASE WHEN seoMeta IS NULL THEN 'NULL' WHEN seoMeta = '' THEN 'EMPTY' ELSE LEFT(seoMeta, 150) END as seoMeta_preview FROM pages ORDER BY slug;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4EV5ivwhyC7eCUY.ebc471170149 --database 4KwtmFvvd67FSFhQ5dyp9H --execute SELECT slug, CASE WHEN seoMeta IS NULL THEN 'NULL' WHEN seoMeta = '' THEN 'EMPTY' ELSE LEFT(seoMeta, 150) END as seoMeta_preview FROM pages ORDER BY slug;",
+  "rows": [
+    {
+      "slug": "about-us",
+      "seoMeta_preview": "{\"en\": {\"title\": \"About FastlyGo | Courier Service in Skopje\", \"description\": \"Leading courier and delivery service in Skopje. Fast, reliable, and aff"
+    },
+    {
+      "slug": "areas",
+      "seoMeta_preview": "{\"tr\": {\"title\": \"Teslimat B\\u00f6lgeleri | FastlyGo\", \"description\": \"Kuzey Makedonya genelinde h\\u0131zl\\u0131 ve g\\u00fcvenilir teslimat hizmeti. \\"
+    },
+    {
+      "slug": "home",
+      "seoMeta_preview": "{\"en\": {\"title\": \"FastlyGo - Food Delivery, Courier & Cargo Service in Skopje\", \"description\": \"Professional food delivery, courier and cargo service "
+    },
+    {
+      "slug": "how-it-works",
+      "seoMeta_preview": "{\"en\": {\"title\": \"How It Works | FastlyGo Delivery\", \"description\": \"Learn how FastlyGo delivery works. Simple steps to order courier service with rea"
+    },
+    {
+      "slug": "new-order",
+      "seoMeta_preview": "{\"en\": {\"badge\": \"New Order\", \"description\": \"Fast and reliable delivery\", \"heading\": \"Create Courier Order\", \"heroTitle\": \"Call a Courier\", \"keywords"
+    },
+    {
+      "slug": "privacy",
+      "seoMeta_preview": "{\"en\": {\"title\": \"Privacy Policy | FastlyGo\", \"description\": \"FastlyGo privacy policy. Learn how we protect your personal data and ensure secure deliv"
+    },
+    {
+      "slug": "services",
+      "seoMeta_preview": "{\"en\": {\"title\": \"Our Services | FastlyGo Delivery\", \"description\": \"Food, grocery, pharmacy, and package delivery services in Skopje. Fast delivery w"
+    },
+    {
+      "slug": "terms",
+      "seoMeta_preview": "{\"en\": {\"title\": \"Terms of Service | FastlyGo\", \"description\": \"FastlyGo terms of service. Read our delivery service agreement and user terms for cour"
+    }
+  ],
+  "messages": [],
+  "stdout": "slug\tseoMeta_preview\nabout-us\t{\"en\": {\"title\": \"About FastlyGo | Courier Service in Skopje\", \"description\": \"Leading courier and delivery service in Skopje. Fast, reliable, and aff\nareas\t{\"tr\": {\"title\": \"Teslimat B\\u00f6lgeleri | FastlyGo\", \"description\": \"Kuzey Makedonya genelinde h\\u0131zl\\u0131 ve g\\u00fcvenilir teslimat hizmeti. \\\nhome\t{\"en\": {\"title\": \"FastlyGo - Food Delivery, Courier & Cargo Service in Skopje\", \"description\": \"Professional food delivery, courier and cargo service \nhow-it-works\t{\"en\": {\"title\": \"How It Works | FastlyGo Delivery\", \"description\": \"Learn how FastlyGo delivery works. Simple steps to order courier service with rea\nnew-order\t{\"en\": {\"badge\": \"New Order\", \"description\": \"Fast and reliable delivery\", \"heading\": \"Create Courier Order\", \"heroTitle\": \"Call a Courier\", \"keywords\nprivacy\t{\"en\": {\"title\": \"Privacy Policy | FastlyGo\", \"description\": \"FastlyGo privacy policy. Learn how we protect your personal data and ensure secure deliv\nservices\t{\"en\": {\"title\": \"Our Services | FastlyGo Delivery\", \"description\": \"Food, grocery, pharmacy, and package delivery services in Skopje. Fast delivery w\nterms\t{\"en\": {\"title\": \"Terms of Service | FastlyGo\", \"description\": \"FastlyGo terms of service. Read our delivery service agreement and user terms for cour\n",
+  "stderr": "",
+  "execution_time_ms": 54
+}

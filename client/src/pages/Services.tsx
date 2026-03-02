@@ -96,13 +96,18 @@ export default function Services() {
   const cardRefs = useRef<(HTMLDivElement | null)[]>([]);
 
   // Fetch SEO from pages table
-  const { data: pageData } = trpc.pages.getBySlug.useQuery({ slug: 'services' }, {
+  const { data: pageData, isLoading: isSeoLoading } = trpc.pages.getBySlug.useQuery({ slug: 'services' }, {
     retry: false,
     refetchOnWindowFocus: false,
+    staleTime: 1000 * 60 * 60, // Cache 1 hour
   });
   const dbSeo = useSeoFromDatabase(pageData?.seoMeta);
   // Fetch categories from database
-  const { data: categories = [], isLoading } = trpc.categories.list.useQuery();
+  const { data: categories = [], isLoading } = trpc.categories.list.useQuery(undefined, {
+    retry: false,
+    refetchOnWindowFocus: false,
+    staleTime: 1000 * 60 * 60,
+  });
   // Intersection observer for scroll animations
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -265,9 +270,9 @@ export default function Services() {
   return (
     <div className="min-h-screen bg-white">
       <SEOHead
-        title={dbSeo.title || t("heroTag") + " - FastlyGo"}
-        description={dbSeo.description || t("heroSubtitle")}
-        keywords={dbSeo.keywords || "delivery services skopje, courier services, FastlyGo"}
+        title={isSeoLoading ? "" : dbSeo.title}
+        description={isSeoLoading ? "" : dbSeo.description}
+        keywords={isSeoLoading ? "" : dbSeo.keywords}
       />
       <Header />
 

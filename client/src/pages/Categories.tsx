@@ -51,7 +51,7 @@ export default function Categories() {
   );
 
   // Page SEO from pages table
-  const { data: pageData } = trpc.pages.getBySlug.useQuery({ slug: 'categories' }, { retry: false });
+  const { data: pageData, isLoading: isSeoLoading } = trpc.pages.getBySlug.useQuery({ slug: 'categories' }, { retry: false });
   const pageSeoMeta = pageData?.seoMeta ? (typeof pageData.seoMeta === 'string' ? JSON.parse(pageData.seoMeta) : pageData.seoMeta) : null;
   const pageSeo = pageSeoMeta?.[language] || pageSeoMeta?.en || {};
 

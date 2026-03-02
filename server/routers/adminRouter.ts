@@ -5,7 +5,7 @@ import { getDb } from "../db";
 import * as db from "../db";
 import { 
   users, couriers, businesses, orders, earnings, 
-  paymentRequests, siteSettings, appVersions 
+  paymentRequests, siteSettings, appVersions, pushNotifications, pushTokens 
 } from "../../drizzle/schema";
 import { eq, and, desc, sql, gte, lte } from "drizzle-orm";
 import { emitToUser } from "../_core/socket";
@@ -1075,7 +1075,7 @@ export const adminRouter = router({
       }
 
       // Get target device tokens
-      const { pushTokens } = await import("../../drizzle/schema");
+      // pushTokens already imported at top
       
       // Build where conditions
       const conditions = [eq(pushTokens.isActive, true)];
@@ -1110,7 +1110,6 @@ export const adminRouter = router({
       const tokens = await dbInstance.select().from(pushTokens).where(and(...conditions));
 
       // Save notification to database
-      const { pushNotifications } = await import("../../drizzle/schema");
       const [notification] = await dbInstance.insert(pushNotifications).values({
         title: input.title,
         body: input.body,
@@ -1124,13 +1123,32 @@ export const adminRouter = router({
         createdBy: ctx.user?.id || 0,
       });
 
-      // TODO: Send actual push notifications to devices
-      // For web: use Web Push API
-      // For mobile: use FCM/Expo Push
+      // Send actual web push notifications
+      let sentCount = 0;
+      let failedCount = 0;
+
+      if (input.platform === "web" || input.platform === "all") {
+        const { sendWebPushToAll } = await import("../webPushService");
+        const webTokens = tokens.filter(t => t.platform === "web" && t.endpoint && t.p256dh && t.auth);
+        if (webTokens.length > 0) {
+          const result = await sendWebPushToAll(
+            { title: input.title, body: input.body, imageUrl: input.imageUrl, actionUrl: input.actionUrl },
+            { userIds: input.targetAudience !== "all" ? tokens.map(t => t.userId).filter(Boolean) as number[] : undefined }
+          );
+          sentCount += result.sent;
+          failedCount += result.failed;
+        }
+      }
+
+      // Update sentCount and failedCount in DB
+      await dbInstance.update(pushNotifications)
+        .set({ sentCount, failedCount })
+        .where(eq(pushNotifications.id, notification.insertId));
 
       return {
         success: true,
-        sentCount: tokens.length,
+        sentCount,
+        failedCount,
         notificationId: notification.insertId,
       };
     }),
@@ -1142,7 +1160,6 @@ export const adminRouter = router({
     const dbInstance = await getDb();
     if (!dbInstance) return [];
 
-    const { pushNotifications } = await import("../../drizzle/schema");
     const notifications = await dbInstance
       .select()
       .from(pushNotifications)

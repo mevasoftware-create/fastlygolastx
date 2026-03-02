@@ -42,7 +42,7 @@ export default function Areas() {
   const { language } = useLanguage();
   const [searchQuery, setSearchQuery] = useState('');
 
-  const { data: pageData } = trpc.pages.getBySlug.useQuery({ slug: 'areas' });
+  const { data: pageData, isLoading: isSeoLoading } = trpc.pages.getBySlug.useQuery({ slug: 'areas' });
   const pageSeoMeta = pageData?.seoMeta ? (typeof pageData.seoMeta === 'string' ? JSON.parse(pageData.seoMeta) : pageData.seoMeta) : null;
   const seoData = pageSeoMeta?.[language] || pageSeoMeta?.en || {};
 

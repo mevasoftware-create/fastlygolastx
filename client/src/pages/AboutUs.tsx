@@ -12,7 +12,7 @@ import { useSeoFromDatabase } from '@/hooks/useSeoFromDatabase';
 export default function AboutUs() {
   const { language } = useLanguage();
 
-  const { data: pageData } = trpc.pages.getBySlug.useQuery({ slug: 'about-us' }, {
+  const { data: pageData, isLoading: isSeoLoading } = trpc.pages.getBySlug.useQuery({ slug: 'about-us' }, {
     retry: false,
     refetchOnWindowFocus: false,
   });
@@ -86,9 +86,9 @@ export default function AboutUs() {
   return (
     <>
       <SEOHead
-        title={seoData.title}
-        description={seoData.description}
-        keywords={seoData.keywords}
+        title={isSeoLoading ? "" : seoData.title}
+        description={isSeoLoading ? "" : seoData.description}
+        keywords={isSeoLoading ? "" : seoData.keywords}
         structuredData={structuredData}
       />
 

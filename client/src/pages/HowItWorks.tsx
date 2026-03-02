@@ -164,7 +164,7 @@ function StepSection({
 /* ─── Main page ──────────────────────────────────────────────── */
 export default function HowItWorks() {
   const { language } = useLanguage();
-  const { data: pageData } = trpc.pages.getBySlug.useQuery({ slug: 'how-it-works' }, {
+  const { data: pageData, isLoading: isSeoLoading } = trpc.pages.getBySlug.useQuery({ slug: 'how-it-works' }, {
     retry: false,
     refetchOnWindowFocus: false,
   });
@@ -352,9 +352,9 @@ export default function HowItWorks() {
 
       <div className="min-h-screen bg-white">
         <SEOHead
-          title={dbSeo.title || t("title")}
-          description={dbSeo.description || t("description")}
-          keywords={dbSeo.keywords || undefined}
+          title={isSeoLoading ? "" : (dbSeo.title || t("title"))}
+          description={isSeoLoading ? "" : (dbSeo.description || t("description"))}
+          keywords={isSeoLoading ? "" : (dbSeo.keywords || undefined)}
         />
         <Header />
 

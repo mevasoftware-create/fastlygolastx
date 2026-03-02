@@ -17,6 +17,8 @@ interface SEOHeadProps {
   canonical?: string;
   customDescription?: string;
   noindex?: boolean;
+  /** When true, suppresses <title> rendering so the static index.html title persists until data arrives */
+  isLoading?: boolean;
 }
 
 /**
@@ -41,6 +43,7 @@ export default function SEOHead({
   keywords: customKeywords,
   canonical: customCanonical,
   noindex = false,
+  isLoading = false,
 }: SEOHeadProps) {
   // Safe location hook usage with error handling
   let location = '/';
@@ -82,8 +85,14 @@ export default function SEOHead({
     sq: `${baseUrl}${pathname}?lang=sq`,
   };
 
-  // Get translated content or use custom values
-  const title = customTitle || t(titleKey as any, language);
+  // Title resolution:
+  // - customTitle is a non-empty string → use it directly (DB value)
+  // - customTitle is "" (empty string, loading state) → suppress <title> so index.html static title persists
+  // - customTitle is undefined → fall back to i18n key
+  const titleResolved = customTitle !== undefined
+    ? (customTitle !== '' ? customTitle : null)   // null = suppress
+    : t(titleKey as any, language);               // i18n fallback
+  const title = titleResolved;
   const description = customDescription || t(descriptionKey as any, language);
   const keywords = customKeywords || t(keywordsKey as any, language);
   const finalCanonicalUrl = customCanonical || defaultCanonicalUrl;
@@ -103,8 +112,8 @@ export default function SEOHead({
 
   return (
     <>
-      {/* Title */}
-      <title>{title}</title>
+      {/* Title — suppressed when title===null (loading state: empty string passed) so index.html static title persists */}
+      {title !== null && <title>{title ?? ''}</title>}
 
       {/* Primary Meta Tags */}
       <meta name="description" content={description} />
@@ -134,7 +143,7 @@ export default function SEOHead({
       {/* Open Graph */}
       <meta property="og:type" content="website" />
       <meta property="og:url" content={finalCanonicalUrl} />
-      <meta property="og:title" content={title} />
+      <meta property="og:title" content={title ?? ''} />
       <meta property="og:description" content={description} />
       <meta property="og:site_name" content={siteName} />
       <meta
@@ -155,7 +164,7 @@ export default function SEOHead({
 
       {/* Twitter Card */}
       <meta name="twitter:card" content="summary_large_image" />
-      <meta name="twitter:title" content={title} />
+      <meta name="twitter:title" content={title ?? ''} />
       <meta name="twitter:description" content={description} />
       <meta name="twitter:image" content={ogImageUrl} />
       <meta name="twitter:image:width" content="1200" />

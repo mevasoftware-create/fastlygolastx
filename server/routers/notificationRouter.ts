@@ -1,7 +1,7 @@
 import { router, protectedProcedure } from "../_core/trpc";
 import { z } from "zod";
 import { getDb } from "../db";
-import { notifications } from "../../drizzle/schema";
+import { notifications, pushTokens } from "../../drizzle/schema";
 import { eq, desc, and, sql } from "drizzle-orm";
 import { TRPCError } from "@trpc/server";
 
@@ -129,6 +129,72 @@ export const notificationRouter = router({
       pushNotifications: true,
     };
   }),
+
+  // Register push token (web push subscription)
+  registerPushToken: protectedProcedure
+    .input(z.object({
+      endpoint: z.string(),
+      p256dh: z.string(),
+      auth: z.string(),
+      platform: z.enum(['web', 'ios', 'android']).default('web'),
+    }))
+    .mutation(async ({ ctx, input }) => {
+      const dbInstance = await getDb();
+      if (!dbInstance) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database not available" });
+
+      // Check if token already exists
+      const existing = await dbInstance
+        .select()
+        .from(pushTokens)
+        .where(eq(pushTokens.endpoint, input.endpoint))
+        .limit(1);
+
+      if (existing.length > 0) {
+        // Update existing token
+        await dbInstance
+          .update(pushTokens)
+          .set({
+            userId: ctx.user.id,
+            p256dh: input.p256dh,
+            auth: input.auth,
+            isActive: true,
+            lastUsedAt: new Date(),
+          })
+          .where(eq(pushTokens.endpoint, input.endpoint));
+      } else {
+        // Insert new token
+        await dbInstance
+          .insert(pushTokens)
+          .values({
+            userId: ctx.user.id,
+            endpoint: input.endpoint,
+            p256dh: input.p256dh,
+            auth: input.auth,
+            platform: input.platform,
+            isActive: true,
+          });
+      }
+
+      return { success: true };
+    }),
+
+  // Unregister push token
+  unregisterPushToken: protectedProcedure
+    .input(z.object({ endpoint: z.string() }))
+    .mutation(async ({ ctx, input }) => {
+      const dbInstance = await getDb();
+      if (!dbInstance) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database not available" });
+
+      await dbInstance
+          .update(pushTokens)
+          .set({ isActive: false })
+          .where(and(
+            eq(pushTokens.endpoint, input.endpoint),
+            eq(pushTokens.userId, ctx.user.id)
+          ));
+
+      return { success: true };
+    }),
 
   // Update notification settings
   updateSettings: protectedProcedure
