@@ -116,8 +116,10 @@ export default function Header() {
                 {categories.map((category) => {
                   let shortName: Record<string, string> = {};
                   try {
-                    if (category.shortName && typeof category.shortName === 'string') {
-                      shortName = JSON.parse(category.shortName);
+                    if (category.shortName) {
+                      shortName = typeof category.shortName === 'string'
+                        ? JSON.parse(category.shortName)
+                        : (category.shortName as Record<string, string>);
                     }
                   } catch (e) {
                     console.error('Failed to parse shortName for category:', category.slug, e);
@@ -420,8 +422,10 @@ export default function Header() {
                 {categories.map((category) => {
                   let shortName: Record<string, string> = {};
                   try {
-                    if (category.shortName && typeof category.shortName === 'string') {
-                      shortName = JSON.parse(category.shortName);
+                    if (category.shortName) {
+                      shortName = typeof category.shortName === 'string'
+                        ? JSON.parse(category.shortName)
+                        : (category.shortName as Record<string, string>);
                     }
                   } catch (e) {
                     console.error('Failed to parse shortName for category:', category.slug, e);
