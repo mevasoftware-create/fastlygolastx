@@ -1,0 +1,109 @@
+{
+  "query": "SELECT TABLE_NAME FROM information_schema.TABLES WHERE TABLE_SCHEMA = DATABASE() ORDER BY TABLE_NAME;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4EV5ivwhyC7eCUY.ebc471170149 --database 4KwtmFvvd67FSFhQ5dyp9H --execute SELECT TABLE_NAME FROM information_schema.TABLES WHERE TABLE_SCHEMA = DATABASE() ORDER BY TABLE_NAME;",
+  "rows": [
+    {
+      "TABLE_NAME": "__drizzle_migrations"
+    },
+    {
+      "TABLE_NAME": "appVersions"
+    },
+    {
+      "TABLE_NAME": "areas"
+    },
+    {
+      "TABLE_NAME": "businesses"
+    },
+    {
+      "TABLE_NAME": "categories"
+    },
+    {
+      "TABLE_NAME": "couponUsage"
+    },
+    {
+      "TABLE_NAME": "coupons"
+    },
+    {
+      "TABLE_NAME": "courierLocations"
+    },
+    {
+      "TABLE_NAME": "couriers"
+    },
+    {
+      "TABLE_NAME": "earnings"
+    },
+    {
+      "TABLE_NAME": "errorLogs"
+    },
+    {
+      "TABLE_NAME": "favoriteAddresses"
+    },
+    {
+      "TABLE_NAME": "fcmTokens"
+    },
+    {
+      "TABLE_NAME": "notifications"
+    },
+    {
+      "TABLE_NAME": "orderTracking"
+    },
+    {
+      "TABLE_NAME": "orders"
+    },
+    {
+      "TABLE_NAME": "pages"
+    },
+    {
+      "TABLE_NAME": "paymentRequests"
+    },
+    {
+      "TABLE_NAME": "priceIncreaseHistory"
+    },
+    {
+      "TABLE_NAME": "priceOffers"
+    },
+    {
+      "TABLE_NAME": "pricingConfig"
+    },
+    {
+      "TABLE_NAME": "pushNotificationTokens"
+    },
+    {
+      "TABLE_NAME": "ratings"
+    },
+    {
+      "TABLE_NAME": "redirects"
+    },
+    {
+      "TABLE_NAME": "referrals"
+    },
+    {
+      "TABLE_NAME": "restaurantTransactions"
+    },
+    {
+      "TABLE_NAME": "siteSettings"
+    },
+    {
+      "TABLE_NAME": "supportTicketMessages"
+    },
+    {
+      "TABLE_NAME": "supportTickets"
+    },
+    {
+      "TABLE_NAME": "surgeConfig"
+    },
+    {
+      "TABLE_NAME": "userWallets"
+    },
+    {
+      "TABLE_NAME": "users"
+    },
+    {
+      "TABLE_NAME": "walletTransactions"
+    }
+  ],
+  "messages": [],
+  "stdout": "TABLE_NAME\n__drizzle_migrations\nappVersions\nareas\nbusinesses\ncategories\ncouponUsage\ncoupons\ncourierLocations\ncouriers\nearnings\nerrorLogs\nfavoriteAddresses\nfcmTokens\nnotifications\norderTracking\norders\npages\npaymentRequests\npriceIncreaseHistory\npriceOffers\npricingConfig\npushNotificationTokens\nratings\nredirects\nreferrals\nrestaurantTransactions\nsiteSettings\nsupportTicketMessages\nsupportTickets\nsurgeConfig\nuserWallets\nusers\nwalletTransactions\n",
+  "stderr": "",
+  "execution_time_ms": 52
+}

@@ -1,0 +1,40 @@
+{
+  "query": "SELECT TABLE_NAME FROM information_schema.TABLES WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME LIKE 'push%';\nSHOW COLUMNS FROM pushNotificationTokens;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4EV5ivwhyC7eCUY.ebc471170149 --database 4KwtmFvvd67FSFhQ5dyp9H --execute SELECT TABLE_NAME FROM information_schema.TABLES WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME LIKE 'push%';\nSHOW COLUMNS FROM pushNotificationTokens;",
+  "rows": [
+    {
+      "TABLE_NAME": "pushNotificationTokens"
+    },
+    {
+      "TABLE_NAME": "Field\tType\tNull\tKey\tDefault\tExtra"
+    },
+    {
+      "TABLE_NAME": "id\tint\tNO\tPRI\tNULL\tauto_increment"
+    },
+    {
+      "TABLE_NAME": "userId\tint\tNO\t\tNULL\t"
+    },
+    {
+      "TABLE_NAME": "token\ttext\tNO\t\tNULL\t"
+    },
+    {
+      "TABLE_NAME": "platform\tenum('ios','android','web')\tYES\t\tweb\t"
+    },
+    {
+      "TABLE_NAME": "deviceType\tvarchar(50)\tYES\t\tNULL\t"
+    },
+    {
+      "TABLE_NAME": "isActive\ttinyint(1)\tYES\t\t1\t"
+    },
+    {
+      "TABLE_NAME": "createdAt\ttimestamp\tYES\t\tCURRENT_TIMESTAMP\t"
+    },
+    {
+      "TABLE_NAME": "updatedAt\ttimestamp\tYES\t\tCURRENT_TIMESTAMP\tDEFAULT_GENERATED on update CURRENT_TIMESTAMP"
+    }
+  ],
+  "messages": [],
+  "stdout": "TABLE_NAME\npushNotificationTokens\nField\tType\tNull\tKey\tDefault\tExtra\nid\tint\tNO\tPRI\tNULL\tauto_increment\nuserId\tint\tNO\t\tNULL\t\ntoken\ttext\tNO\t\tNULL\t\nplatform\tenum('ios','android','web')\tYES\t\tweb\t\ndeviceType\tvarchar(50)\tYES\t\tNULL\t\nisActive\ttinyint(1)\tYES\t\t1\t\ncreatedAt\ttimestamp\tYES\t\tCURRENT_TIMESTAMP\t\nupdatedAt\ttimestamp\tYES\t\tCURRENT_TIMESTAMP\tDEFAULT_GENERATED on update CURRENT_TIMESTAMP\n",
+  "stderr": "",
+  "execution_time_ms": 64
+}

@@ -93,3 +93,6 @@
 - [x] Header.tsx menü shortName JSON.parse hatası düzeltildi
 - [x] TypeScript hataları: 0
 - [x] Browser console hataları: 0
+
+## Bildirim Sistemi Düzeltmesi (02.03.2026)
+- [x] Admin panelinden bildirim gönderme hatası düzeltildi (push_notifications ve push_tokens tabloları oluşturuldu)
