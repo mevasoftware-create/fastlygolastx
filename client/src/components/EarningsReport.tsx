@@ -5,6 +5,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from ".
 import { trpc } from "@/lib/trpc";
 import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
 import { DollarSign, TrendingUp, Package, Calendar } from "lucide-react";
+import { formatEUR } from "@/lib/formatEUR";
 
 type Period = "daily" | "weekly" | "monthly";
 
@@ -16,15 +17,6 @@ export function EarningsReport() {
 
   // Get chart data
   const { data: chartData = [], isLoading: chartLoading } = trpc.earnings.chartData.useQuery({ period });
-
-  // Format currency
-  const formatCurrency = (cents: number) => {
-    return new Intl.NumberFormat("tr-TR", {
-      style: "currency",
-      currency: "EUR",
-      minimumFractionDigits: 2,
-    }).format(cents / 100);
-  };
 
   // Format date based on period
   const formatDate = (dateStr: string) => {
@@ -79,10 +71,10 @@ export function EarningsReport() {
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold text-green-600">
-                {formatCurrency(stats.totalEarnings)}
+                {formatEUR(stats.totalEarnings)}
               </div>
               <p className="text-xs text-muted-foreground mt-1">
-                Net: {formatCurrency(stats.netEarnings)}
+                Net: {formatEUR(stats.netEarnings)}
               </p>
             </CardContent>
           </Card>
@@ -107,7 +99,7 @@ export function EarningsReport() {
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">
-                {formatCurrency(stats.averagePerDelivery)}
+                {formatEUR(stats.averagePerDelivery)}
               </div>
               <p className="text-xs text-muted-foreground mt-1">
                 Teslimat başına
@@ -122,7 +114,7 @@ export function EarningsReport() {
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold text-orange-600">
-                {formatCurrency(stats.totalCommission)}
+                {formatEUR(stats.totalCommission)}
               </div>
               <p className="text-xs text-muted-foreground mt-1">
                 Toplam kesinti
@@ -164,11 +156,11 @@ export function EarningsReport() {
                   fontSize={12}
                 />
                 <YAxis 
-                  tickFormatter={(value) => formatCurrency(value)}
+                  tickFormatter={(value) => formatEUR(value)}
                   fontSize={12}
                 />
                 <Tooltip 
-                  formatter={(value: number) => formatCurrency(value)}
+                  formatter={(value: number) => formatEUR(value)}
                   labelFormatter={formatDate}
                 />
                 <Legend />

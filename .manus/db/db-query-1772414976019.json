@@ -1,0 +1,142 @@
+{
+  "query": "SELECT TABLE_NAME, TABLE_ROWS FROM information_schema.TABLES WHERE TABLE_SCHEMA = DATABASE() ORDER BY TABLE_ROWS DESC, TABLE_NAME;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4EV5ivwhyC7eCUY.ebc471170149 --database 4KwtmFvvd67FSFhQ5dyp9H --execute SELECT TABLE_NAME, TABLE_ROWS FROM information_schema.TABLES WHERE TABLE_SCHEMA = DATABASE() ORDER BY TABLE_ROWS DESC, TABLE_NAME;",
+  "rows": [
+    {
+      "TABLE_NAME": "users",
+      "TABLE_ROWS": "93"
+    },
+    {
+      "TABLE_NAME": "couriers",
+      "TABLE_ROWS": "50"
+    },
+    {
+      "TABLE_NAME": "earnings",
+      "TABLE_ROWS": "50"
+    },
+    {
+      "TABLE_NAME": "orders",
+      "TABLE_ROWS": "37"
+    },
+    {
+      "TABLE_NAME": "areas",
+      "TABLE_ROWS": "21"
+    },
+    {
+      "TABLE_NAME": "ratings",
+      "TABLE_ROWS": "15"
+    },
+    {
+      "TABLE_NAME": "pages",
+      "TABLE_ROWS": "8"
+    },
+    {
+      "TABLE_NAME": "businesses",
+      "TABLE_ROWS": "7"
+    },
+    {
+      "TABLE_NAME": "categories",
+      "TABLE_ROWS": "6"
+    },
+    {
+      "TABLE_NAME": "pricingConfig",
+      "TABLE_ROWS": "3"
+    },
+    {
+      "TABLE_NAME": "__drizzle_migrations",
+      "TABLE_ROWS": "0"
+    },
+    {
+      "TABLE_NAME": "appVersions",
+      "TABLE_ROWS": "0"
+    },
+    {
+      "TABLE_NAME": "couponUsage",
+      "TABLE_ROWS": "0"
+    },
+    {
+      "TABLE_NAME": "coupons",
+      "TABLE_ROWS": "0"
+    },
+    {
+      "TABLE_NAME": "courierLocations",
+      "TABLE_ROWS": "0"
+    },
+    {
+      "TABLE_NAME": "errorLogs",
+      "TABLE_ROWS": "0"
+    },
+    {
+      "TABLE_NAME": "favoriteAddresses",
+      "TABLE_ROWS": "0"
+    },
+    {
+      "TABLE_NAME": "fcmTokens",
+      "TABLE_ROWS": "0"
+    },
+    {
+      "TABLE_NAME": "notifications",
+      "TABLE_ROWS": "0"
+    },
+    {
+      "TABLE_NAME": "orderTracking",
+      "TABLE_ROWS": "0"
+    },
+    {
+      "TABLE_NAME": "paymentRequests",
+      "TABLE_ROWS": "0"
+    },
+    {
+      "TABLE_NAME": "priceIncreaseHistory",
+      "TABLE_ROWS": "0"
+    },
+    {
+      "TABLE_NAME": "priceOffers",
+      "TABLE_ROWS": "0"
+    },
+    {
+      "TABLE_NAME": "pushNotificationTokens",
+      "TABLE_ROWS": "0"
+    },
+    {
+      "TABLE_NAME": "redirects",
+      "TABLE_ROWS": "0"
+    },
+    {
+      "TABLE_NAME": "referrals",
+      "TABLE_ROWS": "0"
+    },
+    {
+      "TABLE_NAME": "restaurantTransactions",
+      "TABLE_ROWS": "0"
+    },
+    {
+      "TABLE_NAME": "siteSettings",
+      "TABLE_ROWS": "0"
+    },
+    {
+      "TABLE_NAME": "supportTicketMessages",
+      "TABLE_ROWS": "0"
+    },
+    {
+      "TABLE_NAME": "supportTickets",
+      "TABLE_ROWS": "0"
+    },
+    {
+      "TABLE_NAME": "surgeConfig",
+      "TABLE_ROWS": "0"
+    },
+    {
+      "TABLE_NAME": "userWallets",
+      "TABLE_ROWS": "0"
+    },
+    {
+      "TABLE_NAME": "walletTransactions",
+      "TABLE_ROWS": "0"
+    }
+  ],
+  "messages": [],
+  "stdout": "TABLE_NAME\tTABLE_ROWS\nusers\t93\ncouriers\t50\nearnings\t50\norders\t37\nareas\t21\nratings\t15\npages\t8\nbusinesses\t7\ncategories\t6\npricingConfig\t3\n__drizzle_migrations\t0\nappVersions\t0\ncouponUsage\t0\ncoupons\t0\ncourierLocations\t0\nerrorLogs\t0\nfavoriteAddresses\t0\nfcmTokens\t0\nnotifications\t0\norderTracking\t0\npaymentRequests\t0\npriceIncreaseHistory\t0\npriceOffers\t0\npushNotificationTokens\t0\nredirects\t0\nreferrals\t0\nrestaurantTransactions\t0\nsiteSettings\t0\nsupportTicketMessages\t0\nsupportTickets\t0\nsurgeConfig\t0\nuserWallets\t0\nwalletTransactions\t0\n",
+  "stderr": "",
+  "execution_time_ms": 65
+}

@@ -1,0 +1,109 @@
+{
+  "query": "SHOW TABLES;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4EV5ivwhyC7eCUY.ebc471170149 --database 4KwtmFvvd67FSFhQ5dyp9H --execute SHOW TABLES;",
+  "rows": [
+    {
+      "Tables_in_4KwtmFvvd67FSFhQ5dyp9H": "__drizzle_migrations"
+    },
+    {
+      "Tables_in_4KwtmFvvd67FSFhQ5dyp9H": "appVersions"
+    },
+    {
+      "Tables_in_4KwtmFvvd67FSFhQ5dyp9H": "areas"
+    },
+    {
+      "Tables_in_4KwtmFvvd67FSFhQ5dyp9H": "businesses"
+    },
+    {
+      "Tables_in_4KwtmFvvd67FSFhQ5dyp9H": "categories"
+    },
+    {
+      "Tables_in_4KwtmFvvd67FSFhQ5dyp9H": "couponUsage"
+    },
+    {
+      "Tables_in_4KwtmFvvd67FSFhQ5dyp9H": "coupons"
+    },
+    {
+      "Tables_in_4KwtmFvvd67FSFhQ5dyp9H": "courierLocations"
+    },
+    {
+      "Tables_in_4KwtmFvvd67FSFhQ5dyp9H": "couriers"
+    },
+    {
+      "Tables_in_4KwtmFvvd67FSFhQ5dyp9H": "earnings"
+    },
+    {
+      "Tables_in_4KwtmFvvd67FSFhQ5dyp9H": "errorLogs"
+    },
+    {
+      "Tables_in_4KwtmFvvd67FSFhQ5dyp9H": "favoriteAddresses"
+    },
+    {
+      "Tables_in_4KwtmFvvd67FSFhQ5dyp9H": "fcmTokens"
+    },
+    {
+      "Tables_in_4KwtmFvvd67FSFhQ5dyp9H": "notifications"
+    },
+    {
+      "Tables_in_4KwtmFvvd67FSFhQ5dyp9H": "orderTracking"
+    },
+    {
+      "Tables_in_4KwtmFvvd67FSFhQ5dyp9H": "orders"
+    },
+    {
+      "Tables_in_4KwtmFvvd67FSFhQ5dyp9H": "pages"
+    },
+    {
+      "Tables_in_4KwtmFvvd67FSFhQ5dyp9H": "paymentRequests"
+    },
+    {
+      "Tables_in_4KwtmFvvd67FSFhQ5dyp9H": "priceIncreaseHistory"
+    },
+    {
+      "Tables_in_4KwtmFvvd67FSFhQ5dyp9H": "priceOffers"
+    },
+    {
+      "Tables_in_4KwtmFvvd67FSFhQ5dyp9H": "pricingConfig"
+    },
+    {
+      "Tables_in_4KwtmFvvd67FSFhQ5dyp9H": "pushNotificationTokens"
+    },
+    {
+      "Tables_in_4KwtmFvvd67FSFhQ5dyp9H": "ratings"
+    },
+    {
+      "Tables_in_4KwtmFvvd67FSFhQ5dyp9H": "redirects"
+    },
+    {
+      "Tables_in_4KwtmFvvd67FSFhQ5dyp9H": "referrals"
+    },
+    {
+      "Tables_in_4KwtmFvvd67FSFhQ5dyp9H": "restaurantTransactions"
+    },
+    {
+      "Tables_in_4KwtmFvvd67FSFhQ5dyp9H": "siteSettings"
+    },
+    {
+      "Tables_in_4KwtmFvvd67FSFhQ5dyp9H": "supportTicketMessages"
+    },
+    {
+      "Tables_in_4KwtmFvvd67FSFhQ5dyp9H": "supportTickets"
+    },
+    {
+      "Tables_in_4KwtmFvvd67FSFhQ5dyp9H": "surgeConfig"
+    },
+    {
+      "Tables_in_4KwtmFvvd67FSFhQ5dyp9H": "userWallets"
+    },
+    {
+      "Tables_in_4KwtmFvvd67FSFhQ5dyp9H": "users"
+    },
+    {
+      "Tables_in_4KwtmFvvd67FSFhQ5dyp9H": "walletTransactions"
+    }
+  ],
+  "messages": [],
+  "stdout": "Tables_in_4KwtmFvvd67FSFhQ5dyp9H\n__drizzle_migrations\nappVersions\nareas\nbusinesses\ncategories\ncouponUsage\ncoupons\ncourierLocations\ncouriers\nearnings\nerrorLogs\nfavoriteAddresses\nfcmTokens\nnotifications\norderTracking\norders\npages\npaymentRequests\npriceIncreaseHistory\npriceOffers\npricingConfig\npushNotificationTokens\nratings\nredirects\nreferrals\nrestaurantTransactions\nsiteSettings\nsupportTicketMessages\nsupportTickets\nsurgeConfig\nuserWallets\nusers\nwalletTransactions\n",
+  "stderr": "",
+  "execution_time_ms": 143
+}

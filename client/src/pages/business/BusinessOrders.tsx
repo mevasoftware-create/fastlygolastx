@@ -8,14 +8,11 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Package, Search, Filter, MapPin, User, Phone, Clock, DollarSign } from "lucide-react";
 import { useLocation } from "wouter";
-import { formatCurrency } from "@/lib/currency";
-import { useLanguage } from "@/contexts/LanguageContext";
+import { formatEUR } from "@/lib/formatEUR";
 
 export default function BusinessOrders() {
   const { user, loading } = useAuth();
   const [, setLocation] = useLocation();
-  const { language } = useLanguage();
-
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
 
@@ -149,7 +146,7 @@ export default function BusinessOrders() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm text-gray-600">Toplam Harcama</p>
-                  <p className="text-2xl font-bold text-orange-600">{formatCurrency(stats.totalSpent, language)}</p>
+                  <p className="text-2xl font-bold text-orange-600">{formatEUR(stats.totalSpent)}</p>
                 </div>
                 <DollarSign className="h-8 w-8 text-orange-400" />
               </div>
@@ -222,7 +219,7 @@ export default function BusinessOrders() {
                     <div className="text-right">
                       <p className="text-sm text-gray-600">Tutar</p>
                       <p className="text-xl font-bold text-orange-600">
-                        {formatCurrency(order.totalFee || 0, language)}
+                        {formatEUR(order.totalFee || 0)}
                       </p>
                     </div>
                   </div>
