@@ -43,30 +43,25 @@ export default function Areas() {
   const [searchQuery, setSearchQuery] = useState('');
 
   const { data: pageData } = trpc.pages.getBySlug.useQuery({ slug: 'areas' });
-  const pageSeoMeta = pageData?.seoMeta ? JSON.parse(pageData.seoMeta) : null;
+  const pageSeoMeta = pageData?.seoMeta ? (typeof pageData.seoMeta === 'string' ? JSON.parse(pageData.seoMeta) : pageData.seoMeta) : null;
   const seoData = pageSeoMeta?.[language] || pageSeoMeta?.en || {};
 
   const { data: areas, isLoading, error } = trpc.areas.list.useQuery();
 
-  const parsedAreas = (areas || []).map((area: AreaData) => {
-    try {
-      return { ...area, seoMeta: JSON.parse(area.seoMeta) };
-    } catch {
-      return { ...area, seoMeta: {} };
-    }
-  });
+  // seoMeta is already a parsed JSON object from the API (superjson)
+  const parsedAreas = (areas || []);
 
   const getAreaName = (area: any) => {
-    const meta = area.seoMeta[language] || area.seoMeta.en || {};
-    return meta.shortTitle || meta.title || area.slug;
+    const meta = area.seoMeta?.[language] || area.seoMeta?.en || {};
+    return meta.badge || meta.shortTitle || meta.title || area.slug;
   };
 
   const getAreaSubtitle = (area: any) => {
-    const meta = area.seoMeta[language] || area.seoMeta.en || {};
+    const meta = area.seoMeta?.[language] || area.seoMeta?.en || {};
     return meta.subtitle || '';
   };
 
-  const filteredAreas = parsedAreas.filter((area: ParsedArea) =>
+  const filteredAreas = parsedAreas.filter((area: any) =>
     getAreaName(area).toLowerCase().includes(searchQuery.toLowerCase())
   );
 

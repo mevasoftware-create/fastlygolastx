@@ -6,6 +6,7 @@ import { useLocation } from "wouter";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { trpc } from "@/lib/trpc";
 import { useEffect, useRef, useState } from "react";
+import { useSeoFromDatabase } from "@/hooks/useSeoFromDatabase";
 
 // Category image map keyed by slug
 const CATEGORY_IMAGES: Record<string, string> = {
@@ -94,6 +95,12 @@ export default function Services() {
   const [visibleCards, setVisibleCards] = useState<Set<number>>(new Set());
   const cardRefs = useRef<(HTMLDivElement | null)[]>([]);
 
+  // Fetch SEO from pages table
+  const { data: pageData } = trpc.pages.getBySlug.useQuery({ slug: 'services' }, {
+    retry: false,
+    refetchOnWindowFocus: false,
+  });
+  const dbSeo = useSeoFromDatabase(pageData?.seoMeta);
   // Fetch categories from database
   const { data: categories = [], isLoading } = trpc.categories.list.useQuery();
   // Intersection observer for scroll animations
@@ -258,9 +265,9 @@ export default function Services() {
   return (
     <div className="min-h-screen bg-white">
       <SEOHead
-        title={t("heroTag") + " - FastlyGo"}
-        description={t("heroSubtitle")}
-        keywords="delivery services skopje, courier services, FastlyGo"
+        title={dbSeo.title || t("heroTag") + " - FastlyGo"}
+        description={dbSeo.description || t("heroSubtitle")}
+        keywords={dbSeo.keywords || "delivery services skopje, courier services, FastlyGo"}
       />
       <Header />
 

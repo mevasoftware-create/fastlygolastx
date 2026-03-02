@@ -42,7 +42,7 @@ export default function CourierDashboard() {
 
   const { data: availableOrders, isLoading: ordersLoading } = trpc.courier.pendingOrders.useQuery(
     undefined,
-    { enabled: isAuthenticated && courierStatus?.status === 'approved' }
+    { enabled: isAuthenticated && courierStatus?.status === 'active' }
   );
 
   const { data: myOrders } = trpc.courier.myOrders.useQuery(
@@ -146,7 +146,7 @@ export default function CourierDashboard() {
 
   useEffect(() => {
     // Sadece çevrimiçi ve onaylı kuryeler için konum takibi yap
-    if (!courierStatus?.isAvailable || courierStatus?.status !== 'approved') {
+    if (!courierStatus?.isAvailable || courierStatus?.status !== 'active') {
       return;
     }
 
@@ -213,7 +213,7 @@ export default function CourierDashboard() {
     return null;
   }
 
-  if (courierStatus.status === 'rejected') {
+  if (courierStatus.status === 'inactive') {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-orange-50 to-orange-100">
         <Card className="max-w-md w-full">

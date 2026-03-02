@@ -6,15 +6,17 @@ import { getAboutUsSchemas } from '@/lib/structuredData';
 import { Users, Zap, Target, Heart, TrendingUp, MapPin, Bike, Package, Shield, Star, CheckCircle } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { Link } from 'wouter';
+import { trpc } from '@/lib/trpc';
+import { useSeoFromDatabase } from '@/hooks/useSeoFromDatabase';
 
 export default function AboutUs() {
   const { language } = useLanguage();
 
-  const seoData = {
-    title: 'About Us - FastlyGo Courier & Delivery Service',
-    description: 'Learn about FastlyGo, our mission, values, and commitment to providing fast and reliable delivery services in Skopje, Macedonia.',
-    keywords: 'about FastlyGo, courier company, delivery service, Skopje, Macedonia'
-  };
+  const { data: pageData } = trpc.pages.getBySlug.useQuery({ slug: 'about-us' }, {
+    retry: false,
+    refetchOnWindowFocus: false,
+  });
+  const seoData = useSeoFromDatabase(pageData?.seoMeta);
 
   const structuredData = getAboutUsSchemas();
 

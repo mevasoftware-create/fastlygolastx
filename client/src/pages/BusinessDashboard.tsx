@@ -94,7 +94,7 @@ export default function BusinessDashboard() {
   useEffect(() => {
     if (!loading && !profileLoading && user && profile) {
       // Pending durumda onay bekleyen sayfaya yönlendir
-      if (profile.status === 'pending') {
+      if (profile.status === 'inactive' || profile.status === 'suspended') {
         navigate("/pending-approval");
         return;
       }
@@ -201,11 +201,7 @@ export default function BusinessDashboard() {
   }
 
   // Pending status redirect handled by useEffect above
-  if (profile.status === "pending") {
-    return null; // Will redirect to /pending-approval
-  }
-
-  if (profile.status === "rejected") {
+  if (profile.status === "inactive" || profile.status === "suspended") {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-orange-50 to-orange-100">
         <Card className="max-w-md">
@@ -830,7 +826,7 @@ export default function BusinessDashboard() {
                     <CardTitle className="text-sm font-medium">Durum</CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <Badge variant={profile.status === "approved" ? "default" : "secondary"}>
+                    <Badge variant={profile.status === "active" ? "default" : "secondary"}>
                       {profile.status}
                     </Badge>
                     <p className="text-xs text-muted-foreground mt-2">Hesap durumu</p>

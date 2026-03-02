@@ -1,24 +1,134 @@
 <!doctype html>
-<html lang="en">
+<html>
 
   <head>
     <meta charset="UTF-8" />
     <meta
       name="viewport"
       content="width=device-width, initial-scale=1.0, maximum-scale=1" />
-    <title>FastlyGo</title>    
-    <!-- THIS IS THE START OF A COMMENT BLOCK, BLOCK TO BE DELETED: Google Fonts here, example:
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+    
+    <!-- Apple Touch Icon for iOS -->
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+    
+    <!-- Web App Manifest for PWA -->
+    <link rel="manifest" href="/manifest.json" />
+    
+    <!-- Theme Color for browser chrome -->
+    <meta name="theme-color" content="#FF6B00" />
+    
+    <!-- Apple Web App Meta Tags -->
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="%VITE_APP_TITLE%" />
+    
+    <meta name="author" content="%VITE_APP_TITLE%" />
+    <meta name="application-name" content="%VITE_APP_TITLE%" />
+    
+
+    <!-- Permissions Policy for browser features -->
+    <meta http-equiv="Permissions-Policy" content="identity-credentials-get=*" />
+    
+    <!-- Cache Control: managed by server-side headers, not HTML meta tags -->
+    
+
+    <!-- Google Search Console verification -->
+    <!-- Add your verification code here if needed -->
+    
+    <!-- Font Optimization for PageSpeed - Latin subset only -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
-    THIS IS THE END OF A COMMENT BLOCK, BLOCK TO BE DELETED -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap&subset=latin" rel="stylesheet" media="all" />
+    
+    <!-- Preload hero image for LCP optimization -->
+    <link rel="preload" as="image" href="/images/optimized/hero-poster.webp" type="image/webp" fetchpriority="high" />
+    
+    <!-- Static title -->
+    <title>FastlyGo</title>
   </head>
 
   <body>
     <div id="root"></div>
+    
+    <!-- Critical: Main application script -->
     <script type="module" src="/src/main.tsx"></script>
+    
+    <!-- Non-critical: Service Worker registration -->
+    <script>
+      // Service Worker registration with update handling
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('/sw.js')
+            .then(reg => {
+              console.log('[App] Service Worker registered', reg);
+              
+              // Check for updates every 60 seconds
+              setInterval(() => {
+                reg.update();
+              }, 60000);
+              
+              // Handle updates
+              reg.addEventListener('updatefound', () => {
+                const newWorker = reg.installing;
+                if (newWorker) {
+                  newWorker.addEventListener('statechange', () => {
+                    if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                      console.log('[App] New version available, reloading...');
+                      // New service worker available, reload the page
+                      window.location.reload();
+                    }
+                  });
+                }
+              });
+            })
+            .catch(err => console.log('[App] Service Worker registration failed', err));
+        });
+        
+        // Handle controller change (when new SW takes over)
+        navigator.serviceWorker.addEventListener('controllerchange', () => {
+          console.log('[App] Controller changed, reloading...');
+          window.location.reload();
+        });
+      }
+    </script>
+    
+    <!-- Non-critical: Analytics scripts loaded after page content -->
+    <!-- DNS Prefetch for analytics -->
+    <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
+    <link rel="dns-prefetch" href="https://www.google-analytics.com" />
+    
+    <!-- Google Analytics (gtag.js) with Consent Mode -->
+    <script>
+      // Initialize dataLayer before gtag.js loads
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      
+      // Set default consent mode
+      gtag('consent', 'default', {
+        'ad_storage': 'denied',
+        'ad_user_data': 'denied',
+        'ad_personalization': 'denied',
+        'analytics_storage': 'granted'
+      });
+    </script>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-60JTZ74RGY"></script>
+    <script>
+      gtag('js', new Date());
+      gtag('config', 'G-60JTZ74RGY', {
+        'anonymize_ip': true,
+        'allow_google_signals': false,
+        'allow_ad_personalization_signals': false
+      });
+    </script>
+    
+    <!-- Umami Analytics -->
     <script
-      defer
+      async
       src="%VITE_ANALYTICS_ENDPOINT%/umami"
       data-website-id="%VITE_ANALYTICS_WEBSITE_ID%"></script>
   </body>

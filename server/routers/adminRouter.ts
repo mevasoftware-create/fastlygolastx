@@ -60,7 +60,7 @@ export const adminRouter = router({
     const activeCouriers = await dbInstance
       .select({ count: sql<number>`count(*)` })
       .from(couriers)
-      .where(and(eq(couriers.status, "approved"), eq(couriers.isAvailable, true)));
+      .where(eq(couriers.status, "active"));
     const pendingCouriers = await dbInstance
       .select({ count: sql<number>`count(*)` })
       .from(couriers)
@@ -71,11 +71,11 @@ export const adminRouter = router({
     const activeBusinesses = await dbInstance
       .select({ count: sql<number>`count(*)` })
       .from(businesses)
-      .where(eq(businesses.status, "approved"));
+      .where(eq(businesses.status, "active"));
     const pendingBusinesses = await dbInstance
       .select({ count: sql<number>`count(*)` })
       .from(businesses)
-      .where(eq(businesses.status, "pending"));
+      .where(eq(businesses.status, "inactive"));
 
     // Revenue stats (from completed orders)
     const revenueToday = await dbInstance
@@ -149,7 +149,7 @@ export const adminRouter = router({
       // Update courier status
       await dbInstance
         .update(couriers)
-        .set({ status: "approved", isVerified: true })
+        .set({ status: "active", isVerified: true })
         .where(eq(couriers.id, input.courierId));
 
       // Update user role
@@ -194,7 +194,7 @@ export const adminRouter = router({
       // Update courier status
       await dbInstance
         .update(couriers)
-        .set({ status: "rejected" })
+        .set({ status: "inactive" })
         .where(eq(couriers.id, input.courierId));
 
       // Notify courier
@@ -233,7 +233,7 @@ export const adminRouter = router({
       // Update business status
       await dbInstance
         .update(businesses)
-        .set({ status: "approved", isVerified: true })
+        .set({ status: "active", isVerified: true })
         .where(eq(businesses.id, input.businessId));
 
       // Update user role
@@ -278,7 +278,7 @@ export const adminRouter = router({
       // Update business status
       await dbInstance
         .update(businesses)
-        .set({ status: "rejected" })
+        .set({ status: "inactive" })
         .where(eq(businesses.id, input.businessId));
 
       // Notify business
@@ -358,7 +358,7 @@ export const adminRouter = router({
       })
       .from(businesses)
       .leftJoin(users, eq(businesses.userId, users.id))
-      .where(eq(businesses.status, "pending"))
+      .where(eq(businesses.status, "inactive"))
       .orderBy(desc(businesses.createdAt));
 
     return pending;
@@ -589,7 +589,7 @@ export const adminRouter = router({
       contactPerson: z.string().optional(),
       phone: z.string().optional(),
       address: z.string().optional(),
-      status: z.enum(["pending", "approved", "rejected", "suspended"]).optional(),
+      status: z.enum(["active", "inactive", "suspended"]).optional(),
       balance: z.number().optional(),
     }))
     .mutation(async ({ input }) => {
@@ -642,7 +642,7 @@ export const adminRouter = router({
       phone: z.string().optional(),
       vehicleType: z.enum(["bicycle", "motorcycle", "car", "van"]).optional(),
       vehiclePlate: z.string().optional(),
-      status: z.enum(["pending", "approved", "rejected"]).optional(),
+      status: z.enum(["active", "inactive", "suspended", "pending"]).optional(),
       isAvailable: z.boolean().optional(),
     }))
     .mutation(async ({ input }) => {

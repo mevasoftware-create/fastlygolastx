@@ -87,8 +87,13 @@ export async function upsertUser(user: InsertUser): Promise<void> {
   }
 }
 
-// OAuth user lookup removed - using email-based lookup instead
-
+/// OAuth user lookup removed - using email-based lookup instead
+export async function getUserByEmail(email: string) {
+  const db = await getDb();
+  if (!db) return undefined;
+  const result = await db.select().from(users).where(eq(users.email, email)).limit(1);
+  return result.length > 0 ? result[0] : undefined;
+}
 export async function getUserById(id: number) {
   const db = await getDb();
   if (!db) return undefined;
@@ -166,7 +171,7 @@ export async function approveCourier(courierId: number) {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
   await db.update(couriers)
-    .set({ status: 'approved', updatedAt: new Date() })
+    .set({ status: 'active', updatedAt: new Date() })
     .where(eq(couriers.id, courierId));
 }
 
@@ -980,14 +985,4 @@ export async function getSurgeConfigById(id: number): Promise<SurgeConfig | null
   if (!db) throw new Error("Database not available");
   const result = await db.select().from(surgeConfig).where(eq(surgeConfig.id, id)).limit(1);
   return result.length > 0 ? result[0] : null;
-}
-
-export async function getUserByOpenId(openId: string) {
-  const db = await getDb();
-  if (!db) {
-    console.warn("[Database] Cannot get user: database not available");
-    return undefined;
-  }
-  const result = await db.select().from(users).where(eq(users.email, openId)).limit(1);
-  return result.length > 0 ? result[0] : undefined;
 }

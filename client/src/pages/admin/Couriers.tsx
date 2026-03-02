@@ -31,7 +31,7 @@ export function CouriersPage() {
   const [filterDemo, setFilterDemo] = useState("all");
   const [editingCourier, setEditingCourier] = useState<any>(null);
   const [deletingId, setDeletingId] = useState<number | null>(null);
-  const [editApprovalStatus, setEditApprovalStatus] = useState<"pending" | "approved" | "rejected">("pending");
+  const [editApprovalStatus, setEditApprovalStatus] = useState<"pending" | "active" | "inactive" | "suspended">("pending");
 
   const { data: couriers, refetch, isLoading } = trpc.admin.getAllCouriersWithUsers.useQuery();
 
@@ -62,7 +62,7 @@ export function CouriersPage() {
 
   const stats = [
     { label: "Toplam", value: couriers?.length || 0, color: "text-gray-900" },
-    { label: "Onaylı", value: couriers?.filter((c: any) => c.status === "approved").length || 0, color: "text-green-600" },
+    { label: "Onaylı", value: couriers?.filter((c: any) => c.status === "active").length || 0, color: "text-green-600" },
     { label: "Beklemede", value: couriers?.filter((c: any) => c.status === "pending").length || 0, color: "text-amber-600" },
     { label: "Çevrimiçi", value: couriers?.filter((c: any) => c.isOnline).length || 0, color: "text-blue-600" },
   ];
@@ -98,8 +98,8 @@ export function CouriersPage() {
           <SelectContent>
             <SelectItem value="all">Tüm Durumlar</SelectItem>
             <SelectItem value="pending">Beklemede</SelectItem>
-            <SelectItem value="approved">Onaylı</SelectItem>
-            <SelectItem value="rejected">Reddedildi</SelectItem>
+            <SelectItem value="active">Onaylı</SelectItem>
+            <SelectItem value="inactive">Reddedildi</SelectItem>
           </SelectContent>
         </Select>
         <Select value={filterDemo} onValueChange={setFilterDemo}>
@@ -184,7 +184,7 @@ export function CouriersPage() {
                             </Button>
                           </>
                         )}
-                        {c.status === "approved" && (
+                        {c.status === "active" && (
                           <Button size="sm" variant="ghost"
                             className="h-7 px-2 text-xs text-amber-700 bg-amber-50 hover:bg-amber-100 border border-amber-200 rounded-lg gap-1"
                             disabled={rejectMutation.isPending}
@@ -192,7 +192,7 @@ export function CouriersPage() {
                             <XCircle className="h-3.5 w-3.5" />Askıya Al
                           </Button>
                         )}
-                        {c.status === "rejected" && (
+                        {c.status === "inactive" && (
                           <Button size="sm" variant="ghost"
                             className="h-7 px-2 text-xs text-green-700 bg-green-50 hover:bg-green-100 border border-green-200 rounded-lg gap-1"
                             disabled={approveMutation.isPending}
@@ -231,8 +231,8 @@ export function CouriersPage() {
                 <SelectTrigger><SelectValue /></SelectTrigger>
                 <SelectContent>
                   <SelectItem value="pending">Beklemede</SelectItem>
-                  <SelectItem value="approved">Onayla</SelectItem>
-                  <SelectItem value="rejected">Reddet</SelectItem>
+                  <SelectItem value="active">Onayla</SelectItem>
+                  <SelectItem value="inactive">Reddet</SelectItem>
                 </SelectContent>
               </Select>
             </div>

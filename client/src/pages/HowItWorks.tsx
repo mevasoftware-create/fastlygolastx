@@ -5,6 +5,8 @@ import SEOHead from "@/components/SEOHead";
 import { Link } from "wouter";
 import { useEffect, useRef, useState } from "react";
 import { Zap, ArrowRight, CheckCircle2, Star } from "lucide-react";
+import { trpc } from "@/lib/trpc";
+import { useSeoFromDatabase } from "@/hooks/useSeoFromDatabase";
 
 /* ─── CDN images ─────────────────────────────────────────────── */
 const IMG_ORDER    = "https://d2xsxph8kpxj0f.cloudfront.net/310519663142180542/ZkKgZDz9VnqDkYQWNb7iTG/hiw_step1_order-fjh3ZhjkSbVn58SrqdPQEN.webp";
@@ -162,6 +164,11 @@ function StepSection({
 /* ─── Main page ──────────────────────────────────────────────── */
 export default function HowItWorks() {
   const { language } = useLanguage();
+  const { data: pageData } = trpc.pages.getBySlug.useQuery({ slug: 'how-it-works' }, {
+    retry: false,
+    refetchOnWindowFocus: false,
+  });
+  const dbSeo = useSeoFromDatabase(pageData?.seoMeta);
 
   const t = (key: string): string => {
     const translations: Record<string, Record<string, string>> = {
@@ -344,7 +351,11 @@ export default function HowItWorks() {
       `}</style>
 
       <div className="min-h-screen bg-white">
-        <SEOHead title={t("title")} description={t("description")} />
+        <SEOHead
+          title={dbSeo.title || t("title")}
+          description={dbSeo.description || t("description")}
+          keywords={dbSeo.keywords || undefined}
+        />
         <Header />
 
         {/* ── HERO ─────────────────────────────────────────────── */}

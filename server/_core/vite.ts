@@ -5,7 +5,7 @@ import { nanoid } from "nanoid";
 import path from "path";
 import { createServer as createViteServer } from "vite";
 import viteConfig from "../../vite.config";
-// SEO disabled by user request
+// injectSeoTags DISABLED - Manus auto SEO removed, site uses custom SEO
 // import { injectSeoTags } from "./seoMiddleware";
 
 export async function setupVite(app: Express, server: Server) {
@@ -52,7 +52,7 @@ export async function setupVite(app: Express, server: Server) {
         `src="/src/main.tsx?v=${nanoid()}"`
       );
       let page = await vite.transformIndexHtml(url, template);
-      // SEO injection disabled by user request
+      // SEO tag injection DISABLED - Manus auto SEO removed, site uses custom SEO
       // page = injectSeoTags(page, url);
       res.status(200).set({ "Content-Type": "text/html" }).end(page);
     } catch (e) {
@@ -83,9 +83,9 @@ export function serveStatic(app: Express) {
         res.sendFile(indexPath);
         return;
       }
-      // SEO injection disabled by user request
-      const url = req.originalUrl || req.url;
-      void url; // suppress unused variable warning
+      // SEO tag injection DISABLED - Manus auto SEO removed, site uses custom SEO
+      // const url = req.originalUrl || req.url;
+      // const injectedHtml = injectSeoTags(html, url);
       res.status(200).set({ "Content-Type": "text/html" }).end(html);
     });
   });

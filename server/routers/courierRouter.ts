@@ -224,7 +224,7 @@ export const courierRouter = router({
         .where(eq(couriers.userId, ctx.user.id))
         .limit(1);
 
-      if (courier.length === 0 || courier[0].status !== "approved") {
+      if (courier.length === 0 || courier[0].status !== "active") {
         throw new TRPCError({ code: "FORBIDDEN", message: "Courier not approved" });
       }
 
@@ -341,7 +341,7 @@ export const courierRouter = router({
       .where(eq(couriers.userId, ctx.user.id))
       .limit(1);
 
-    if (courier.length === 0 || courier[0].status !== "approved") {
+    if (courier.length === 0 || courier[0].status !== "active") {
       return [];
     }
 
@@ -381,7 +381,7 @@ export const courierRouter = router({
         .where(eq(couriers.userId, ctx.user.id))
         .limit(1);
 
-      if (courier.length === 0 || courier[0].status !== "approved") {
+      if (courier.length === 0 || courier[0].status !== "active") {
         throw new TRPCError({ code: "FORBIDDEN", message: "Courier not approved" });
       }
 

@@ -45,11 +45,13 @@ export default function Home() {
   const { language, isLoading: languageLoading } = useLanguage();
   const { t } = useTranslation();
 
-  // Fetch home page SEO data from database
-
-  // Get SEO data from database
-
-  // Fetch public stats
+   // Fetch home page SEO data from database
+  const { data: pageData } = trpc.pages.getBySlug.useQuery({ slug: 'home' }, {
+    retry: false,
+    refetchOnWindowFocus: false,
+  });
+  const seoData = useSeoFromDatabase(pageData?.seoMeta);
+  // Fetch public statss
   const { data: stats } = trpc.public.stats.useQuery(undefined, {
     retry: false,
     refetchOnWindowFocus: false,
@@ -66,13 +68,12 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-orange-50/30 via-white to-amber-50/20">
       <SEOHead 
-        
-        
-        
+        title={seoData.title || undefined}
+        description={seoData.description || undefined}
+        keywords={seoData.keywords || undefined}
         titleKey="seoTitle"
         descriptionKey="seoDescription"
         keywordsKey="seoKeywords"
-        customDescription="Professional food delivery, courier and cargo service in Skopje. Fast delivery in 15 minutes, real-time tracking. Order courier now!"
         structuredData={structuredData}
       />
       

@@ -89,7 +89,7 @@ export const businessRouter = router({
           address: input.address,
           phone: input.phone,
           taxNumber: input.taxNumber || null,
-          status: "pending",
+          status: "inactive",
           balance: 0,
           totalDebt: 0,
           isVerified: false,
@@ -121,7 +121,7 @@ export const businessRouter = router({
     if (!db) throw new Error("Database not available");
 
     try {
-      const pending = await db.select().from(businesses).where(eq(businesses.status, "pending"));
+      const pending = await db.select().from(businesses).where(eq(businesses.status, "inactive"));
       return pending;
     } catch (error) {
       console.error("[Business] Get pending error:", error);
@@ -141,7 +141,7 @@ export const businessRouter = router({
 
       try {
         await db.update(businesses)
-          .set({ status: "approved" })
+          .set({ status: "active" })
           .where(eq(businesses.id, input.businessId));
 
         return { success: true, message: "İşletme onaylandı" };
@@ -163,7 +163,7 @@ export const businessRouter = router({
 
       try {
         await db.update(businesses)
-          .set({ status: "rejected" })
+          .set({ status: "inactive" })
           .where(eq(businesses.id, input.businessId));
 
         return { success: true, message: "İşletme reddedildi" };

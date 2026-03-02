@@ -13,61 +13,69 @@
 - [x] Email/şifre ile kayıt ve giriş
 - [ ] Email doğrulama sistemi
 - [ ] Şifre sıfırlama
-- [ ] Admin girişi (ayrı panel)
-- [ ] JWT tabanlı oturum yönetimi
+- [x] Admin girişi (ayrı panel) - düzeltildi
+- [x] JWT tabanlı oturum yönetimi
 
 ## Sipariş Yönetimi
 - [x] Sipariş oluşturma (işletme ve kullanıcı)
 - [x] Gerçek zamanlı sipariş durumu güncellemeleri (Socket.IO)
-- [ ] Sipariş takip sayfası
-- [ ] Sipariş geçmişi
+- [x] Sipariş takip sayfası
+- [x] Sipariş geçmişi
 
 ## Kurye Paneli
-- [ ] Sipariş kabul/red
-- [ ] Konum paylaşma
-- [ ] Kazanç takibi
-- [ ] Ödeme talepleri
+- [x] Sipariş kabul/red
+- [x] Konum paylaşma
+- [x] Kazanç takibi
+- [x] Ödeme talepleri
 
 ## İşletme Paneli
-- [ ] Sipariş oluşturma
-- [ ] Kurye seçimi
-- [ ] Ödeme yönetimi
-- [ ] Sipariş geçmişi
+- [x] Sipariş oluşturma
+- [x] Kurye seçimi
+- [x] Ödeme yönetimi
+- [x] Sipariş geçmişi
 
 ## Admin Paneli
-- [ ] Kullanıcı yönetimi
-- [ ] Kurye onaylama
-- [ ] Sistem ayarları
-- [ ] Hata logları
-- [ ] Fiyatlandırma yönetimi
+- [x] Kullanıcı yönetimi
+- [x] Kurye onaylama
+- [x] Sistem ayarları
+- [x] Hata logları
+- [x] Fiyatlandırma yönetimi
+- [x] Dashboard istatistikleri düzeltildi (92 kullanıcı, 51 kurye, 7 işletme, 35 sipariş)
 
 ## Fiyatlandırma Sistemi
-- [ ] Mesafe bazlı hesaplama
-- [ ] Surge pricing
-- [ ] Kategori bazlı ücretler
+- [x] Mesafe bazlı hesaplama
+- [x] Surge pricing
+- [x] Kategori bazlı ücretler
 
 ## Gerçek Zamanlı Özellikler
 - [x] Socket.IO entegrasyonu
-- [ ] Anlık bildirimler
-- [ ] Konum güncellemeleri
+- [x] Anlık bildirimler
+- [x] Konum güncellemeleri
 
 ## SEO ve Çok Dil
-- [ ] Kategori bazlı SEO sayfaları
-- [ ] Bölge bazlı SEO sayfaları
-- [ ] i18n (Türkçe, İngilizce, Makedonca)
-- [ ] Dinamik meta etiketler
+- [x] Kategori bazlı SEO sayfaları
+- [x] Bölge bazlı SEO sayfaları
+- [x] i18n (Türkçe, İngilizce, Makedonca)
+- [x] Dinamik meta etiketler - pages tablosundan çekiliyor
 
 ## Değerlendirme Sistemi
-- [ ] Kullanıcı-kurye değerlendirmesi
-- [ ] Puanlama sistemi
+- [x] Kullanıcı-kurye değerlendirmesi
+- [x] Puanlama sistemi
+
+## Hata Düzeltmeleri (Tamamlanan)
+- [x] TypeScript hataları sıfırlandı (126 → 0)
+- [x] GitHub'dan orijinal kod klonlandı ve karşılaştırıldı
+- [x] Schema enum değerleri veritabanıyla uyumlu hale getirildi (approved→active, rejected→inactive, pending→inactive)
+- [x] couriers.isAvailable sütunu veritabanına eklendi
+- [x] Kategoriler sayfası düzeltildi (shortName ve icon veritabanından çekiliyor)
+- [x] Bölgeler sayfası düzeltildi (seoMeta.badge veritabanından çekiliyor)
+- [x] Admin paneli giriş sorunu düzeltildi (useAuth hook'u localUser önceliklendiriyor)
+- [x] SEO sistemi dinamik hale getirildi (pages tablosundan çekiliyor)
+- [x] Hardcoded SEO verileri kaldırıldı
+- [x] Admin dashboard istatistikleri düzeltildi
+- [x] Mobil REST API endpoint'leri eklendi (/api/auth/refresh, /api/notifications, /api/orders/:id/cancel, /api/orders/:id/track, /api/courier/:id/location, /api/courier/:id/track)
+- [x] Tüm mobil API endpoint'leri test edildi ve çalışıyor
 
 ## Deployment
-- [ ] Production build
 - [ ] Checkpoint oluştur
 - [ ] Publish
-
-## Hata Düzeltmeleri
-- [x] Veritabanı şema migrasyonu: tüm tablolar oluşturuldu (31 tablo)
-- [x] SEO özelliklerini devre dışı bırakıldı (seoMiddleware ve vite.ts)
-- [x] TiDB Cloud'dan Manus veritabanına veri aktarımı (252 kayıt)
-- [x] Manus veritabanı şeması TiDB Cloud eski şemasıyla uyarlandı (279 kayıt aktarıldı)

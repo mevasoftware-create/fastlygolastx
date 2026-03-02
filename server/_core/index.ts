@@ -12,6 +12,8 @@ import { serveStatic, setupVite } from "./vite";
 import { initializeSocketIO } from "./socket";
 import { defaultRateLimit, lenientRateLimit, logRateLimitInfo } from "./rateLimit";
 import { seoMiddleware } from "./seoMiddleware";
+import jwt from "jsonwebtoken";
+import { getDb } from "../db";
 
 function isPortAvailable(port: number): Promise<boolean> {
   return new Promise(resolve => {
@@ -156,7 +158,7 @@ async function startServer() {
 
 
 
-  // SEO Middleware - disabled by user request
+  // SEO Middleware - DISABLED (Manus auto SEO removed, site uses custom SEO)
   // app.use(seoMiddleware);
 
   // Temporary debug endpoint - remove after diagnosis
@@ -173,36 +175,8 @@ async function startServer() {
     });
   });
 
-  // robots.txt - SEO disabled by user request
-  app.get('/robots.txt', (req, res) => {
-    res.type('text/plain');
-    res.send('User-agent: *\nDisallow: /');
-  });
-
-  // sitemap.xml - SEO disabled by user request
-  app.get('/sitemap.xml', (req, res) => {
-    res.status(404).send('Not found');
-    return;
-  });
-  // sitemap.xml - original (disabled)
-  app.get('/sitemap-disabled.xml', (req, res) => {
-    const BASE = 'https://fastlygo.mk';
-    const now = new Date().toISOString();
-    const publicPages = [
-      { loc: '/', priority: '1.0', changefreq: 'daily' },
-      { loc: '/how-it-works', priority: '0.8', changefreq: 'monthly' },
-      { loc: '/services', priority: '0.8', changefreq: 'monthly' },
-      { loc: '/about-us', priority: '0.7', changefreq: 'monthly' },
-      { loc: '/areas', priority: '0.8', changefreq: 'weekly' },
-      { loc: '/courier/register', priority: '0.7', changefreq: 'monthly' },
-      { loc: '/business/register', priority: '0.7', changefreq: 'monthly' },
-      { loc: '/terms-of-service', priority: '0.3', changefreq: 'yearly' },
-      { loc: '/privacy-policy', priority: '0.3', changefreq: 'yearly' },
-    ];
-    const urls = publicPages.map(p => `  <url>\n    <loc>${BASE}${p.loc}</loc>\n    <lastmod>${now}</lastmod>\n    <changefreq>${p.changefreq}</changefreq>\n    <priority>${p.priority}</priority>\n  </url>`).join('\n');
-    res.type('application/xml');
-    res.send(`<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls}\n</urlset>`);
-  });
+  // robots.txt and sitemap.xml - DISABLED (Manus auto SEO removed)
+  // Custom robots.txt and sitemap.xml should be placed in client/public/ folder
 
   // OAuth routes handled separately
   
@@ -236,6 +210,144 @@ async function startServer() {
   );
   // Initialize Socket.IO
   initializeSocketIO(server);
+
+  // ─── REST API endpoints for mobile app ───────────────────────────────────
+  const verifyToken = (req: any, res: any): { id: number; email: string; role: string } | null => {
+    const auth = req.headers.authorization || "";
+    const token = auth.startsWith("Bearer ") ? auth.slice(7) : null;
+    if (!token) { res.status(401).json({ error: "Unauthorized" }); return null; }
+    try {
+      return jwt.verify(token, process.env.JWT_SECRET || "secret") as any;
+    } catch { res.status(401).json({ error: "Invalid token" }); return null; }
+  };
+
+  // POST /api/auth/refresh - Refresh access token
+  app.post("/api/auth/refresh", async (req: any, res: any) => {
+    const user = verifyToken(req, res);
+    if (!user) return;
+    const newToken = jwt.sign(
+      { id: user.id, email: user.email, role: user.role },
+      process.env.JWT_SECRET || "secret",
+      { expiresIn: "30d" }
+    );
+    res.json({ token: newToken });
+  });
+
+  // GET /api/notifications - Get user notifications
+  app.get("/api/notifications", async (req: any, res: any) => {
+    const user = verifyToken(req, res);
+    if (!user) return;
+    try {
+      const db = await getDb();
+      if (!db) return res.json([]);
+      const { notifications } = await import("../../drizzle/schema");
+      const { eq, desc } = await import("drizzle-orm");
+      const items = await db.select().from(notifications)
+        .where(eq(notifications.userId, user.id))
+        .orderBy(desc(notifications.createdAt))
+        .limit(50);
+      res.json(items);
+    } catch (e) { res.status(500).json({ error: "Server error" }); }
+  });
+
+  // POST /api/notifications/:id/read - Mark notification as read
+  app.post("/api/notifications/:id/read", async (req: any, res: any) => {
+    const user = verifyToken(req, res);
+    if (!user) return;
+    try {
+      const db = await getDb();
+      if (!db) return res.json({ success: false });
+      const { notifications } = await import("../../drizzle/schema");
+      const { eq, and } = await import("drizzle-orm");
+      await db.update(notifications)
+        .set({ isRead: true })
+        .where(and(eq(notifications.id, parseInt(req.params.id)), eq(notifications.userId, user.id)));
+      res.json({ success: true });
+    } catch (e) { res.status(500).json({ error: "Server error" }); }
+  });
+
+  // POST /api/orders/:id/cancel - Cancel an order
+  app.post("/api/orders/:id/cancel", async (req: any, res: any) => {
+    const user = verifyToken(req, res);
+    if (!user) return;
+    try {
+      const db = await getDb();
+      if (!db) return res.json({ success: false });
+      const { orders } = await import("../../drizzle/schema");
+      const { eq, and } = await import("drizzle-orm");
+      const order = await db.select().from(orders)
+        .where(and(eq(orders.id, parseInt(req.params.id)), eq(orders.customerId, user.id)))
+        .limit(1);
+      if (!order.length) return res.status(404).json({ error: "Order not found" });
+      if (order[0].status !== "pending") return res.status(400).json({ error: "Order cannot be cancelled" });
+      await db.update(orders).set({ status: "cancelled" }).where(eq(orders.id, parseInt(req.params.id)));
+      res.json({ success: true });
+    } catch (e) { res.status(500).json({ error: "Server error" }); }
+  });
+
+  // GET /api/orders/:id/track - Track order status
+  app.get("/api/orders/:id/track", async (req: any, res: any) => {
+    const user = verifyToken(req, res);
+    if (!user) return;
+    try {
+      const db = await getDb();
+      if (!db) return res.status(500).json({ error: "DB unavailable" });
+      const { orders, couriers } = await import("../../drizzle/schema");
+      const { eq } = await import("drizzle-orm");
+      const order = await db.select().from(orders).where(eq(orders.id, parseInt(req.params.id))).limit(1);
+      if (!order.length) return res.status(404).json({ error: "Order not found" });
+      let courierLocation = null;
+      if (order[0].courierId) {
+        const courier = await db.select({
+          lat: couriers.currentLatitude, lng: couriers.currentLongitude
+        }).from(couriers).where(eq(couriers.id, order[0].courierId)).limit(1);
+        if (courier.length) courierLocation = courier[0];
+      }
+      res.json({ order: order[0], courierLocation });
+    } catch (e) { res.status(500).json({ error: "Server error" }); }
+  });
+
+  // GET /api/courier/:id/location - Get courier location
+  app.get("/api/courier/:id/location", async (req: any, res: any) => {
+    const user = verifyToken(req, res);
+    if (!user) return;
+    try {
+      const db = await getDb();
+      if (!db) return res.status(500).json({ error: "DB unavailable" });
+      const { couriers } = await import("../../drizzle/schema");
+      const { eq } = await import("drizzle-orm");
+      const courier = await db.select({
+        id: couriers.id, lat: couriers.currentLatitude, lng: couriers.currentLongitude,
+        isAvailable: couriers.isAvailable, status: couriers.status
+      }).from(couriers).where(eq(couriers.id, parseInt(req.params.id))).limit(1);
+      if (!courier.length) return res.status(404).json({ error: "Courier not found" });
+      res.json(courier[0]);
+    } catch (e) { res.status(500).json({ error: "Server error" }); }
+  });
+
+  // GET /api/courier/:id/track - Track courier
+  app.get("/api/courier/:id/track", async (req: any, res: any) => {
+    const user = verifyToken(req, res);
+    if (!user) return;
+    try {
+      const db = await getDb();
+      if (!db) return res.status(500).json({ error: "DB unavailable" });
+      const { couriers, users: usersTable } = await import("../../drizzle/schema");
+      const { eq } = await import("drizzle-orm");
+      const courier = await db.select({
+        id: couriers.id, vehicleType: couriers.vehicleType, vehiclePlate: couriers.vehiclePlate,
+        status: couriers.status, isAvailable: couriers.isAvailable,
+        lat: couriers.currentLatitude, lng: couriers.currentLongitude,
+        rating: couriers.rating, totalDeliveries: couriers.totalDeliveries,
+        name: usersTable.name
+      }).from(couriers)
+        .leftJoin(usersTable, eq(couriers.userId, usersTable.id))
+        .where(eq(couriers.id, parseInt(req.params.id))).limit(1);
+      if (!courier.length) return res.status(404).json({ error: "Courier not found" });
+      res.json(courier[0]);
+    } catch (e) { res.status(500).json({ error: "Server error" }); }
+  });
+  // ─────────────────────────────────────────────────────────────────────────
   
   // development mode uses Vite, production mode uses static files
   if (process.env.NODE_ENV === "development") {

@@ -45,11 +45,11 @@ export default function PendingApproval() {
     if (user.role === "user") { setLocation("/"); return; }
 
     // Kurye onaylanıldıysa dashboard'a yönlendir
-    if (user.role === "courier" && courierData?.status === "approved") {
+    if (user.role === "courier" && courierData?.status === "active") {
       setLocation("/courier"); return;
     }
     // İşletme onaylanıldıysa dashboard'a yönlendir
-    if (user.role === "business" && businessData?.status === "approved") {
+    if (user.role === "business" && businessData?.status === "active") {
       setLocation("/business-dashboard"); return;
     }
   }, [user, loading, courierData, businessData, setLocation]);

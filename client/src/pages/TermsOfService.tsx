@@ -3,16 +3,16 @@ import Footer from "@/components/Footer";
 import SEOHead from "@/components/SEOHead";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useTranslation } from "@/lib/i18n";
+import { trpc } from "@/lib/trpc";
+import { useSeoFromDatabase } from "@/hooks/useSeoFromDatabase";
 export default function TermsOfService() {
   const { language } = useLanguage();
   const { t } = useTranslation();
-  
-  // Static SEO data
-  const seoData = {
-    title: 'Terms of Service - FastlyGo Courier & Delivery',
-    description: 'FastlyGo terms of service and usage conditions. Read our terms and conditions for using our delivery platform.',
-    keywords: 'terms of service, terms and conditions, FastlyGo, delivery service'
-  };
+  const { data: pageData } = trpc.pages.getBySlug.useQuery({ slug: 'terms' }, {
+    retry: false,
+    refetchOnWindowFocus: false,
+  });
+  const seoData = useSeoFromDatabase(pageData?.seoMeta);
   
   const structuredData = {
     "@context": "https://schema.org",

@@ -124,7 +124,7 @@ async function calculatePricing(
         .select({ count: sql<number>`count(*)` })
         .from(couriers)
         .where(and(
-          eq(couriers.status, "approved"),
+          eq(couriers.status, "active"),
           eq(couriers.isAvailable, true)
         ));
       
@@ -132,7 +132,7 @@ async function calculatePricing(
       const activeCouriersResult = await dbInstance
       .select({ count: sql<number>`count(*)` })
       .from(couriers)
-      .where(eq(couriers.status, "approved"));
+      .where(eq(couriers.status, "active"));
     
       const availableCount = Number(availableCouriersResult[0]?.count || 0);
       const activeCount = Number(activeCouriersResult[0]?.count || 0);
@@ -232,7 +232,7 @@ export const appRouter = router({
       const totalOrders = await dbInstance.select({ count: sql<number>`count(*)` }).from(orders);
       const completedOrders = await dbInstance.select({ count: sql<number>`count(*)` }).from(orders).where(eq(orders.status, 'delivered'));
       const totalUsers = await dbInstance.select({ count: sql<number>`count(*)` }).from(users);
-      const activeCouriers = await dbInstance.select({ count: sql<number>`count(*)` }).from(couriers).where(eq(couriers.status, 'approved'));
+      const activeCouriers = await dbInstance.select({ count: sql<number>`count(*)` }).from(couriers).where(eq(couriers.status, 'active'));
       
       // Orders completed today
       const today = new Date();
@@ -1172,7 +1172,7 @@ export const appRouter = router({
     // Get pending orders for couriers
     pendingOrders: protectedProcedure.query(async ({ ctx }) => {
       const courier = await db.getCourierByUserId(ctx.user.id);
-      if (!courier || courier.status !== 'approved') {
+      if (!courier || courier.status !== 'active') {
         throw new TRPCError({ code: "FORBIDDEN", message: "Only approved couriers can access this" });
       }
       return await db.getPendingOrders();
@@ -1181,7 +1181,7 @@ export const appRouter = router({
     // Get available orders for couriers (alias for pendingOrders - mobile app compatibility)
     getAvailableOrders: protectedProcedure.query(async ({ ctx }) => {
       const courier = await db.getCourierByUserId(ctx.user.id);
-      if (!courier || courier.status !== 'approved') {
+      if (!courier || courier.status !== 'active') {
         throw new TRPCError({ code: "FORBIDDEN", message: "Only approved couriers can access this" });
       }
       const orders = await db.getPendingOrders();
@@ -1555,7 +1555,7 @@ export const appRouter = router({
     // Alias for app compatibility
     availableOrders: protectedProcedure.query(async ({ ctx }) => {
       const courier = await db.getCourierByUserId(ctx.user.id);
-      if (!courier || courier.status !== 'approved') {
+      if (!courier || courier.status !== 'active') {
         throw new TRPCError({ code: "FORBIDDEN", message: "Only approved couriers can access this" });
       }
       return await db.getPendingOrders();
@@ -1848,15 +1848,13 @@ export const appRouter = router({
           address: input.address,
           latitude: input.latitude || null,
           longitude: input.longitude || null,
-          balance: 0,
+           balance: 0,
           totalDebt: 0,
-          status: "pending",
+          status: "inactive",
         });
-
         return { success: true };
       }),
-
-    // Get restaurant profile
+    // Get restaurant profilee
     getProfile: protectedProcedure.query(async ({ ctx }) => {
       const dbInstance = await getDb();
       if (!dbInstance) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database not available" });

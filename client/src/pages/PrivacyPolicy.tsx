@@ -3,16 +3,16 @@ import Footer from "@/components/Footer";
 import SEOHead from "@/components/SEOHead";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useTranslation } from "@/lib/i18n";
+import { trpc } from "@/lib/trpc";
+import { useSeoFromDatabase } from "@/hooks/useSeoFromDatabase";
 export default function PrivacyPolicy() {
   const { language } = useLanguage();
   const { t } = useTranslation();
-  
-  // Static SEO data
-  const seoData = {
-    title: 'Privacy Policy - FastlyGo Courier & Delivery Service',
-    description: 'FastlyGo privacy policy and data protection information. Learn how we collect, use, and protect your personal data.',
-    keywords: 'privacy policy, data protection, FastlyGo, courier service'
-  };
+  const { data: pageData } = trpc.pages.getBySlug.useQuery({ slug: 'privacy' }, {
+    retry: false,
+    refetchOnWindowFocus: false,
+  });
+  const seoData = useSeoFromDatabase(pageData?.seoMeta);
   
   const structuredData = {
     "@context": "https://schema.org",

@@ -4,13 +4,14 @@ import { useLocation } from 'wouter';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { AlertCircle, Lock, Mail, ArrowLeft, Eye, EyeOff, Loader2, Shield } from 'lucide-react';
+import { AlertCircle, Lock, Mail, ArrowLeft, Eye, EyeOff, Loader2, Shield, LogOut } from 'lucide-react';
 import { trpc } from '@/lib/trpc';
 import { APP_LOGO, APP_TITLE } from '@/const';
 import { toast } from 'sonner';
 
 export default function AdminLogin() {
   const [, navigate] = useLocation();
+  const { user: currentUser, logout } = useAuth();
 
   // Set page title and noindex meta tag
   useEffect(() => {
@@ -35,12 +36,25 @@ export default function AdminLogin() {
   }, []);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [loggingOut, setLoggingOut] = useState(false);
+
+  const handleLogoutAndStay = async () => {
+    setLoggingOut(true);
+    try {
+      await logout();
+      toast.success('Çıkış yapıldı. Şimdi admin girişi yapabilirsiniz.');
+    } catch {
+      // ignore
+    } finally {
+      setLoggingOut(false);
+    }
+  };
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false);
-
+   const [loading, setLoading] = useState(false);
+  const utils = trpc.useUtils();
   const loginMutation = trpc.auth.login.useMutation({
-    onSuccess: (data) => {
+    onSuccess: async (data) => {
       console.log('Login response:', data);
       if (data.role === 'admin') {
         // Token'ı localStorage'a kaydet (Authorization header için)
@@ -53,10 +67,10 @@ export default function AdminLogin() {
           }));
         }
         toast.success('Admin paneline hoş geldiniz!');
-        // Navigate to dashboard
+        // Sayfayı yeniden yükle - localStorage token'u ile auth.me sorgusu doğru çalışsın
         setTimeout(() => {
-          navigate('/admin/dashboard');
-        }, 100);
+          window.location.href = '/admin';
+        }, 500);
       } else {
         setError('Bu hesap admin değildir. Lütfen admin hesabı kullanın.');
         toast.error('Admin hesabı gereklidir');
@@ -136,13 +150,37 @@ export default function AdminLogin() {
 
           {/* Login Form */}
           <form onSubmit={handleLogin} className="space-y-6 bg-white rounded-2xl shadow-lg p-8 border border-orange-100">
-            {/* Error Alert */}
-            {error && (
-              <div className="bg-red-50 border border-red-200 rounded-lg p-4 flex gap-3">
-                <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
-                <p className="text-red-700 text-sm">{error}</p>
+          {/* Current User Warning */}
+          {currentUser && currentUser.role !== 'admin' && (
+            <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
+              <div className="flex gap-3 items-start">
+                <AlertCircle className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
+                <div className="flex-1">
+                  <p className="text-amber-800 text-sm font-medium mb-1">Başka bir hesapla giriş yapılmış</p>
+                  <p className="text-amber-700 text-xs mb-2">{currentUser.email || currentUser.name} hesabıyla giriş yapılmış durumda. Admin paneline erişmek için önce çıkış yapın.</p>
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant="outline"
+                    onClick={handleLogoutAndStay}
+                    disabled={loggingOut}
+                    className="bg-amber-100 border-amber-300 text-amber-800 hover:bg-amber-200 text-xs h-7"
+                  >
+                    {loggingOut ? <Loader2 className="w-3 h-3 mr-1 animate-spin" /> : <LogOut className="w-3 h-3 mr-1" />}
+                    Çıkış Yap
+                  </Button>
+                </div>
               </div>
-            )}
+            </div>
+          )}
+
+          {/* Error Alert */}
+          {error && (
+            <div className="bg-red-50 border border-red-200 rounded-lg p-4 flex gap-3">
+              <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
+              <p className="text-red-700 text-sm">{error}</p>
+            </div>
+          )}
 
             {/* Email Field */}
             <div className="space-y-2">
