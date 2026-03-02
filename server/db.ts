@@ -71,11 +71,11 @@ export async function upsertUser(user: InsertUser): Promise<void> {
     }
 
     if (!values.lastSignedIn) {
-      values.lastSignedIn = new Date();
+      (values as any).lastSignedIn = sql`NOW()`;
     }
 
     if (Object.keys(updateSet).length === 0) {
-      updateSet.lastSignedIn = new Date();
+      (updateSet as any).lastSignedIn = sql`NOW()`;
     }
 
     await db.insert(users).values(values).onDuplicateKeyUpdate({
@@ -149,7 +149,7 @@ export async function updateCourierLocation(courierId: number, latitude: string,
   const db = await getDb();
   if (!db) throw new Error("Database not available");
   await db.update(couriers)
-    .set({ currentLatitude: latitude, currentLongitude: longitude, updatedAt: new Date() })
+    .set({ currentLatitude: latitude, currentLongitude: longitude, updatedAt: sql`NOW()` })
     .where(eq(couriers.id, courierId));
 }
 
@@ -157,7 +157,7 @@ export async function updateCourierAvailability(courierId: number, isAvailable: 
   const db = await getDb();
   if (!db) throw new Error("Database not available");
   await db.update(couriers)
-    .set({ isAvailable, updatedAt: new Date() })
+    .set({ isAvailable, updatedAt: sql`NOW()` })
     .where(eq(couriers.id, courierId));
 }
 
@@ -171,7 +171,7 @@ export async function approveCourier(courierId: number) {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
   await db.update(couriers)
-    .set({ status: 'active', updatedAt: new Date() })
+    .set({ status: 'active', updatedAt: sql`NOW()` })
     .where(eq(couriers.id, courierId));
 }
 
@@ -352,7 +352,7 @@ export async function upsertPricingConfig(config: InsertPricingConfig) {
       commissionRate: config.commissionRate,
       description: config.description,
       isActive: config.isActive,
-      updatedAt: new Date(),
+      updatedAt: sql`NOW()`,
     },
   });
 }
@@ -448,7 +448,7 @@ export async function updateCourierPaymentInfo(
       iban: paymentInfo.iban,
       identityNumber: paymentInfo.identityNumber,
       identityType: paymentInfo.identityType,
-      updatedAt: new Date(),
+      updatedAt: sql`NOW()`,
     })
     .where(eq(couriers.id, courierId));
 }
@@ -520,7 +520,7 @@ export async function updatePaymentRequestStatus(
   await db.update(paymentRequests)
     .set({
       status: status as any,
-      processedAt: new Date(),
+      processedAt: sql`NOW()`,
       processedBy,
       notes: notes || null,
       rejectionReason: rejectionReason || null,
@@ -837,7 +837,7 @@ export async function resolveErrorLog(id: number, resolvedBy: number, notes?: st
     .set({
       resolved: true,
       resolvedBy,
-      resolvedAt: new Date(),
+      resolvedAt: sql`NOW()`,
       notes,
     })
     .where(eq(errorLogs.id, id));
