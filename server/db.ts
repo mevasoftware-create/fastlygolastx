@@ -301,11 +301,11 @@ export async function updateOrderStatus(orderId: number, status: string, additio
   const updateData: any = { status, ...additionalData };
   
   if (status === 'accepted') {
-    updateData.acceptedAt = new Date();
+    updateData.acceptedAt = sql`NOW()`;
   } else if (status === 'picked_up') {
-    updateData.pickedUpAt = new Date();
+    updateData.pickedUpAt = sql`NOW()`;
   } else if (status === 'delivered') {
-    updateData.deliveredAt = new Date();
+    updateData.deliveredAt = sql`NOW()`;
   }
   
   await db.update(orders)
@@ -317,7 +317,7 @@ export async function assignCourierToOrder(orderId: number, courierId: number) {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
   await db.update(orders)
-    .set({ courierId, status: 'accepted', acceptedAt: new Date() })
+    .set({ courierId, status: 'accepted', acceptedAt: sql`NOW()` })
     .where(eq(orders.id, orderId));
 }
 

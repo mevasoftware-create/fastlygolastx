@@ -599,28 +599,28 @@ export default function Order() {
                   </div>
                 </div>
 
-                <div className="grid grid-cols-3 gap-4">
+                <div className="grid grid-cols-3 gap-2">
                   {[
-                    { value: "small", label: t('small'), icon: "📦", size: "30x30cm", gradient: "from-green-400 to-green-500" },
-                    { value: "medium", label: t('medium'), icon: "📦", size: "50x50cm", gradient: "from-blue-400 to-blue-500" },
-                    { value: "large", label: t('large'), icon: "📦", size: "70x70cm", gradient: "from-orange-400 to-orange-500" },
+                    { value: "small", label: t('small'), icon: "📦", size: "30×30cm" },
+                    { value: "medium", label: t('medium'), icon: "📦", size: "50×50cm" },
+                    { value: "large", label: t('large'), icon: "📦", size: "70×70cm" },
                   ].map((size) => (
                     <button
                       key={size.value}
                       type="button"
                       onClick={() => setFormData({ ...formData, packageSize: size.value as any })}
-                      className={`group relative p-4 md:p-5 rounded-xl border-2 transition-all duration-200 ${
+                      className={`group relative p-2.5 rounded-xl border-2 transition-all duration-200 flex flex-col items-center gap-1 ${
                         formData.packageSize === size.value
-                          ? "border-orange-400 bg-gradient-to-br from-orange-50 to-orange-100 shadow-xl"
-                          : "border-gray-200 hover:border-orange-300 bg-white hover:shadow-lg"
+                          ? "border-orange-400 bg-orange-50 shadow-md"
+                          : "border-gray-200 hover:border-orange-300 bg-white hover:shadow-sm"
                       }`}
                     >
-                      <div className="text-3xl md:text-4xl mb-2">{size.icon}</div>
-                      <div className="font-semibold text-sm md:text-base text-gray-900 mb-0.5">{size.label}</div>
-                      <div className="text-xs text-gray-600">{size.size}</div>
+                      <div className="text-2xl">{size.icon}</div>
+                      <div className="font-semibold text-xs text-gray-900">{size.label}</div>
+                      <div className="text-[10px] text-gray-500">{size.size}</div>
                       {formData.packageSize === size.value && (
-                        <div className="absolute top-2 right-2 w-6 h-6 rounded-full bg-gradient-to-br from-orange-500 to-orange-600 flex items-center justify-center shadow-md">
-                          <CheckCircle className="w-3.5 h-3.5 text-white" />
+                        <div className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-orange-500 flex items-center justify-center shadow-sm">
+                          <CheckCircle className="w-2.5 h-2.5 text-white" />
                         </div>
                       )}
                     </button>
@@ -753,6 +753,40 @@ export default function Order() {
                   rows={3}
                   className="resize-none border-orange-200 focus:border-orange-400 focus:ring-orange-400 rounded-xl text-sm md:text-base"
                 />
+              </div>
+            </Card>
+
+            {/* Payment Type - Compact */}
+            <Card className="p-4 bg-white/80 backdrop-blur-sm shadow-lg border-orange-100 rounded-2xl">
+              <div className="flex items-center gap-3">
+                <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-green-500 to-green-600 flex items-center justify-center shadow-sm flex-shrink-0">
+                  <DollarSign className="h-4 w-4 text-white" />
+                </div>
+                <span className="text-sm font-semibold text-gray-900 flex-shrink-0">{t('paymentType')}</span>
+                <div className="flex gap-2 ml-auto">
+                  <button
+                    type="button"
+                    onClick={() => setFormData({ ...formData, paymentType: 'sender_pays' })}
+                    className={`px-3 py-1.5 rounded-lg border-2 text-xs font-semibold transition-all ${
+                      formData.paymentType === 'sender_pays'
+                        ? 'border-green-500 bg-green-50 text-green-700'
+                        : 'border-gray-200 bg-white text-gray-600 hover:border-gray-300'
+                    }`}
+                  >
+                    {t('senderPays')}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setFormData({ ...formData, paymentType: 'receiver_pays' })}
+                    className={`px-3 py-1.5 rounded-lg border-2 text-xs font-semibold transition-all ${
+                      formData.paymentType === 'receiver_pays'
+                        ? 'border-orange-500 bg-orange-50 text-orange-700'
+                        : 'border-gray-200 bg-white text-gray-600 hover:border-gray-300'
+                    }`}
+                  >
+                    {t('receiverPays')}
+                  </button>
+                </div>
               </div>
             </Card>
 
