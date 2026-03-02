@@ -1,6 +1,5 @@
 import { useLocation } from "wouter";
 import { trpc } from "@/lib/trpc";
-import { formatCurrency } from "@/lib/currency";
 import {
   Users, Bike, Building2, Package, TrendingUp, Clock, CheckCircle2,
   AlertCircle, ArrowRight, MapPin, Star, CreditCard, Activity,
@@ -12,6 +11,8 @@ import {
   ResponsiveContainer, BarChart, Bar,
 } from "recharts";
 import { useMemo } from "react";
+
+import { formatEUR } from "@/lib/formatEUR";
 
 const STATUS_MAP: Record<string, { label: string; color: string }> = {
   pending: { label: "Bekliyor", color: "bg-yellow-100 text-yellow-700" },
@@ -49,7 +50,7 @@ function RevenueCard({ label, value, icon: Icon, accent }: { label: string; valu
         <p className="text-sm font-medium opacity-80">{label}</p>
         <Icon className="h-5 w-5 opacity-70" />
       </div>
-      <p className="text-2xl font-bold">{formatCurrency(value)}</p>
+      <p className="text-2xl font-bold">{formatEUR(value)}</p>
     </div>
   );
 }
@@ -192,7 +193,7 @@ export default function AdminHome() {
               <XAxis dataKey="day" tick={{ fontSize: 11, fill: "#9ca3af" }} axisLine={false} tickLine={false} />
               <YAxis tick={{ fontSize: 11, fill: "#9ca3af" }} axisLine={false} tickLine={false} />
               <Tooltip contentStyle={{ borderRadius: "12px", border: "1px solid #e5e7eb", fontSize: 12 }}
-                formatter={(v: any) => [`€${Number(v).toFixed(2)}`, "Gelir"]} />
+                formatter={(v: any) => [formatEUR(v), "Gelir"]} />
               <Bar dataKey="gelir" fill="url(#gelirGrad)" radius={[6, 6, 0, 0]} name="Gelir" />
             </BarChart>
           </ResponsiveContainer>
@@ -245,7 +246,7 @@ export default function AdminHome() {
                         <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold ${s.color}`}>{s.label}</span>
                       </td>
                       <td className="px-4 py-4">
-                        <p className="font-semibold text-gray-900 text-sm">{formatCurrency(order.totalFee || 0)}</p>
+                        <p className="font-semibold text-gray-900 text-sm">{formatEUR(order.totalFee)}</p>
                       </td>
                     </tr>
                   );

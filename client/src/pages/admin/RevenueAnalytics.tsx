@@ -3,6 +3,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { trpc } from "@/lib/trpc";
 import { TrendingUp } from "lucide-react";
+import { formatEUR } from "@/lib/formatEUR";
 import { useState } from "react";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
 
@@ -65,7 +66,7 @@ export default function RevenueAnalytics() {
                   </CardHeader>
                   <CardContent>
                     <div className="text-2xl font-bold text-orange-600">
-                      {(revenueReport.reduce((sum, item) => sum + (item.total || 0), 0) / 100).toFixed(2)} MKD
+                      {formatEUR(revenueReport.reduce((sum, item) => sum + (item.total || 0), 0))}
                     </div>
                   </CardContent>
                 </Card>
@@ -88,8 +89,8 @@ export default function RevenueAnalytics() {
                       {(() => {
                         const total = revenueReport.reduce((sum, item) => sum + (item.total || 0), 0);
                         const count = revenueReport.reduce((sum, item) => sum + (item.count || 0), 0);
-                        return count > 0 ? ((total / count) / 100).toFixed(2) : "0.00";
-                      })()} MKD
+                        return count > 0 ? formatEUR(total / count) : "€0.00";
+                      })()}
                     </div>
                   </CardContent>
                 </Card>
@@ -102,7 +103,7 @@ export default function RevenueAnalytics() {
                     <CartesianGrid strokeDasharray="3 3" />
                     <XAxis dataKey="date" />
                     <YAxis />
-                    <Tooltip formatter={(value: number) => `${(value / 100).toFixed(2)} MKD`} />
+                    <Tooltip formatter={(value: number) => [formatEUR(value), 'Gelir']} />
                     <Legend />
                     <Line type="monotone" dataKey="revenue" stroke="#FF6B00" name="Günlük Gelir" strokeWidth={2} dot={false} />
                   </LineChart>

@@ -13,6 +13,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { formatEUR } from "@/lib/formatEUR";
 
 export default function AdminPayments() {
   const [selectedRequest, setSelectedRequest] = useState<any>(null);
@@ -138,7 +139,7 @@ export default function AdminPayments() {
                     <div>
                       <p className="text-sm text-gray-600">Talep Edilen Tutar</p>
                       <p className="text-2xl font-bold text-orange-600">
-                        €{(request.amount / 100).toFixed(2)}
+                        {formatEUR(request.amount)}
                       </p>
                       {request.iban && (
                         <p className="text-sm text-gray-600 mt-2">
@@ -199,8 +200,8 @@ export default function AdminPayments() {
                     <div>
                       <p className="text-sm text-gray-600">Tutar</p>
                       <p className="text-lg font-bold text-gray-900">
-                        €{(request.amount / 100).toFixed(2)}
-                      </p>
+{formatEUR(request.amount)}
+                        </p>
                     </div>
                     {request.processedAt && (
                       <p className="text-sm text-gray-500">
@@ -237,7 +238,7 @@ export default function AdminPayments() {
               <div className="flex justify-between">
                 <span className="text-gray-600">Tutar:</span>
                 <span className="font-semibold text-orange-600">
-                  €{(selectedRequest.amount / 100).toFixed(2)}
+                  {formatEUR(selectedRequest.amount)}
                 </span>
               </div>
               {selectedRequest.iban && (

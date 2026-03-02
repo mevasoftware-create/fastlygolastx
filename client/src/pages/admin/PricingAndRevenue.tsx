@@ -5,6 +5,7 @@ import { Label } from "@/components/ui/label";
 import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
 import { DollarSign, TrendingUp, Calendar } from "lucide-react";
+import { formatEUR } from "@/lib/formatEUR";
 import { useState } from "react";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
 
@@ -31,7 +32,7 @@ export default function PricingAndRevenue() {
   const handleEditPricing = (scenario: any) => {
     setEditingScenario(scenario.scenario);
     setEditForm({
-      baseFee: scenario.baseFee / 100, // Convert cents to dollars
+      baseFee: scenario.baseFee / 100, // convert cents to EUR for input
       perKmFee: scenario.perKmFee / 100,
       minFee: 0,
     });
@@ -98,7 +99,7 @@ export default function PricingAndRevenue() {
                   </CardHeader>
                   <CardContent>
                     <div className="text-2xl font-bold">
-                      {(revenueReport.reduce((sum, item) => sum + (item.total || 0), 0) / 100).toFixed(2)} MKD
+                      {formatEUR(revenueReport.reduce((sum, item) => sum + (item.total || 0), 0))}
                     </div>
                   </CardContent>
                 </Card>
@@ -119,8 +120,8 @@ export default function PricingAndRevenue() {
                   <CardContent>
                     <div className="text-2xl font-bold">
                       {revenueReport.length > 0
-                        ? ((revenueReport.reduce((sum, item) => sum + (item.total || 0), 0) / revenueReport.reduce((sum, item) => sum + (item.count || 0), 0)) / 100).toFixed(2)
-                        : "0.00"} MKD
+                        ? formatEUR(revenueReport.reduce((sum, item) => sum + (item.total || 0), 0) / revenueReport.reduce((sum, item) => sum + (item.count || 0), 0))
+                        : "€0.00"}
                     </div>
                   </CardContent>
                 </Card>
@@ -134,7 +135,7 @@ export default function PricingAndRevenue() {
                     <CartesianGrid strokeDasharray="3 3" />
                     <XAxis dataKey="date" />
                     <YAxis />
-                    <Tooltip formatter={(value: number) => `${(value / 100).toFixed(2)} MKD`} />
+                    <Tooltip formatter={(value: number) => [formatEUR(value), 'Gelir']} />
                     <Legend />
                     <Line type="monotone" dataKey="revenue" stroke="#FF6B00" name="Günlük Gelir" />
                   </LineChart>
@@ -168,7 +169,7 @@ export default function PricingAndRevenue() {
                     <div className="space-y-4">
                       <div className="grid grid-cols-2 gap-4">
                         <div>
-                          <Label>Taban Ücret (MKD)</Label>
+                          <Label>Taban Ücret (€)</Label>
                           <Input
                             type="number"
                             value={editForm.baseFee}
@@ -176,7 +177,7 @@ export default function PricingAndRevenue() {
                           />
                         </div>
                         <div>
-                          <Label>Km Başına Ücret (MKD)</Label>
+                          <Label>Km Başına Ücret (€)</Label>
                           <Input
                             type="number"
                             value={editForm.perKmFee}
@@ -192,8 +193,8 @@ export default function PricingAndRevenue() {
                   ) : (
                     <div className="flex items-center justify-between">
                       <div className="space-y-1">
-                        <div>Taban Ücret: {(scenario.baseFee / 100).toFixed(2)} MKD</div>
-                        <div>Km Başına: {(scenario.perKmFee / 100).toFixed(2)} MKD</div>
+                        <div>Taban Ücret: {formatEUR(scenario.baseFee)}</div>
+                        <div>Km Başına: {formatEUR(scenario.perKmFee)}/km</div>
                       </div>
                       <Button onClick={() => handleEditPricing(scenario)}>Düzenle</Button>
                     </div>

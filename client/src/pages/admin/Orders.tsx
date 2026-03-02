@@ -7,7 +7,7 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { toast } from "sonner";
 import { Search, Edit, Trash2, Package, Clock, CheckCircle2, XCircle, Truck, ShoppingBag, RefreshCw, Filter, Map, List } from "lucide-react";
-import { formatCurrency } from "@/lib/currency";
+import { formatEUR } from "@/lib/formatEUR";
 
 const STATUS_CONFIG: Record<string, { label: string; color: string; bg: string }> = {
   pending:    { label: "Beklemede",     color: "text-amber-700",  bg: "bg-amber-50 border-amber-200" },
@@ -181,7 +181,7 @@ export function OrdersPage() {
                       {order.courierId ? <span className="font-medium text-gray-700">#{order.courierId}</span> : <span className="text-gray-300">—</span>}
                     </td>
                     <td className="px-4 py-3">
-                      <span className="font-semibold text-orange-600">{formatCurrency(order.totalFee)}</span>
+                      <span className="font-semibold text-orange-600">{formatEUR(order.totalFee)}</span>
                     </td>
                     <td className="px-4 py-3"><StatusBadge status={order.status} /></td>
                     <td className="px-4 py-3 text-xs text-gray-400">{new Date(order.createdAt).toLocaleDateString("tr-TR")}</td>
@@ -222,7 +222,7 @@ export function OrdersPage() {
               </Select>
             </div>
             <div className="rounded-lg bg-gray-50 p-3 space-y-1.5 text-sm">
-              <div className="flex gap-2"><span className="text-gray-500 w-24">Tutar:</span><span className="font-medium">{formatCurrency(editingOrder?.totalFee || 0)}</span></div>
+              <div className="flex gap-2"><span className="text-gray-500 w-24">Tutar:</span><span className="font-medium">{formatEUR(editingOrder?.totalFee)}</span></div>
               <div className="flex gap-2"><span className="text-gray-500 w-24">Alış:</span><span className="text-xs">{editingOrder?.pickupAddress}</span></div>
               <div className="flex gap-2"><span className="text-gray-500 w-24">Teslimat:</span><span className="text-xs">{editingOrder?.deliveryAddress}</span></div>
             </div>

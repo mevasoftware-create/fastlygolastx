@@ -1,0 +1,80 @@
+{
+  "query": "SELECT id, orderNumber, totalFee, baseFee, distanceFee FROM orders ORDER BY createdAt DESC LIMIT 10;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4EV5ivwhyC7eCUY.ebc471170149 --database 4KwtmFvvd67FSFhQ5dyp9H --execute SELECT id, orderNumber, totalFee, baseFee, distanceFee FROM orders ORDER BY createdAt DESC LIMIT 10;",
+  "rows": [
+    {
+      "id": "720003",
+      "orderNumber": "RT-MM8FBT96-LBWJA",
+      "totalFee": "170",
+      "baseFee": "100",
+      "distanceFee": "20"
+    },
+    {
+      "id": "720002",
+      "orderNumber": "RT-MLZPGIUM-K9YBI",
+      "totalFee": "231",
+      "baseFee": "100",
+      "distanceFee": "28"
+    },
+    {
+      "id": "690001",
+      "orderNumber": "RT-MLQN0Y4F-PHM4B",
+      "totalFee": "210",
+      "baseFee": "100",
+      "distanceFee": "0"
+    },
+    {
+      "id": "660002",
+      "orderNumber": "RT-MLJZEKY5-XF5FV",
+      "totalFee": "203",
+      "baseFee": "100",
+      "distanceFee": "6"
+    },
+    {
+      "id": "660001",
+      "orderNumber": "RT-MLJZBBZW-JYXTM",
+      "totalFee": "142",
+      "baseFee": "100",
+      "distanceFee": "9"
+    },
+    {
+      "id": "630001",
+      "orderNumber": "RT-MKSCHRRL-64TMF",
+      "totalFee": "748",
+      "baseFee": "100",
+      "distanceFee": "384"
+    },
+    {
+      "id": "600001",
+      "orderNumber": "RT-MKRFQVF6-25ANN",
+      "totalFee": "263",
+      "baseFee": "100",
+      "distanceFee": "52"
+    },
+    {
+      "id": "570001",
+      "orderNumber": "RT-MKL0OWTL-RMDH8",
+      "totalFee": "172",
+      "baseFee": "100",
+      "distanceFee": "22"
+    },
+    {
+      "id": "540001",
+      "orderNumber": "RT-MK88XDZ0-11HJP",
+      "totalFee": "136",
+      "baseFee": "100",
+      "distanceFee": "36"
+    },
+    {
+      "id": "510001",
+      "orderNumber": "RT-MK4L6HGM-VOQ43",
+      "totalFee": "175",
+      "baseFee": "100",
+      "distanceFee": "25"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\torderNumber\ttotalFee\tbaseFee\tdistanceFee\n720003\tRT-MM8FBT96-LBWJA\t170\t100\t20\n720002\tRT-MLZPGIUM-K9YBI\t231\t100\t28\n690001\tRT-MLQN0Y4F-PHM4B\t210\t100\t0\n660002\tRT-MLJZEKY5-XF5FV\t203\t100\t6\n660001\tRT-MLJZBBZW-JYXTM\t142\t100\t9\n630001\tRT-MKSCHRRL-64TMF\t748\t100\t384\n600001\tRT-MKRFQVF6-25ANN\t263\t100\t52\n570001\tRT-MKL0OWTL-RMDH8\t172\t100\t22\n540001\tRT-MK88XDZ0-11HJP\t136\t100\t36\n510001\tRT-MK4L6HGM-VOQ43\t175\t100\t25\n",
+  "stderr": "",
+  "execution_time_ms": 56
+}

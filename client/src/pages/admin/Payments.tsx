@@ -10,6 +10,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
 import { DollarSign, CheckCircle, XCircle, Clock, AlertCircle, Loader2 } from 'lucide-react';
+import { formatEUR } from '@/lib/formatEUR';
 
 export function PaymentsPage() {
   const [selectedRequest, setSelectedRequest] = useState<any>(null);
@@ -145,7 +146,7 @@ export function PaymentsPage() {
             <CardTitle className="text-sm font-medium text-gray-600">Toplam Tutar</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">₺{(stats.totalAmount / 100).toFixed(2)}</div>
+            <div className="text-2xl font-bold">{formatEUR(stats.totalAmount)}</div>
           </CardContent>
         </Card>
       </div>
@@ -219,7 +220,7 @@ export function PaymentsPage() {
                   {filteredRequests.map((request: any) => (
                     <TableRow key={request.id}>
                       <TableCell className="font-medium">#{request.courierId}</TableCell>
-                      <TableCell className="font-bold">₺{(request.amount / 100).toFixed(2)}</TableCell>
+                      <TableCell className="font-bold">{formatEUR(request.amount)}</TableCell>
                       <TableCell>{getStatusBadge(request.status)}</TableCell>
                       <TableCell className="text-sm text-gray-600">
                         {new Date(request.requestedAt).toLocaleDateString('tr-TR')}
@@ -246,7 +247,7 @@ export function PaymentsPage() {
                               <DialogHeader>
                                 <DialogTitle>Ödeme Talebini İşle</DialogTitle>
                                 <DialogDescription>
-                                  Kurye #{request.courierId} - ₺{(request.amount / 100).toFixed(2)}
+                                  Kurye #{request.courierId} - {formatEUR(request.amount)}
                                 </DialogDescription>
                               </DialogHeader>
 

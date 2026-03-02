@@ -5,6 +5,7 @@ import { Label } from "@/components/ui/label";
 import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
 import { DollarSign, Edit2, Save, X } from "lucide-react";
+import { formatEUR } from "@/lib/formatEUR";
 import { useState } from "react";
 
 export default function Pricing() {
@@ -17,7 +18,7 @@ export default function Pricing() {
   const handleEditPricing = (scenario: any) => {
     setEditingScenario(scenario.scenario);
     setEditForm({
-      baseFee: scenario.baseFee / 100,
+      baseFee: scenario.baseFee / 100,  // convert cents to EUR for display
       perKmFee: scenario.perKmFee / 100,
       minFee: 0,
     });
@@ -82,7 +83,7 @@ export default function Pricing() {
                 <div className="space-y-4">
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <Label>Taban Ücret (MKD)</Label>
+                      <Label>Taban Ücret (€)</Label>
                       <Input
                         type="number"
                         step="0.01"
@@ -91,7 +92,7 @@ export default function Pricing() {
                       />
                     </div>
                     <div>
-                      <Label>Km Başına Ücret (MKD)</Label>
+                      <Label>Km Başına Ücret (€)</Label>
                       <Input
                         type="number"
                         step="0.01"
@@ -119,11 +120,11 @@ export default function Pricing() {
                 <div className="grid grid-cols-2 gap-6">
                   <div className="bg-gray-50 rounded-lg p-4">
                     <p className="text-xs text-gray-500 mb-1">Taban Ücret</p>
-                    <p className="text-xl font-bold text-gray-900">{(scenario.baseFee / 100).toFixed(2)} <span className="text-sm font-normal text-gray-500">MKD</span></p>
+                    <p className="text-xl font-bold text-gray-900">{formatEUR(scenario.baseFee)}</p>
                   </div>
                   <div className="bg-gray-50 rounded-lg p-4">
                     <p className="text-xs text-gray-500 mb-1">Km Başına</p>
-                    <p className="text-xl font-bold text-gray-900">{(scenario.perKmFee / 100).toFixed(2)} <span className="text-sm font-normal text-gray-500">MKD/km</span></p>
+                    <p className="text-xl font-bold text-gray-900">{formatEUR(scenario.perKmFee)}/km</p>
                   </div>
                 </div>
               )}

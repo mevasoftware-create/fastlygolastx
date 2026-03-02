@@ -9,6 +9,7 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { toast } from "sonner";
 import { Search, Trash2, Mail, User, Package, Calendar, Phone, MapPin, Eye } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { formatEUR } from "@/lib/formatEUR";
 
 interface CustomerUser {
   id: number;
@@ -59,12 +60,13 @@ export function CustomersPage() {
     return allOrders.filter((order: any) => order.userId === userId).length;
   };
 
-  // Get total spent for a customer
+  // Get total spent for a customer (returns MKD, display as EUR)
   const getTotalSpent = (userId: number) => {
     if (!allOrders) return 0;
     const customerOrders = allOrders.filter((order: any) => order.userId === userId && order.status === 'delivered');
     return customerOrders.reduce((sum: number, order: any) => sum + (order.totalFee || 0), 0);
   };
+
 
   // Get customer orders
   const getCustomerOrders = (userId: number) => {
@@ -158,7 +160,7 @@ export function CustomersPage() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-orange-600">
-              €{customers.reduce((sum: number, c: CustomerUser) => sum + getTotalSpent(c.id), 0).toFixed(2)}
+              {formatEUR(customers.reduce((sum: number, c: CustomerUser) => sum + getTotalSpent(c.id), 0))}
             </div>
           </CardContent>
         </Card>
@@ -232,7 +234,7 @@ export function CustomersPage() {
                   </TableCell>
                   <TableCell>
                     <span className="font-medium text-green-600">
-                      €{getTotalSpent(customer.id).toFixed(2)}
+                      {formatEUR(getTotalSpent(customer.id))}
                     </span>
                   </TableCell>
                   <TableCell className="text-sm text-muted-foreground">
@@ -334,7 +336,7 @@ export function CustomersPage() {
                     <p className="text-sm text-muted-foreground">Tamamlanan</p>
                   </div>
                   <div className="text-center p-4 bg-orange-50 rounded-lg">
-                    <p className="text-2xl font-bold text-orange-600">€{getTotalSpent(selectedCustomer.id).toFixed(2)}</p>
+                    <p className="text-2xl font-bold text-orange-600">{formatEUR(getTotalSpent(selectedCustomer.id))}</p>
                     <p className="text-sm text-muted-foreground">Toplam Harcama</p>
                   </div>
                 </CardContent>
@@ -362,7 +364,7 @@ export function CustomersPage() {
                             <TableCell className="font-mono">#{order.id}</TableCell>
                             <TableCell>{formatDateTime(order.createdAt)}</TableCell>
                             <TableCell>{getStatusBadge(order.status)}</TableCell>
-                            <TableCell className="font-medium">€{(order.totalFee || 0).toFixed(2)}</TableCell>
+                            <TableCell className="font-medium">{formatEUR(order.totalFee || 0)}</TableCell>
                           </TableRow>
                         ))}
                       </TableBody>
