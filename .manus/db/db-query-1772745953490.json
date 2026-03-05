@@ -1,0 +1,25 @@
+{
+  "query": "SELECT slug, lat, lng FROM areas LIMIT 3;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4EV5ivwhyC7eCUY.ebc471170149 --database 4KwtmFvvd67FSFhQ5dyp9H --execute SELECT slug, lat, lng FROM areas LIMIT 3;",
+  "rows": [
+    {
+      "slug": "aerodrom",
+      "lat": "41.9836",
+      "lng": "21.4914"
+    },
+    {
+      "slug": "centar",
+      "lat": "41.9981",
+      "lng": "21.4254"
+    },
+    {
+      "slug": "karpos",
+      "lat": "42.0069",
+      "lng": "21.3883"
+    }
+  ],
+  "messages": [],
+  "stdout": "slug\tlat\tlng\naerodrom\t41.9836\t21.4914\ncentar\t41.9981\t21.4254\nkarpos\t42.0069\t21.3883\n",
+  "stderr": "",
+  "execution_time_ms": 292
+}

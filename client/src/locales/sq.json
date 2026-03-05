@@ -13,7 +13,7 @@
   "comingSoon": "Së Shpejti",
   "areasCTATitle": "Gati për Porosi?",
   "areasCTADescription": "Zgjidhni zonën tuaj dhe filloni të porosisni nga restorantet dhe dyqanet tuaja të preferuara.",
-  "startOrdering": "Filloni të Porosisni",
+  "startOrdering": "Filloni të Porositni",
   "catFoodDelivery": "Dërgesë Ushqimi",
   "catGrocery": "Ushqimore & Treg",
   "catPharmacy": "Farmaci",
@@ -646,7 +646,6 @@
   "orderInSeconds": "Vendosni porosinë tuaj në sekonda",
   "readyToOrder": "Gati për të Thirrur një Korrier?",
   "orderInMinutes": "Vendosni porosinë tuaj tani dhe merrni atë në minuta. E shpejtë, e besueshme, e përballueshme.",
-  "startOrdering": "Filloni të Porositni",
   "foodDeliveryTitle": "Dërgesë Ushqimi në Shkup",
   "foodDeliverySubtitle": "Porosit nga restorantet, fast food, ëmbëlsira dhe më shumë. Dërgesë në 15 minuta.",
   "foodCategories": "Kategoritë e Ushqimit",
@@ -972,5 +971,8 @@
   "enterPhone": "Vendosni numrin e telefonit",
   "contactInfo": "Informacioni i Kontaktit",
   "pickupContact": "Kontakti i Marrjes",
-  "deliveryContact": "Kontakti i Dorëzimit"
+  "deliveryContact": "Kontakti i Dorëzimit",
+  "mapView": "Harta",
+  "listView": "Lista",
+  "viewArea": "Shiko Zonën"
 }

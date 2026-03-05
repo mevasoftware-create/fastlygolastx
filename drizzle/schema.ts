@@ -1,4 +1,4 @@
-import { int, mysqlEnum, mysqlTable, text, timestamp, varchar, decimal, boolean, json, index } from "drizzle-orm/mysql-core";
+import { int, mysqlEnum, mysqlTable, text, timestamp, varchar, decimal, boolean, json, index, double } from "drizzle-orm/mysql-core";
 
 /**
  * Core user table backing auth flow.
@@ -460,6 +460,8 @@ export const areas = mysqlTable("areas", {
   seoMeta: text("seoMeta").notNull(), // JSON: {en: {title, subtitle, description, keywords}, tr: {...}, mk: {...}, sq: {...}}
   active: boolean("active").default(true).notNull(),
   displayOrder: int("displayOrder").default(0).notNull(),
+  lat: double("lat"),
+  lng: double("lng"),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
 });

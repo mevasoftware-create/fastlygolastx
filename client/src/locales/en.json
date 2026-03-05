@@ -975,5 +975,8 @@
   "enterPhone": "Enter phone number",
   "contactInfo": "Contact Information",
   "pickupContact": "Pickup Contact",
-  "deliveryContact": "Delivery Contact"
+  "deliveryContact": "Delivery Contact",
+  "mapView": "Map",
+  "listView": "List",
+  "viewArea": "View Area"
 }

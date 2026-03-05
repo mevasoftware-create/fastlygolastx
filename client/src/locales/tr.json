@@ -646,7 +646,6 @@
   "orderInSeconds": "Saniyeler içinde sipariş verin",
   "readyToOrder": "Kurye Çağırmaya Hazır mısınız?",
   "orderInMinutes": "Hemen sipariş verin ve dakikalar içinde teslim alın. Hızlı, güvenilir, uygun fiyatlı.",
-  "startOrdering": "Sipariş Vermeye Başla",
   "foodDeliveryTitle": "Üsküp\\",
   "foodDeliverySubtitle": "Restoranlar, fast food, tatlılar ve daha fazlasından sipariş verin. 15 dakikada teslimat.",
   "foodCategories": "Yemek Kategorileri",
@@ -886,5 +885,8 @@
   "enterPhone": "Telefon numarası girin",
   "contactInfo": "İletişim Bilgileri",
   "pickupContact": "Alıcı Bilgileri",
-  "deliveryContact": "Teslim Edilecek Kişi Bilgileri"
+  "deliveryContact": "Teslim Edilecek Kişi Bilgileri",
+  "mapView": "Harita",
+  "listView": "Liste",
+  "viewArea": "Bölgeyi Gör"
 }
