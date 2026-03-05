@@ -1,29 +1,28 @@
-import { useState, useCallback, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import SEOHead from '@/components/SEOHead';
 import { MapView } from '@/components/Map';
-import { MapPin, Search, CheckCircle, Clock, Loader2, Zap, ArrowRight, List, Map as MapIcon, X } from 'lucide-react';
-import { useTranslation } from '@/lib/i18n';
+import { MapPin, Search, CheckCircle, ArrowRight, Loader2, Zap } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { Link, useLocation } from 'wouter';
+import { Link } from 'wouter';
 import { trpc } from '@/lib/trpc';
 
-// City color palette
-const cityColors: Record<string, { bg: string; dot: string; badge: string; hex: string }> = {
-  Skopje:   { bg: 'from-orange-50 to-amber-50',   dot: 'bg-orange-400',  badge: 'bg-orange-100 text-orange-600',  hex: '#f97316' },
-  Tetovo:   { bg: 'from-blue-50 to-sky-50',        dot: 'bg-blue-400',    badge: 'bg-blue-100 text-blue-600',      hex: '#3b82f6' },
-  Bitola:   { bg: 'from-purple-50 to-violet-50',   dot: 'bg-purple-400',  badge: 'bg-purple-100 text-purple-600',  hex: '#a855f7' },
-  Ohrid:    { bg: 'from-teal-50 to-cyan-50',        dot: 'bg-teal-400',    badge: 'bg-teal-100 text-teal-600',      hex: '#14b8a6' },
-  Kumanovo: { bg: 'from-rose-50 to-pink-50',        dot: 'bg-rose-400',    badge: 'bg-rose-100 text-rose-600',      hex: '#f43f5e' },
-  Gostivar: { bg: 'from-green-50 to-emerald-50',   dot: 'bg-green-400',   badge: 'bg-green-100 text-green-600',    hex: '#22c55e' },
-  Strumica: { bg: 'from-yellow-50 to-lime-50',     dot: 'bg-yellow-400',  badge: 'bg-yellow-100 text-yellow-700',  hex: '#eab308' },
-  Veles:    { bg: 'from-indigo-50 to-blue-50',     dot: 'bg-indigo-400',  badge: 'bg-indigo-100 text-indigo-600',  hex: '#6366f1' },
-  Kocani:   { bg: 'from-amber-50 to-orange-50',    dot: 'bg-amber-400',   badge: 'bg-amber-100 text-amber-700',    hex: '#f59e0b' },
-  Istip:    { bg: 'from-cyan-50 to-teal-50',        dot: 'bg-cyan-400',    badge: 'bg-cyan-100 text-cyan-600',      hex: '#06b6d4' },
-  Prilep:   { bg: 'from-fuchsia-50 to-pink-50',    dot: 'bg-fuchsia-400', badge: 'bg-fuchsia-100 text-fuchsia-600',hex: '#d946ef' },
+const cityColors: Record<string, string> = {
+  Skopje:   '#f97316',
+  Tetovo:   '#3b82f6',
+  Bitola:   '#a855f7',
+  Ohrid:    '#14b8a6',
+  Kumanovo: '#f43f5e',
+  Gostivar: '#22c55e',
+  Strumica: '#eab308',
+  Veles:    '#6366f1',
+  Kocani:   '#f59e0b',
+  Istip:    '#06b6d4',
+  Prilep:   '#d946ef',
 };
-const defaultCityColor = { bg: 'from-gray-50 to-slate-50', dot: 'bg-gray-400', badge: 'bg-gray-100 text-gray-600', hex: '#6b7280' };
+const defaultHex = '#6b7280';
 
 function getCityForSlug(slug: string): string {
   if (slug.includes('tetovo')) return 'Tetovo';
@@ -40,16 +39,15 @@ function getCityForSlug(slug: string): string {
 }
 
 export default function Areas() {
-  const { t } = useTranslation();
   const { language } = useLanguage();
-  const [, navigate] = useLocation();
+  const { t } = useTranslation();
   const [searchQuery, setSearchQuery] = useState('');
-  const [viewMode, setViewMode] = useState<'map' | 'list'>('map');
   const [selectedArea, setSelectedArea] = useState<any | null>(null);
-  const markersRef = useRef<any[]>([]);
+  const [mapInstance, setMapInstance] = useState<any>(null);
+  const markersRef = useRef<Map<number, any>>(new Map());
   const infoWindowRef = useRef<any>(null);
 
-  const { data: pageData, isLoading: isSeoLoading } = trpc.pages.getBySlug.useQuery({ slug: 'areas' });
+  const { data: pageData } = trpc.pages.getBySlug.useQuery({ slug: 'areas' });
   const pageSeoMeta = pageData?.seoMeta ? (typeof pageData.seoMeta === 'string' ? JSON.parse(pageData.seoMeta) : pageData.seoMeta) : null;
   const seoData = pageSeoMeta?.[language] || pageSeoMeta?.en || {};
 
@@ -57,7 +55,7 @@ export default function Areas() {
 
   const getAreaName = (area: any) => {
     const meta = area.seoMeta?.[language] || area.seoMeta?.en || {};
-    return meta.heading || meta.badge || meta.shortTitle || area.slug;
+    return meta.heading || meta.badge || area.slug;
   };
 
   const getAreaSubtitle = (area: any) => {
@@ -69,7 +67,6 @@ export default function Areas() {
     getAreaName(area).toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  // Group for list view
   const groupedAreas = filteredAreas.reduce((acc: Record<string, any[]>, area: any) => {
     const city = getCityForSlug(area.slug);
     if (!acc[city]) acc[city] = [];
@@ -83,338 +80,263 @@ export default function Areas() {
     return a.localeCompare(b);
   });
 
-  const handleMapReady = useCallback((map: any) => {
-    if (!areas) return;
+  // Add markers when both map and areas are available
+  useEffect(() => {
+    if (!mapInstance || !areas || areas.length === 0) return;
+    if (markersRef.current.size > 0) return; // already added
 
-    // Clear existing markers
-    markersRef.current.forEach(m => m.setMap(null));
-    markersRef.current = [];
+    // Clean map style
+    mapInstance.setOptions({
+      styles: [
+        { featureType: 'poi', elementType: 'labels', stylers: [{ visibility: 'off' }] },
+        { featureType: 'transit', elementType: 'labels', stylers: [{ visibility: 'off' }] },
+        { featureType: 'road', elementType: 'labels.icon', stylers: [{ visibility: 'off' }] },
+        { featureType: 'landscape', elementType: 'geometry', stylers: [{ color: '#f0f0eb' }] },
+        { featureType: 'water', elementType: 'geometry', stylers: [{ color: '#b8d8e8' }] },
+      ]
+    });
 
-    if (infoWindowRef.current) {
-      infoWindowRef.current.close();
-    }
-    infoWindowRef.current = new window.google.maps.InfoWindow();
-
-    const bounds = new window.google.maps.LatLngBounds();
+    infoWindowRef.current = new window.google.maps.InfoWindow({ maxWidth: 240 });
 
     areas.forEach((area: any) => {
       if (!area.lat || !area.lng) return;
 
       const city = getCityForSlug(area.slug);
-      const colors = cityColors[city] || defaultCityColor;
+      const hex = cityColors[city] || defaultHex;
       const areaName = getAreaName(area);
-      const subtitle = getAreaSubtitle(area);
-
-      // Custom SVG pin marker
-      const svgMarker = {
-        path: 'M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z',
-        fillColor: colors.hex,
-        fillOpacity: 1,
-        strokeColor: '#ffffff',
-        strokeWeight: 2,
-        scale: 1.8,
-        anchor: new window.google.maps.Point(12, 22),
-      };
 
       const marker = new window.google.maps.Marker({
         position: { lat: area.lat, lng: area.lng },
-        map,
+        map: mapInstance,
         title: areaName,
-        icon: svgMarker,
-        animation: window.google.maps.Animation.DROP,
+        icon: {
+          path: 'M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z',
+          fillColor: hex,
+          fillOpacity: 1,
+          strokeColor: '#ffffff',
+          strokeWeight: 2.5,
+          scale: 1.8,
+          anchor: new window.google.maps.Point(12, 22),
+        },
       });
 
       marker.addListener('click', () => {
         setSelectedArea(area);
-
-        const content = `
-          <div style="font-family: system-ui, sans-serif; padding: 4px; min-width: 180px; max-width: 240px;">
-            <div style="display:flex; align-items:center; gap:6px; margin-bottom:6px;">
-              <span style="width:10px; height:10px; border-radius:50%; background:${colors.hex}; flex-shrink:0;"></span>
-              <strong style="font-size:15px; color:#1f2937;">${areaName}</strong>
+        const subtitle = getAreaSubtitle(area);
+        infoWindowRef.current.setContent(`
+          <div style="font-family:-apple-system,sans-serif;padding:2px 0;min-width:150px;">
+            <div style="display:flex;align-items:center;gap:6px;margin-bottom:${subtitle ? '4px' : '8px'};">
+              <span style="width:7px;height:7px;border-radius:50%;background:${hex};flex-shrink:0;"></span>
+              <strong style="font-size:13px;color:#111827;">${areaName}</strong>
             </div>
-            ${subtitle ? `<p style="font-size:12px; color:#6b7280; margin:0 0 8px 0; line-height:1.4;">${subtitle}</p>` : ''}
-            <a href="/areas/${area.slug}" style="display:inline-block; background:${colors.hex}; color:white; font-size:12px; font-weight:600; padding:5px 12px; border-radius:8px; text-decoration:none;">
-              ${t('viewArea') || 'View Area'} →
+            ${subtitle ? `<p style="font-size:11px;color:#6b7280;margin:0 0 8px 0;line-height:1.4;padding-left:13px;">${subtitle.length > 70 ? subtitle.slice(0, 70) + '…' : subtitle}</p>` : ''}
+            <a href="/areas/${area.slug}"
+               onclick="event.preventDefault();window.__navigateTo('/areas/${area.slug}')"
+               style="display:inline-flex;align-items:center;gap:4px;background:${hex};color:white;font-size:11px;font-weight:600;padding:4px 10px;border-radius:6px;text-decoration:none;margin-left:13px;">
+              View Area →
             </a>
           </div>
-        `;
-        infoWindowRef.current.setContent(content);
-        infoWindowRef.current.open(map, marker);
-
-        // Handle link click inside InfoWindow
-        window.google.maps.event.addListenerOnce(infoWindowRef.current, 'domready', () => {
-          const link = document.querySelector('.gm-style-iw a[href^="/areas/"]') as HTMLAnchorElement;
-          if (link) {
-            link.addEventListener('click', (e) => {
-              e.preventDefault();
-              navigate(link.getAttribute('href') || '/areas');
-            });
-          }
-        });
+        `);
+        infoWindowRef.current.open(mapInstance, marker);
       });
 
-      markersRef.current.push(marker);
-      bounds.extend({ lat: area.lat, lng: area.lng });
+      markersRef.current.set(area.id, marker);
     });
+  }, [mapInstance, areas]);
 
-    if (markersRef.current.length > 0) {
-      map.fitBounds(bounds, { top: 60, right: 40, bottom: 40, left: 40 });
-    }
-  }, [areas, language]);
+  // Pan to selected area
+  useEffect(() => {
+    if (!selectedArea || !mapInstance || !selectedArea.lat || !selectedArea.lng) return;
+    mapInstance.panTo({ lat: selectedArea.lat, lng: selectedArea.lng });
+    mapInstance.setZoom(13);
+    const marker = markersRef.current.get(selectedArea.id);
+    if (marker) window.google?.maps?.event?.trigger(marker, 'click');
+  }, [selectedArea?.id]);
 
-  const pageHeading = seoData.heading || t('areasPageTitle') || 'Where We Deliver';
+  useEffect(() => {
+    (window as any).__navigateTo = (path: string) => { window.location.href = path; };
+    return () => { delete (window as any).__navigateTo; };
+  }, []);
 
   return (
     <>
       <SEOHead
-        title={isSeoLoading ? '' : (seoData.title || t('areas') + ' - FastlyGo')}
-        description={isSeoLoading ? '' : (seoData.description || 'Explore our delivery coverage areas across North Macedonia.')}
-        keywords={isSeoLoading ? '' : (seoData.keywords || 'delivery areas, Skopje delivery, courier service areas')}
+        title={seoData.title || 'Delivery Areas - FastlyGo'}
+        description={seoData.description || 'Explore our delivery coverage areas across North Macedonia.'}
+        keywords={seoData.keywords || 'delivery areas, Skopje delivery, courier service'}
       />
 
       <div className="min-h-screen flex flex-col bg-white">
         <Header />
 
-        {/* ── Hero ── */}
-        <section className="relative pt-20 pb-10 overflow-hidden bg-gradient-to-br from-orange-50 via-amber-50/40 to-white">
-          <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-orange-100/40 rounded-full blur-3xl -translate-y-1/3 translate-x-1/4 pointer-events-none" />
-          <div className="container relative">
-            <div className="max-w-3xl mx-auto text-center space-y-5">
-              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/80 backdrop-blur-sm text-orange-600 text-sm font-semibold shadow-sm border border-orange-100">
-                <MapPin className="w-4 h-4 text-orange-500" />
-                {t('deliveryAreas') || 'Delivery Areas'}
+        {/* Header bar */}
+        <div className="pt-14 pb-4 bg-gradient-to-b from-orange-50/60 to-white border-b border-gray-100">
+          <div className="container">
+            <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-3">
+              <div>
+                <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-orange-100 text-orange-600 text-xs font-semibold mb-2">
+                  <MapPin className="w-3 h-3" />
+                  {t('deliveryAreas') || 'Delivery Areas'}
+                </div>
+                <h1 className="text-2xl md:text-3xl font-extrabold text-gray-900 tracking-tight">
+                  {seoData.heading || t('areasPageTitle') || 'Where We Deliver'}
+                </h1>
+                <p className="text-gray-400 mt-0.5 text-sm">
+                  {t('areasPageSubtitle') || 'Fast and reliable delivery across North Macedonia.'}
+                </p>
               </div>
-              <h1 className="text-4xl md:text-5xl font-extrabold text-gray-900 leading-tight tracking-tight">
-                {pageHeading}
-              </h1>
-              <p className="text-lg text-gray-500 leading-relaxed max-w-2xl mx-auto">
-                {t('areasPageSubtitle') || 'Fast and reliable delivery service across North Macedonia. Choose your city and district to get started.'}
-              </p>
-
-              {/* Controls row */}
-              <div className="flex flex-col sm:flex-row items-center gap-3 max-w-xl mx-auto pt-1">
-                {/* Search */}
-                <div className="relative flex-1 w-full">
-                  <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-                  <input
-                    type="text"
-                    placeholder={t('searchCityOrDistrict') || 'Search city or district...'}
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    className="w-full pl-10 pr-4 py-3 rounded-xl border border-orange-100 bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-orange-200 focus:border-orange-300 text-sm transition-all"
-                  />
-                </div>
-
-                {/* View toggle */}
-                <div className="flex items-center bg-white border border-orange-100 rounded-xl shadow-sm overflow-hidden flex-shrink-0">
-                  <button
-                    onClick={() => setViewMode('map')}
-                    className={`flex items-center gap-1.5 px-4 py-3 text-sm font-semibold transition-all ${
-                      viewMode === 'map'
-                        ? 'bg-orange-500 text-white'
-                        : 'text-gray-500 hover:text-orange-500'
-                    }`}
-                  >
-                    <MapIcon className="w-4 h-4" />
-                    {t('mapView') || 'Map'}
-                  </button>
-                  <button
-                    onClick={() => setViewMode('list')}
-                    className={`flex items-center gap-1.5 px-4 py-3 text-sm font-semibold transition-all ${
-                      viewMode === 'list'
-                        ? 'bg-orange-500 text-white'
-                        : 'text-gray-500 hover:text-orange-500'
-                    }`}
-                  >
-                    <List className="w-4 h-4" />
-                    {t('listView') || 'List'}
-                  </button>
-                </div>
+              <div className="relative w-full md:w-60">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400" />
+                <input
+                  type="text"
+                  placeholder={t('searchCityOrDistrict') || 'Search area...'}
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="w-full pl-9 pr-4 py-2 rounded-xl border border-gray-200 bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-orange-200 focus:border-orange-300 text-sm"
+                />
               </div>
             </div>
           </div>
-        </section>
+        </div>
 
-        {/* ── Map View ── */}
-        {viewMode === 'map' && (
-          <section className="flex-1 relative">
+        {/* Split layout */}
+        <div className="flex flex-1 overflow-hidden" style={{ height: 'calc(100vh - 170px)', minHeight: '480px' }}>
+
+          {/* LEFT: Area list */}
+          <div className="w-64 lg:w-72 flex-shrink-0 overflow-y-auto border-r border-gray-100 bg-white">
             {isLoading ? (
-              <div className="flex items-center justify-center h-[600px]">
-                <Loader2 className="w-8 h-8 text-orange-400 animate-spin" />
+              <div className="flex items-center justify-center h-32">
+                <Loader2 className="w-5 h-5 text-orange-400 animate-spin" />
+              </div>
+            ) : filteredAreas.length === 0 ? (
+              <div className="flex flex-col items-center justify-center h-32 gap-2 text-gray-300">
+                <MapPin className="w-7 h-7" />
+                <p className="text-xs">{t('noAreasFound') || 'No areas found.'}</p>
               </div>
             ) : (
-              <div className="relative">
-                {/* Map */}
-                <MapView
-                  center={{ lat: 41.6086, lng: 21.7453 }}
-                  zoom={8}
-                  className="w-full h-[600px] md:h-[680px]"
-                  onMapReady={handleMapReady}
-                />
+              <div className="py-1">
+                {sortedCities.map(cityName => {
+                  const hex = cityColors[cityName] || defaultHex;
+                  return (
+                    <div key={cityName}>
+                      <div className="flex items-center gap-2 px-4 py-2 sticky top-0 bg-white/95 backdrop-blur-sm z-10 border-b border-gray-50">
+                        <span className="w-2 h-2 rounded-full flex-shrink-0" style={{ background: hex }} />
+                        <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">{cityName}</span>
+                        <span className="ml-auto text-[10px] text-gray-300">{groupedAreas[cityName].length}</span>
+                      </div>
 
-                {/* Selected area card (bottom overlay) */}
-                {selectedArea && (
-                  <div className="absolute bottom-6 left-1/2 -translate-x-1/2 w-full max-w-sm px-4 z-10">
-                    <div className={`bg-white rounded-2xl shadow-2xl border border-gray-100 p-4 flex items-start gap-3`}>
-                      <div className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0`}
-                        style={{ background: (cityColors[getCityForSlug(selectedArea.slug)] || defaultCityColor).hex + '22' }}>
-                        <MapPin className="w-5 h-5" style={{ color: (cityColors[getCityForSlug(selectedArea.slug)] || defaultCityColor).hex }} />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="font-bold text-gray-900 text-base leading-tight">{getAreaName(selectedArea)}</p>
-                        {getAreaSubtitle(selectedArea) && (
-                          <p className="text-xs text-gray-500 mt-0.5 line-clamp-2">{getAreaSubtitle(selectedArea)}</p>
-                        )}
-                        <Link href={`/areas/${selectedArea.slug}`}>
-                          <span className="inline-flex items-center gap-1 text-xs font-semibold text-orange-500 mt-2 hover:text-orange-600 cursor-pointer">
-                            {t('viewArea') || 'View Area'} <ArrowRight className="w-3 h-3" />
-                          </span>
-                        </Link>
-                      </div>
-                      <button
-                        onClick={() => setSelectedArea(null)}
-                        className="text-gray-300 hover:text-gray-500 flex-shrink-0 mt-0.5"
-                      >
-                        <X className="w-4 h-4" />
-                      </button>
+                      {groupedAreas[cityName]
+                        .sort((a: any, b: any) => (a.displayOrder || 0) - (b.displayOrder || 0))
+                        .map((area: any) => {
+                          const areaName = getAreaName(area);
+                          const isSelected = selectedArea?.id === area.id;
+                          return (
+                            <button
+                              key={area.id}
+                              onClick={() => setSelectedArea(isSelected ? null : area)}
+                              className={`w-full text-left px-3 py-2.5 flex items-center gap-2.5 transition-colors group border-l-2 ${
+                                isSelected
+                                  ? 'bg-orange-50 border-l-orange-400'
+                                  : 'hover:bg-gray-50/80 border-l-transparent hover:border-l-orange-200'
+                              }`}
+                            >
+                              <div
+                                className="w-6 h-6 rounded-md flex items-center justify-center flex-shrink-0"
+                                style={{ background: hex + '18' }}
+                              >
+                                <MapPin className="w-3 h-3" style={{ color: hex }} />
+                              </div>
+                              <span className={`text-sm flex-1 truncate ${isSelected ? 'text-orange-600 font-semibold' : 'text-gray-700 group-hover:text-gray-900'}`}>
+                                {areaName}
+                              </span>
+                              {area.active && (
+                                <CheckCircle className="w-3 h-3 text-green-400 flex-shrink-0" />
+                              )}
+                              <Link
+                                href={`/areas/${area.slug}`}
+                                onClick={(e) => e.stopPropagation()}
+                              >
+                                <ArrowRight className={`w-3 h-3 flex-shrink-0 ${isSelected ? 'text-orange-400' : 'text-gray-200 group-hover:text-orange-300'}`} />
+                              </Link>
+                            </button>
+                          );
+                        })}
                     </div>
-                  </div>
-                )}
+                  );
+                })}
+              </div>
+            )}
+          </div>
 
-                {/* Stats bar */}
-                <div className="absolute top-4 left-4 z-10">
-                  <div className="bg-white/90 backdrop-blur-sm rounded-xl shadow-md border border-white px-4 py-2 flex items-center gap-2 text-sm font-semibold text-gray-700">
-                    <MapPin className="w-4 h-4 text-orange-500" />
-                    {filteredAreas.length} {t('areas') || 'areas'}
+          {/* RIGHT: Map */}
+          <div className="flex-1 relative overflow-hidden">
+            <MapView
+              center={{ lat: 41.55, lng: 21.75 }}
+              zoom={9}
+              className="w-full h-full"
+              onMapReady={(map) => {
+                // Center on North Macedonia
+                map.setCenter({ lat: 41.55, lng: 21.75 });
+                map.setZoom(9);
+                setMapInstance(map);
+              }}
+            />
+
+            {/* Selected area card */}
+            {selectedArea && (
+              <div className="absolute bottom-5 left-1/2 -translate-x-1/2 z-10 w-60">
+                <div className="bg-white rounded-2xl shadow-2xl border border-gray-100 p-3.5">
+                  <div className="flex items-start gap-2.5">
+                    <div
+                      className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0"
+                      style={{ background: (cityColors[getCityForSlug(selectedArea.slug)] || defaultHex) + '18' }}
+                    >
+                      <MapPin className="w-4 h-4" style={{ color: cityColors[getCityForSlug(selectedArea.slug)] || defaultHex }} />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="font-bold text-gray-900 text-sm">{getAreaName(selectedArea)}</p>
+                      {getAreaSubtitle(selectedArea) && (
+                        <p className="text-xs text-gray-400 mt-0.5 line-clamp-2">{getAreaSubtitle(selectedArea)}</p>
+                      )}
+                      <Link href={`/areas/${selectedArea.slug}`}>
+                        <span
+                          className="inline-flex items-center gap-1 text-xs font-bold mt-2 px-2.5 py-1 rounded-lg text-white"
+                          style={{ background: cityColors[getCityForSlug(selectedArea.slug)] || defaultHex }}
+                        >
+                          View Area <ArrowRight className="w-3 h-3" />
+                        </span>
+                      </Link>
+                    </div>
+                    <button onClick={() => setSelectedArea(null)} className="text-gray-300 hover:text-gray-500 text-lg leading-none">×</button>
                   </div>
                 </div>
               </div>
             )}
 
-            {/* Area chips below map */}
-            {!isLoading && filteredAreas.length > 0 && (
-              <div className="py-6 bg-gray-50 border-t border-gray-100">
-                <div className="container">
-                  <div className="flex flex-wrap gap-2 justify-center max-w-5xl mx-auto">
-                    {filteredAreas.map((area: any) => {
-                      const city = getCityForSlug(area.slug);
-                      const colors = cityColors[city] || defaultCityColor;
-                      return (
-                        <Link key={area.id} href={`/areas/${area.slug}`}>
-                          <span
-                            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium cursor-pointer hover:scale-105 transition-transform border border-transparent hover:border-current"
-                            style={{ background: colors.hex + '18', color: colors.hex }}
-                          >
-                            <span className="w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ background: colors.hex }} />
-                            {getAreaName(area)}
-                          </span>
-                        </Link>
-                      );
-                    })}
-                  </div>
-                </div>
+            {/* Badge */}
+            <div className="absolute top-3 right-3 z-10">
+              <div className="bg-white/90 backdrop-blur-sm rounded-xl shadow-sm px-2.5 py-1.5 flex items-center gap-1.5 text-xs font-semibold text-gray-600 border border-white/80">
+                <MapPin className="w-3 h-3 text-orange-500" />
+                {filteredAreas.length} {t('areas') || 'areas'}
               </div>
-            )}
-          </section>
-        )}
-
-        {/* ── List View ── */}
-        {viewMode === 'list' && (
-          <section className="py-12">
-            <div className="container">
-              {isLoading && (
-                <div className="flex items-center justify-center py-20">
-                  <Loader2 className="w-8 h-8 text-orange-400 animate-spin" />
-                </div>
-              )}
-
-              {!isLoading && filteredAreas.length === 0 && (
-                <div className="text-center py-20 space-y-3">
-                  <MapPin className="w-14 h-14 text-orange-200 mx-auto" />
-                  <p className="text-gray-400 text-lg">{t('noAreasFound') || 'No areas found matching your search.'}</p>
-                </div>
-              )}
-
-              {!isLoading && filteredAreas.length > 0 && (
-                <div className="space-y-12 max-w-6xl mx-auto">
-                  {sortedCities.map(cityName => {
-                    const colors = cityColors[cityName] || defaultCityColor;
-                    return (
-                      <div key={cityName}>
-                        <div className="flex items-center gap-4 mb-6">
-                          <div className={`w-3 h-3 rounded-full ${colors.dot} flex-shrink-0`} />
-                          <h2 className="text-2xl font-extrabold text-gray-900">{cityName}</h2>
-                          <span className={`px-3 py-1 rounded-full text-xs font-semibold ${colors.badge}`}>
-                            {groupedAreas[cityName].length} {t('districts') || 'districts'}
-                          </span>
-                          <div className="flex-1 h-px bg-gray-100" />
-                        </div>
-
-                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                          {groupedAreas[cityName]
-                            .sort((a: any, b: any) => a.displayOrder - b.displayOrder)
-                            .map((area: any) => {
-                              const areaName = getAreaName(area);
-                              const areaSubtitle = getAreaSubtitle(area);
-                              return (
-                                <Link key={area.id} href={`/areas/${area.slug}`}>
-                                  <div className={`group relative bg-gradient-to-br ${colors.bg} rounded-2xl p-5 border border-white hover:border-orange-200 transition-all duration-300 hover:shadow-lg hover:scale-[1.02] cursor-pointer`}>
-                                    <div className="flex items-start justify-between gap-2">
-                                      <div className="space-y-1.5 flex-1 min-w-0">
-                                        <div className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold ${
-                                          area.active ? 'bg-green-100 text-green-600' : 'bg-gray-100 text-gray-500'
-                                        }`}>
-                                          {area.active
-                                            ? <><CheckCircle className="w-3 h-3" />{t('active') || 'Active'}</>
-                                            : <><Clock className="w-3 h-3" />{t('comingSoon') || 'Coming Soon'}</>
-                                          }
-                                        </div>
-                                        <h3 className="text-base font-bold text-gray-800 group-hover:text-orange-600 transition-colors">
-                                          {areaName}
-                                        </h3>
-                                        {areaSubtitle && (
-                                          <p className="text-xs text-gray-500 line-clamp-2 leading-relaxed">{areaSubtitle}</p>
-                                        )}
-                                      </div>
-                                      <ArrowRight className="w-4 h-4 text-gray-300 group-hover:text-orange-400 group-hover:translate-x-1 transition-all duration-300 flex-shrink-0 mt-1" />
-                                    </div>
-                                  </div>
-                                </Link>
-                              );
-                            })}
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              )}
             </div>
-          </section>
-        )}
+          </div>
+        </div>
 
-        {/* ── CTA ── */}
-        <section className="py-14 bg-gradient-to-br from-orange-50/60 to-amber-50/30">
+        {/* CTA */}
+        <section className="py-8 bg-gradient-to-br from-orange-50/40 to-amber-50/20 border-t border-orange-100/30">
           <div className="container">
-            <div className="max-w-3xl mx-auto text-center space-y-5">
-              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white text-orange-600 text-sm font-semibold shadow-sm border border-orange-100">
-                <Zap className="w-4 h-4" />
-                {t('readyToOrder') || 'Ready to Order?'}
-              </div>
-              <h2 className="text-3xl md:text-4xl font-extrabold text-gray-900">
-                {t('orderNow') || 'Order Now'}
-              </h2>
-              <p className="text-gray-500 text-lg leading-relaxed max-w-xl mx-auto">
-                {t('orderNowDesc') || 'Get your package delivered in minutes. Fast, reliable, and affordable.'}
-              </p>
+            <div className="max-w-lg mx-auto text-center space-y-2">
+              <h2 className="text-xl font-extrabold text-gray-900">{t('orderNow') || 'Call Courier Now!'}</h2>
+              <p className="text-gray-400 text-sm">{t('orderNowDesc') || 'Get your package delivered in minutes.'}</p>
               <Link href="/new-order">
                 <button
-                  className="inline-flex items-center gap-2 text-white font-bold px-8 py-4 rounded-2xl hover:scale-105 transition-all duration-300 shadow-lg mt-2"
+                  className="inline-flex items-center gap-2 text-white font-bold px-5 py-2.5 rounded-xl hover:scale-105 transition-all shadow-md mt-2 text-sm"
                   style={{ background: 'linear-gradient(135deg, #ff7a35 0%, #f55f00 100%)' }}
                 >
-                  <Zap className="w-5 h-5" />
+                  <Zap className="w-3.5 h-3.5" />
                   {t('callCourier') || 'Call a Courier'}
-                  <ArrowRight className="w-5 h-5" />
+                  <ArrowRight className="w-3.5 h-3.5" />
                 </button>
               </Link>
             </div>

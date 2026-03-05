@@ -170,13 +170,18 @@ export function MapView({
     };
   }, []);
 
+  // Allow external code to update center/zoom after mount (e.g., when data loads)
   useEffect(() => {
-    // TODO: Update map properties when props change
-    if (map.current) {
+    if (map.current && center) {
       map.current.setCenter(center);
+    }
+  }, [center?.lat, center?.lng]);
+
+  useEffect(() => {
+    if (map.current && zoom !== undefined) {
       map.current.setZoom(zoom);
     }
-  }, [center, zoom]);
+  }, [zoom]);
 
   return <div ref={mapContainer} className={className} />;
 }
