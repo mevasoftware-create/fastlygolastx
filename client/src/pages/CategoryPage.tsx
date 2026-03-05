@@ -495,9 +495,27 @@ export default function CategoryPage() {
                   {category?.shortName ? (typeof category.shortName === 'object' ? (category.shortName as Record<string, string>)[language] || (category.shortName as Record<string, string>).en : content.title) : content.title}
                 </h1>
                 
+                {content.subtitle && (
+                  <p className="text-sm font-semibold uppercase tracking-widest text-orange-500">
+                    {content.subtitle}
+                  </p>
+                )}
+
                 <p className="text-lg md:text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
                   {content.description}
                 </p>
+
+                {/* Stats Row */}
+                {config.stats && (
+                  <div className="flex flex-wrap justify-center gap-6 pt-4">
+                    {config.stats.map((stat: any, idx: number) => (
+                      <div key={idx} className="text-center px-5 py-3 rounded-2xl bg-white/80 backdrop-blur-sm shadow-sm border border-orange-100/50">
+                        <div className="text-2xl font-bold text-orange-500">{stat.value}</div>
+                        <div className="text-xs text-gray-500 mt-0.5">{stat.label}</div>
+                      </div>
+                    ))}
+                  </div>
+                )}
                 
                 <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
                   <Button 
@@ -520,6 +538,27 @@ export default function CategoryPage() {
               </div>
             </div>
           </section>
+
+          {/* Features Section */}
+          {config.features && (
+            <section className="py-14 bg-white">
+              <div className="container">
+                <div className="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto">
+                  {config.features.map((feature: any, idx: number) => (
+                    <div key={idx} className="flex gap-4 p-6 rounded-2xl bg-gradient-to-br from-orange-50 to-amber-50 border border-orange-100/50 hover:shadow-md transition-all duration-300">
+                      <div className={`flex-shrink-0 w-12 h-12 rounded-xl bg-gradient-to-br ${feature.color} flex items-center justify-center shadow-sm`}>
+                        <feature.icon className="w-6 h-6 text-white" />
+                      </div>
+                      <div>
+                        <h3 className="font-bold text-gray-800 mb-1">{feature.title}</h3>
+                        <p className="text-sm text-gray-600 leading-relaxed">{feature.desc}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </section>
+          )}
 
           {/* Extras Section (Cuisines/Products/Types) */}
           {config.extras && (

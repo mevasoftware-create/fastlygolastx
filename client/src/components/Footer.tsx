@@ -60,7 +60,7 @@ export default function Footer() {
             <div className="lg:col-span-2 space-y-6">
               <a href="/" className="flex items-center gap-3 group cursor-pointer">
                 <img 
-                  src="/brand/fastlygo_icon_only.webp" 
+                  src="/fastlygo_icon_only.png" 
                   alt="FastlyGo" 
                   className="h-12 w-auto transition-transform duration-300 group-hover:scale-105" 
                 />
