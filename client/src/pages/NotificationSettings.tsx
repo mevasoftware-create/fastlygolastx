@@ -5,6 +5,7 @@ import { Card } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
 import { Settings, Bell, Package, Bike, DollarSign, MessageSquare } from "lucide-react";
 import { useLocation } from "wouter";
+import { PushNotificationToggle } from "@/components/PushNotificationPrompt";
 import { toast } from "sonner";
 
 export default function NotificationSettings() {
@@ -201,6 +202,10 @@ export default function NotificationSettings() {
                   checked={localSettings.pushNotifications}
                   onCheckedChange={() => handleToggle("pushNotifications")}
                 />
+              </div>
+              {/* Web Push Browser Subscription */}
+              <div className="pt-3 border-t border-gray-100">
+                <PushNotificationToggle />
               </div>
             </div>
           </Card>

@@ -2,6 +2,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { Toaster } from "@/components/ui/sonner";
 import { NotFoundPage } from "@/pages/ErrorPage";
 import { PWAInstallPrompt } from "@/components/PWAInstallPrompt";
+import { PushNotificationPrompt } from "@/components/PushNotificationPrompt";
 
 import { Route, Switch, Redirect, useLocation } from "wouter";
 import { useEffect, lazy, Suspense } from "react";
@@ -129,6 +130,7 @@ function App() {
           <TooltipProvider>
             <Toaster />
             <PWAInstallPrompt />
+            <PushNotificationPrompt />
             <Router />
           </TooltipProvider>
         </ThemeProvider>
