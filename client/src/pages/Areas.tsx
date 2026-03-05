@@ -169,23 +169,27 @@ export default function Areas() {
       <div className="min-h-screen flex flex-col bg-white">
         <Header />
 
-        {/* Header bar */}
-        <div className="pt-14 pb-4 bg-gradient-to-b from-orange-50/60 to-white border-b border-gray-100">
-          <div className="container">
-            <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-3">
-              <div>
-                <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-orange-100 text-orange-600 text-xs font-semibold mb-2">
+        {/* Full-width page wrapper */}
+        <div className="flex flex-col flex-1" style={{ paddingTop: '64px' }}>
+
+          {/* Top header bar - full width */}
+          <div className="bg-gradient-to-r from-orange-50/80 to-amber-50/40 border-b border-orange-100/60 px-6 py-4">
+            <div className="flex items-center justify-between gap-4 max-w-full">
+              <div className="flex items-center gap-4">
+                <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-orange-100 text-orange-600 text-xs font-semibold flex-shrink-0">
                   <MapPin className="w-3 h-3" />
                   {t('deliveryAreas') || 'Delivery Areas'}
                 </div>
-                <h1 className="text-2xl md:text-3xl font-extrabold text-gray-900 tracking-tight">
-                  {seoData.heading || t('areasPageTitle') || 'Where We Deliver'}
-                </h1>
-                <p className="text-gray-400 mt-0.5 text-sm">
-                  {t('areasPageSubtitle') || 'Fast and reliable delivery across North Macedonia.'}
-                </p>
+                <div>
+                  <h1 className="text-xl font-extrabold text-gray-900 tracking-tight leading-tight">
+                    {seoData.heading || t('areasPageTitle') || 'Where We Deliver'}
+                  </h1>
+                  <p className="text-gray-400 text-xs mt-0.5 hidden sm:block">
+                    {t('areasPageSubtitle') || 'Fast and reliable delivery across North Macedonia.'}
+                  </p>
+                </div>
               </div>
-              <div className="relative w-full md:w-60">
+              <div className="relative w-56 flex-shrink-0">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400" />
                 <input
                   type="text"
@@ -197,10 +201,9 @@ export default function Areas() {
               </div>
             </div>
           </div>
-        </div>
 
-        {/* Split layout */}
-        <div className="flex flex-1 overflow-hidden" style={{ height: 'calc(100vh - 170px)', minHeight: '480px' }}>
+          {/* Split layout */}
+          <div className="flex overflow-hidden" style={{ height: '450px' }}>
 
           {/* LEFT: Area list */}
           <div className="w-64 lg:w-72 flex-shrink-0 overflow-y-auto border-r border-gray-100 bg-white">
@@ -271,13 +274,13 @@ export default function Areas() {
           {/* RIGHT: Map */}
           <div className="flex-1 relative overflow-hidden">
             <MapView
-              center={{ lat: 41.55, lng: 21.75 }}
-              zoom={9}
+              center={{ lat: 41.7, lng: 21.75 }}
+              zoom={8}
               className="w-full h-full"
               onMapReady={(map) => {
                 // Center on North Macedonia
-                map.setCenter({ lat: 41.55, lng: 21.75 });
-                map.setZoom(9);
+                map.setCenter({ lat: 41.7, lng: 21.75 });
+                map.setZoom(8);
                 setMapInstance(map);
               }}
             />
@@ -321,7 +324,9 @@ export default function Areas() {
               </div>
             </div>
           </div>
-        </div>
+        </div>{/* end split layout */}
+
+        </div>{/* end full-width wrapper */}
 
         {/* CTA */}
         <section className="py-8 bg-gradient-to-br from-orange-50/40 to-amber-50/20 border-t border-orange-100/30">
