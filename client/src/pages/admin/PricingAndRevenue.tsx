@@ -4,7 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
-import { DollarSign, TrendingUp, Calendar } from "lucide-react";
+import { DollarSign, TrendingUp } from "lucide-react";
 import { formatEUR } from "@/lib/formatEUR";
 import { useState } from "react";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
@@ -14,10 +14,6 @@ export default function PricingAndRevenue() {
     startDate: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
     endDate: new Date().toISOString().split('T')[0],
   });
-
-  const handleDateChange = (field: string, value: string) => {
-    setDateRange(prev => ({ ...prev, [field]: value }));
-  };
 
   const { data: pricingSettings, refetch: refetchPricing } = trpc.admin.getPricingSettings.useQuery();
   const { data: revenueReport } = trpc.admin.getRevenueReport.useQuery({

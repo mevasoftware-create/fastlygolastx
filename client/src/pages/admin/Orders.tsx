@@ -6,7 +6,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { toast } from "sonner";
-import { Search, Edit, Trash2, Package, Clock, CheckCircle2, XCircle, Truck, ShoppingBag, RefreshCw, Filter, Map, List } from "lucide-react";
+import { Search, Edit, Trash2, ShoppingBag, RefreshCw, Filter, Map, List } from "lucide-react";
 import { formatEUR } from "@/lib/formatEUR";
 
 const STATUS_CONFIG: Record<string, { label: string; color: string; bg: string }> = {

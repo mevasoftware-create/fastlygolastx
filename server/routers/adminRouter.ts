@@ -428,10 +428,8 @@ export const adminRouter = router({
    */
   allOrders: adminProcedure.query(async () => {
     try {
-      console.log('[Admin] allOrders called');
       const dbInstance = await getDb();
       if (!dbInstance) {
-        console.log('[Admin] Database not available');
         return [];
       }
 
@@ -444,7 +442,6 @@ export const adminRouter = router({
          FROM orders 
          ORDER BY createdAt DESC`
       );
-      console.log('[Admin] Found orders:', rows?.length || 0);
       return rows || [];
     } catch (error) {
       console.error('[Admin] allOrders error:', error);

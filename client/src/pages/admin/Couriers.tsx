@@ -6,7 +6,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { toast } from "sonner";
-import { Search, Edit, Trash2, Bike, RefreshCw, Filter, Star, Mail, MapPin, CheckCircle2, XCircle, Clock } from "lucide-react";
+import { Search, Edit, Trash2, Bike, RefreshCw, Star, Mail, MapPin, CheckCircle2, XCircle } from "lucide-react";
 
 const STATUS_CONFIG: Record<string, { label: string; color: string; bg: string }> = {
   pending:  { label: "Beklemede",  color: "text-amber-700",  bg: "bg-amber-50 border-amber-200" },

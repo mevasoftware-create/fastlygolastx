@@ -888,5 +888,13 @@
   "deliveryContact": "Teslim Edilecek Kişi Bilgileri",
   "mapView": "Harita",
   "listView": "Liste",
-  "viewArea": "Bölgeyi Gör"
+  "viewArea": "Bölgeyi Gör",
+  "testimonial4Name": "Marko Petrovski",
+  "testimonial4Role": "Eczane Sahibi",
+  "testimonial5Name": "Elena Dimitrova",
+  "testimonial5Role": "Restoran Yöneticisi",
+  "testimonial5Text": "Müşterilerimize hızlı teslimat yapabiliyoruz. Kuryeleri gerçek zamanlı takip edebilmek harika!",
+  "testimonial6Name": "Stefan Nikolov",
+  "testimonial6Role": "E-ticaret Satıcısı",
+  "testimonial6Text": "Paket teslimatlarım için en iyi çözüm. Fiyatlar uygun ve servis kaliteli."
 }

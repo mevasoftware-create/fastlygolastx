@@ -1,4 +1,3 @@
-import { useAuth } from "@/_core/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -41,8 +40,7 @@ import { getHomePageSchemas } from "@/lib/structuredData";
 import { useSeoFromDatabase } from "@/hooks/useSeoFromDatabase";
 
 export default function Home() {
-  const { user } = useAuth();
-  const { language, isLoading: languageLoading } = useLanguage();
+  const { language } = useLanguage();
   const { t } = useTranslation();
 
    // Fetch home page SEO data from database
@@ -61,10 +59,6 @@ export default function Home() {
   // Structured Data for SEO (JSON-LD)
   const structuredData = getHomePageSchemas();
 
-  // Use database SEO data if available, otherwise use i18n keys
-  
-  
-  
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-orange-50/30 via-white to-amber-50/20">
@@ -370,16 +364,15 @@ export default function Home() {
                   { name: t('testimonial1Name'), role: t('testimonial1Role'), text: t('testimonial1Text'), img: '/images/optimized/testimonial_1.webp', rating: 5 },
                   { name: t('testimonial2Name'), role: t('testimonial2Role'), text: t('testimonial2Text'), img: '/images/optimized/testimonial_2.webp', rating: 5 },
                   { name: t('testimonial3Name'), role: t('testimonial3Role'), text: t('testimonial3Text'), img: '/images/optimized/testimonial_3.webp', rating: 5 },
-                  { name: 'Marko Petrovski', role: 'Eczane Sahibi', text: 'İlaç teslimatlarımız için FastlyGo\'yu kullanıyoruz. Güvenilir ve hızlı servis!', img: '/images/optimized/testimonial_1.webp', rating: 5 },
-                  { name: 'Elena Dimitrova', role: 'Restoran Yöneticisi', text: 'Müşterilerimize hızlı teslimat yapabiliyoruz. Kuryeleri gerçek zamanlı takip edebilmek harika!', img: '/images/optimized/testimonial_2.webp', rating: 5 },
-                  { name: 'Stefan Nikolov', role: 'E-ticaret Satıcısı', text: 'Paket teslimatlarım için en iyi çözüm. Fiyatlar uygun ve servis kaliteli.', img: '/images/optimized/testimonial_3.webp', rating: 5 },
-                  // Duplicate for seamless loop
+                  { name: t('testimonial4Name'), role: t('testimonial4Role'), text: t('testimonial4Text'), img: '/images/optimized/testimonial_1.webp', rating: 5 },
+                  { name: t('testimonial5Name'), role: t('testimonial5Role'), text: t('testimonial5Text'), img: '/images/optimized/testimonial_2.webp', rating: 5 },
+                  { name: t('testimonial6Name'), role: t('testimonial6Role'), text: t('testimonial6Text'), img: '/images/optimized/testimonial_3.webp', rating: 5 },
                   { name: t('testimonial1Name'), role: t('testimonial1Role'), text: t('testimonial1Text'), img: '/images/optimized/testimonial_1.webp', rating: 5 },
                   { name: t('testimonial2Name'), role: t('testimonial2Role'), text: t('testimonial2Text'), img: '/images/optimized/testimonial_2.webp', rating: 5 },
                   { name: t('testimonial3Name'), role: t('testimonial3Role'), text: t('testimonial3Text'), img: '/images/optimized/testimonial_3.webp', rating: 5 },
-                  { name: 'Marko Petrovski', role: 'Eczane Sahibi', text: 'İlaç teslimatlarımız için FastlyGo\'yu kullanıyoruz. Güvenilir ve hızlı servis!', img: '/images/optimized/testimonial_1.webp', rating: 5 },
-                  { name: 'Elena Dimitrova', role: 'Restoran Yöneticisi', text: 'Müşterilerimize hızlı teslimat yapabiliyoruz. Kuryeleri gerçek zamanlı takip edebilmek harika!', img: '/images/optimized/testimonial_2.webp', rating: 5 },
-                  { name: 'Stefan Nikolov', role: 'E-ticaret Satıcısı', text: 'Paket teslimatlarım için en iyi çözüm. Fiyatlar uygun ve servis kaliteli.', img: '/images/optimized/testimonial_3.webp', rating: 5 },
+                  { name: t('testimonial4Name'), role: t('testimonial4Role'), text: t('testimonial4Text'), img: '/images/optimized/testimonial_1.webp', rating: 5 },
+                  { name: t('testimonial5Name'), role: t('testimonial5Role'), text: t('testimonial5Text'), img: '/images/optimized/testimonial_2.webp', rating: 5 },
+                  { name: t('testimonial6Name'), role: t('testimonial6Role'), text: t('testimonial6Text'), img: '/images/optimized/testimonial_3.webp', rating: 5 },
                 ].map((testimonial, index) => (
                   <div
                     key={index}

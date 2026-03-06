@@ -132,12 +132,10 @@ export const authRouter = router({
 
       // Set session cookie
       const cookieOptions = getSessionCookieOptions(ctx.req);
-      console.log('[Auth] Setting cookie:', COOKIE_NAME, 'with options:', cookieOptions);
       ctx.res.cookie(COOKIE_NAME, result.token, {
         ...cookieOptions,
         maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days in milliseconds
       });
-      console.log('[Auth] Cookie set successfully for user:', result.userId, 'role:', result.role);
 
       return {
         success: true,
@@ -291,12 +289,10 @@ export const authRouter = router({
 
       // Set session cookie
       const cookieOptions = getSessionCookieOptions(ctx.req);
-      console.log('[Auth] Setting cookie:', COOKIE_NAME, 'with options:', cookieOptions);
       ctx.res.cookie(COOKIE_NAME, result.token, {
         ...cookieOptions,
         maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days in milliseconds
       });
-      console.log('[Auth] Cookie set successfully for user:', result.userId, 'role:', result.role);
 
       return {
         success: true,

@@ -32,13 +32,10 @@ export const businessRouter = router({
           userId = ctx.user.id;
           businessEmail = ctx.user.email || input.email || "";
           
-          console.log('[Business] User is logged in:', { userId, email: businessEmail });
           
           // Check if user already has a business profile
           const existingBusiness = await db.select().from(businesses).where(eq(businesses.userId, userId)).limit(1);
-          console.log('[Business] Existing business check:', { count: existingBusiness.length });
           if (existingBusiness.length > 0) {
-            console.log('[Business] User already has business:', existingBusiness[0]);
             throw new Error("Zaten işletme başvurunuz mevcut. Lütfen mevcut başvurunuzun durumunu kontrol edin.");
           }
         } else {
@@ -50,14 +47,10 @@ export const businessRouter = router({
           businessEmail = input.email;
           
           // Check if email already exists
-          console.log('[Business] Checking email:', input.email);
           const existingUser = await db.select().from(users).where(eq(users.email, input.email)).limit(1);
-          console.log('[Business] Existing user check result:', { count: existingUser.length, exists: existingUser.length > 0 });
           if (existingUser.length > 0) {
-            console.log('[Business] Email already exists:', input.email);
             throw new Error("Bu email adresi zaten kullanılıyor");
           }
-          console.log('[Business] Email is available:', input.email);
           
           // Hash password
           const hashedPassword = await bcryptjs.hash(input.password, 10);

@@ -5,13 +5,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
   Search, RefreshCw, Trash2, CheckCircle, XCircle, Building2,
-  Phone, MapPin, Star, ChevronDown, Filter, MoreHorizontal,
+  Phone, MapPin, Star,
   Eye, Ban, Clock, AlertCircle
 } from "lucide-react";
-import {
-  DropdownMenu, DropdownMenuContent, DropdownMenuItem,
-  DropdownMenuSeparator, DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import {
   Dialog, DialogContent, DialogDescription, DialogFooter,
   DialogHeader, DialogTitle,

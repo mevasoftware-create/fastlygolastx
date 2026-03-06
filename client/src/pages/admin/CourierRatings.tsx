@@ -3,11 +3,10 @@ import { useAuth } from "@/_core/hooks/useAuth";
 import DashboardLayout from "@/components/DashboardLayout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { trpc } from "@/lib/trpc";
-import { Star, AlertTriangle, TrendingUp, Award, Search, Filter } from "lucide-react";
+import { Star, AlertTriangle, Award, Search, Filter } from "lucide-react";
 import { useLocation } from "wouter";
 
 export default function CourierRatings() {

@@ -264,7 +264,6 @@
   "responseIn24h": "24-48 hours response",
   "applicationForm": "Application Form",
   "applicationFormDesc": "Last step! Fill in your information and join the FastlyGo family.",
-  "fullName": "Full Name",
   "courierMapTitle": "Live Courier Tracking",
   "courierMapTotal": "Total",
   "courierMapActive": "Active",
@@ -649,7 +648,6 @@
   "orderInSeconds": "Place your order in seconds",
   "readyToOrder": "Ready to Call a Courier?",
   "orderInMinutes": "Place your order now and receive it in minutes. Fast, reliable, affordable.",
-  "startOrdering": "Start Ordering",
   "foodDeliveryTitle": "Food Delivery in Skopje",
   "foodDeliverySubtitle": "Order from restaurants, fast food, desserts and more. Delivery in 15 minutes.",
   "foodCategories": "Food Categories",
@@ -978,5 +976,14 @@
   "deliveryContact": "Delivery Contact",
   "mapView": "Map",
   "listView": "List",
-  "viewArea": "View Area"
+  "viewArea": "View Area",
+  "testimonial4Name": "Marko Petrovski",
+  "testimonial4Role": "Pharmacy Owner",
+  "testimonial4Text": "We use FastlyGo for our medicine deliveries. Reliable and fast service!",
+  "testimonial5Name": "Elena Dimitrova",
+  "testimonial5Role": "Restaurant Manager",
+  "testimonial5Text": "We can deliver fast to our customers. Being able to track couriers in real time is amazing!",
+  "testimonial6Name": "Stefan Nikolov",
+  "testimonial6Role": "E-commerce Seller",
+  "testimonial6Text": "The best solution for my package deliveries. Prices are reasonable and service quality is excellent."
 }

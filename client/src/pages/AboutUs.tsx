@@ -5,7 +5,6 @@ import SEOHead from '@/components/SEOHead';
 import { getAboutUsSchemas } from '@/lib/structuredData';
 import { Users, Zap, Target, Heart, TrendingUp, MapPin, Bike, Package, Shield, Star, CheckCircle } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { Link } from 'wouter';
 import { trpc } from '@/lib/trpc';
 import { useSeoFromDatabase } from '@/hooks/useSeoFromDatabase';
 

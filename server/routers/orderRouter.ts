@@ -2,8 +2,8 @@ import { router, protectedProcedure } from "../_core/trpc";
 import { z } from "zod";
 import { getDb } from "../db";
 import { TRPCError } from "@trpc/server";
-import { orders, priceIncreaseHistory, couriers, users } from "../../drizzle/schema";
-import { eq, and, desc, sql } from "drizzle-orm";
+import { orders, priceIncreaseHistory } from "../../drizzle/schema";
+import { eq, desc, sql } from "drizzle-orm";
 
 /**
  * Order Router - Sipariş yönetimi ve fiyat teklifi sistemi

@@ -1,7 +1,7 @@
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import SEOHead from '@/components/SEOHead';
-import { Clock, MapPin, Star, ArrowRight, CheckCircle, Zap, Shield, Package, Utensils, Timer, ThumbsUp } from 'lucide-react';
+import { Clock, ArrowRight, Zap, Package, Utensils, Timer, ThumbsUp } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useLocation } from 'wouter';
 import { trpc } from '@/lib/trpc';
