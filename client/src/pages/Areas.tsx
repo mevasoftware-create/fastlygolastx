@@ -170,7 +170,7 @@ export default function Areas() {
         <Header />
 
         {/* Full-width page wrapper */}
-        <div className="flex flex-col flex-1" style={{ paddingTop: '64px' }}>
+        <div className="flex flex-col flex-1">
 
           {/* Top header bar - full width */}
           <div className="bg-gradient-to-r from-orange-50/80 to-amber-50/40 border-b border-orange-100/60 px-6 py-4">
@@ -274,13 +274,13 @@ export default function Areas() {
           {/* RIGHT: Map */}
           <div className="flex-1 relative overflow-hidden">
             <MapView
-              center={{ lat: 41.7, lng: 21.75 }}
-              zoom={8}
+              center={{ lat: 41.99, lng: 21.43 }}
+              zoom={10}
               className="w-full h-full"
               onMapReady={(map) => {
-                // Center on North Macedonia
-                map.setCenter({ lat: 41.7, lng: 21.75 });
-                map.setZoom(8);
+                // Center on Skopje
+                map.setCenter({ lat: 41.99, lng: 21.43 });
+                map.setZoom(10);
                 setMapInstance(map);
               }}
             />
