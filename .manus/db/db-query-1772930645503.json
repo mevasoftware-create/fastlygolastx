@@ -1,0 +1,73 @@
+{
+  "query": "SELECT slug FROM areas ORDER BY slug LIMIT 50;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4EV5ivwhyC7eCUY.ebc471170149 --database 4KwtmFvvd67FSFhQ5dyp9H --execute SELECT slug FROM areas ORDER BY slug LIMIT 50;",
+  "rows": [
+    {
+      "slug": "aerodrom"
+    },
+    {
+      "slug": "bitola"
+    },
+    {
+      "slug": "butel"
+    },
+    {
+      "slug": "cair"
+    },
+    {
+      "slug": "centar"
+    },
+    {
+      "slug": "gazi-baba"
+    },
+    {
+      "slug": "gjorce-petrov"
+    },
+    {
+      "slug": "gostivar"
+    },
+    {
+      "slug": "istip"
+    },
+    {
+      "slug": "karpos"
+    },
+    {
+      "slug": "kisela-voda"
+    },
+    {
+      "slug": "kocani"
+    },
+    {
+      "slug": "kumanovo"
+    },
+    {
+      "slug": "ohrid"
+    },
+    {
+      "slug": "prilep"
+    },
+    {
+      "slug": "saraj"
+    },
+    {
+      "slug": "skopje"
+    },
+    {
+      "slug": "strumica"
+    },
+    {
+      "slug": "suto-orizari"
+    },
+    {
+      "slug": "tetovo"
+    },
+    {
+      "slug": "veles"
+    }
+  ],
+  "messages": [],
+  "stdout": "slug\naerodrom\nbitola\nbutel\ncair\ncentar\ngazi-baba\ngjorce-petrov\ngostivar\nistip\nkarpos\nkisela-voda\nkocani\nkumanovo\nohrid\nprilep\nsaraj\nskopje\nstrumica\nsuto-orizari\ntetovo\nveles\n",
+  "stderr": "",
+  "execution_time_ms": 66
+}

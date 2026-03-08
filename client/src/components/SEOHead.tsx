@@ -70,13 +70,9 @@ export default function SEOHead({
       : new URLSearchParams();
   const langFromUrl = urlParams.get('lang') as Language | null;
 
-  // Canonical URL:
-  // - English (default): https://fastlygo.mk/path  (no ?lang=)
-  // - Other languages:   https://fastlygo.mk/path?lang=XX
-  let defaultCanonicalUrl = `${baseUrl}${pathname}`;
-  if (langFromUrl && langFromUrl !== 'en') {
-    defaultCanonicalUrl = `${baseUrl}${pathname}?lang=${langFromUrl}`;
-  }
+  // Canonical URL: always the clean path without ?lang= parameter
+  // Google recommends canonical to be the language-neutral URL; hreflang handles language variants
+  const defaultCanonicalUrl = `${baseUrl}${pathname}`;
 
   const hreflangs = {
     en: `${baseUrl}${pathname}`,
@@ -93,7 +89,11 @@ export default function SEOHead({
     ? (customTitle !== '' ? customTitle : null)   // null = suppress
     : t(titleKey as any, language);               // i18n fallback
   const title = titleResolved;
-  const description = customDescription || t(descriptionKey as any, language);
+  const rawDescription = customDescription || t(descriptionKey as any, language);
+  // Truncate description to 160 characters max (Google's recommended limit)
+  const description = rawDescription && rawDescription.length > 160
+    ? rawDescription.slice(0, 157) + '...'
+    : rawDescription;
   const keywords = customKeywords || t(keywordsKey as any, language);
   const finalCanonicalUrl = customCanonical || defaultCanonicalUrl;
 
