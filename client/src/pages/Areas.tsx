@@ -274,13 +274,13 @@ export default function Areas() {
           {/* RIGHT: Map */}
           <div className="flex-1 relative overflow-hidden">
             <MapView
-              center={{ lat: 41.99, lng: 21.43 }}
-              zoom={10}
+              center={{ lat: 41.9981, lng: 21.4254 }}
+              zoom={11}
               className="w-full h-full"
               onMapReady={(map) => {
                 // Center on Skopje
-                map.setCenter({ lat: 41.99, lng: 21.43 });
-                map.setZoom(10);
+                map.setCenter({ lat: 41.9981, lng: 21.4254 });
+                map.setZoom(11);
                 setMapInstance(map);
               }}
             />
