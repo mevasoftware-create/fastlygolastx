@@ -4,6 +4,7 @@ import { TRPCError } from "@trpc/server";
 import { getDb } from "../db";
 import { fcmTokens } from "../../drizzle/schema";
 import { eq, and } from "drizzle-orm";
+import { sendFcmToUser, sendFcmToToken, isFcmConfigured } from "../fcmService";
 
 export const pushNotificationRouter = router({
   /**
@@ -104,7 +105,17 @@ export const pushNotificationRouter = router({
   }),
 
   /**
-   * Admin: Send test notification
+   * Check FCM configuration status
+   */
+  getStatus: adminProcedure.query(() => {
+    return {
+      configured: isFcmConfigured(),
+      projectId: process.env.FCM_PROJECT_ID || "fastlygo1",
+    };
+  }),
+
+  /**
+   * Admin: Send test notification to a specific user
    */
   sendTest: adminProcedure
     .input(z.object({
@@ -133,18 +144,58 @@ export const pushNotificationRouter = router({
         throw new TRPCError({ code: "NOT_FOUND", message: "No active tokens found for user" });
       }
 
-      // TODO: Implement actual FCM sending logic here
-      // This would use Firebase Admin SDK or HTTP API
-      // For now, just return success
-      console.log(`[Push Notification] Would send to ${tokens.length} devices:`, {
+      if (!isFcmConfigured()) {
+        throw new TRPCError({ 
+          code: "PRECONDITION_FAILED", 
+          message: "FCM not configured. Please set FCM_ACCESS_TOKEN environment variable." 
+        });
+      }
+
+      const result = await sendFcmToUser(input.userId, {
         title: input.title,
         body: input.body,
       });
 
       return { 
-        success: true, 
-        message: `Notification queued for ${tokens.length} device(s)` 
+        success: result.sent > 0,
+        sent: result.sent,
+        failed: result.failed,
+        message: `Sent to ${result.sent} device(s), failed: ${result.failed}`,
+        errors: result.errors,
       };
+    }),
+
+  /**
+   * Admin: Send test notification to a specific FCM token directly
+   */
+  sendTestToToken: adminProcedure
+    .input(z.object({
+      token: z.string(),
+      title: z.string(),
+      body: z.string(),
+      platform: z.enum(["ios", "android", "web"]).default("android"),
+    }))
+    .mutation(async ({ input }) => {
+      if (!isFcmConfigured()) {
+        throw new TRPCError({ 
+          code: "PRECONDITION_FAILED", 
+          message: "FCM not configured. Please set FCM_ACCESS_TOKEN environment variable." 
+        });
+      }
+
+      const result = await sendFcmToToken(input.token, {
+        title: input.title,
+        body: input.body,
+      }, input.platform);
+
+      if (!result.success) {
+        throw new TRPCError({ 
+          code: "INTERNAL_SERVER_ERROR", 
+          message: result.error || "Failed to send notification" 
+        });
+      }
+
+      return { success: true, message: "Notification sent successfully" };
     }),
 });
 
@@ -156,50 +207,18 @@ export async function sendPushNotification(
   userId: number,
   title: string,
   body: string,
-  data?: Record<string, any>
+  data?: Record<string, string>
 ) {
-  const dbInstance = await getDb();
-  if (!dbInstance) return false;
+  if (!isFcmConfigured()) {
+    console.log(`[FCM] Not configured, skipping notification for user ${userId}`);
+    return false;
+  }
 
   try {
-    // Get user's active tokens
-    const tokens = await dbInstance
-      .select()
-      .from(fcmTokens)
-      .where(
-        and(
-          eq(fcmTokens.userId, userId),
-          eq(fcmTokens.isActive, true)
-        )
-      );
-
-    if (tokens.length === 0) {
-      console.log(`[Push Notification] No active tokens for user ${userId}`);
-      return false;
-    }
-
-    // TODO: Implement actual FCM sending logic
-    // Example using Firebase Admin SDK:
-    /*
-    const admin = require('firebase-admin');
-    const message = {
-      notification: { title, body },
-      data: data || {},
-      tokens: tokens.map(t => t.token),
-    };
-    await admin.messaging().sendMulticast(message);
-    */
-
-    console.log(`[Push Notification] Would send to user ${userId}:`, {
-      title,
-      body,
-      data,
-      tokenCount: tokens.length,
-    });
-
-    return true;
+    const result = await sendFcmToUser(userId, { title, body, data });
+    return result.sent > 0;
   } catch (error) {
-    console.error("[Push Notification] Error sending:", error);
+    console.error("[FCM] Error sending push notification:", error);
     return false;
   }
 }
