@@ -1,0 +1,31 @@
+{
+  "query": "SELECT id, email, name, loginMethod, password IS NOT NULL as hasPassword FROM users WHERE role = 'admin';",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4EV5ivwhyC7eCUY.ebc471170149 --database 4KwtmFvvd67FSFhQ5dyp9H --execute SELECT id, email, name, loginMethod, password IS NOT NULL as hasPassword FROM users WHERE role = 'admin';",
+  "rows": [
+    {
+      "id": "2970104",
+      "email": "admin@fastlygo.app",
+      "name": "Admin Userxxx",
+      "loginMethod": "email",
+      "hasPassword": "1"
+    },
+    {
+      "id": "2970302",
+      "email": "mevasoftware@gmail.com",
+      "name": "Meva Software",
+      "loginMethod": "google",
+      "hasPassword": "0"
+    },
+    {
+      "id": "3060999",
+      "email": "admin@fastlygo.mk",
+      "name": "Admin User",
+      "loginMethod": "email",
+      "hasPassword": "1"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\temail\tname\tloginMethod\thasPassword\n2970104\tadmin@fastlygo.app\tAdmin Userxxx\temail\t1\n2970302\tmevasoftware@gmail.com\tMeva Software\tgoogle\t0\n3060999\tadmin@fastlygo.mk\tAdmin User\temail\t1\n",
+  "stderr": "",
+  "execution_time_ms": 49
+}

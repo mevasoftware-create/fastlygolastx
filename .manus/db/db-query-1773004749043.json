@@ -1,0 +1,9 @@
+{
+  "query": "ALTER TABLE `fcmTokens` ADD COLUMN `isActive` tinyint NOT NULL DEFAULT 1 AFTER `deviceId`;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4EV5ivwhyC7eCUY.ebc471170149 --database 4KwtmFvvd67FSFhQ5dyp9H --execute ALTER TABLE `fcmTokens` ADD COLUMN `isActive` tinyint NOT NULL DEFAULT 1 AFTER `deviceId`;",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 220
+}

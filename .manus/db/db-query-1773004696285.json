@@ -1,0 +1,19 @@
+{
+  "query": "INSERT INTO fcmTokens (userId, token, platform) VALUES (2970104, 'TEST_TOKEN_MANUAL_123', 'android');\nSELECT * FROM fcmTokens;\nDELETE FROM fcmTokens WHERE token = 'TEST_TOKEN_MANUAL_123';",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4EV5ivwhyC7eCUY.ebc471170149 --database 4KwtmFvvd67FSFhQ5dyp9H --execute INSERT INTO fcmTokens (userId, token, platform) VALUES (2970104, 'TEST_TOKEN_MANUAL_123', 'android');\nSELECT * FROM fcmTokens;\nDELETE FROM fcmTokens WHERE token = 'TEST_TOKEN_MANUAL_123';",
+  "rows": [
+    {
+      "id": "1",
+      "userId": "2970104",
+      "token": "TEST_TOKEN_MANUAL_123",
+      "deviceType": "android",
+      "deviceId": "NULL",
+      "platform": "android",
+      "createdAt": "2026-03-08 21:18:16"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tuserId\ttoken\tdeviceType\tdeviceId\tplatform\tcreatedAt\n1\t2970104\tTEST_TOKEN_MANUAL_123\tandroid\tNULL\tandroid\t2026-03-08 21:18:16\n",
+  "stderr": "",
+  "execution_time_ms": 76
+}

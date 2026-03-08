@@ -1,0 +1,19 @@
+{
+  "query": "INSERT INTO fcmTokens (userId, token, deviceType, deviceId, isActive) VALUES (2970104, 'TEST_TOKEN_FINAL', 'android', 'test-device-001', 1);\nSELECT id, userId, LEFT(token,20) as token_preview, deviceType, deviceId, isActive, createdAt FROM fcmTokens WHERE token = 'TEST_TOKEN_FINAL';\nDELETE FROM fcmTokens WHERE token = 'TEST_TOKEN_FINAL';",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4EV5ivwhyC7eCUY.ebc471170149 --database 4KwtmFvvd67FSFhQ5dyp9H --execute INSERT INTO fcmTokens (userId, token, deviceType, deviceId, isActive) VALUES (2970104, 'TEST_TOKEN_FINAL', 'android', 'test-device-001', 1);\nSELECT id, userId, LEFT(token,20) as token_preview, deviceType, deviceId, isActive, createdAt FROM fcmTokens WHERE token = 'TEST_TOKEN_FINAL';\nDELETE FROM fcmTokens WHERE token = 'TEST_TOKEN_FINAL';",
+  "rows": [
+    {
+      "id": "3",
+      "userId": "2970104",
+      "token_preview": "TEST_TOKEN_FINAL",
+      "deviceType": "android",
+      "deviceId": "test-device-001",
+      "isActive": "1",
+      "createdAt": "2026-03-08 21:19:14"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tuserId\ttoken_preview\tdeviceType\tdeviceId\tisActive\tcreatedAt\n3\t2970104\tTEST_TOKEN_FINAL\tandroid\ttest-device-001\t1\t2026-03-08 21:19:14\n",
+  "stderr": "",
+  "execution_time_ms": 68
+}

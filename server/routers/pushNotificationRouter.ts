@@ -17,8 +17,17 @@ export const pushNotificationRouter = router({
       deviceId: z.string().optional(),
     }))
     .mutation(async ({ ctx, input }) => {
+      console.log("[FCM] registerToken called", {
+        userId: ctx.user.id,
+        userEmail: ctx.user.email,
+        tokenPreview: input.token.substring(0, 30) + "...",
+        deviceType: input.deviceType,
+        deviceId: input.deviceId,
+      });
+
       const dbInstance = await getDb();
       if (!dbInstance) {
+        console.error("[FCM] registerToken FAILED: Database not available");
         throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database not available" });
       }
 
@@ -44,6 +53,7 @@ export const pushNotificationRouter = router({
             isActive: true,
           })
           .where(eq(fcmTokens.id, existing[0].id));
+        console.log("[FCM] registerToken UPDATED existing token, id:", existing[0].id);
       } else {
         // Create new token
         await dbInstance.insert(fcmTokens).values({
@@ -53,6 +63,7 @@ export const pushNotificationRouter = router({
           deviceId: input.deviceId,
           isActive: true,
         });
+        console.log("[FCM] registerToken INSERTED new token for userId:", ctx.user.id);
       }
 
       return { success: true };

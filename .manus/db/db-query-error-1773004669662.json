@@ -1,0 +1,8 @@
+{
+  "query": "\nALTER TABLE `fcmTokens` \n  ADD COLUMN `deviceType` enum('ios','android','web') AFTER `token`,\n  ADD COLUMN `deviceId` varchar(255) AFTER `deviceType`;\n\nUPDATE `fcmTokens` SET `deviceType` = `platform` WHERE `deviceType` IS NULL;\n\nALTER TABLE `fcmTokens` MODIFY COLUMN `deviceType` enum('ios','android','web') NOT NULL;\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4EV5ivwhyC7eCUY.ebc471170149 --database 4KwtmFvvd67FSFhQ5dyp9H --execute \nALTER TABLE `fcmTokens` \n  ADD COLUMN `deviceType` enum('ios','android','web') AFTER `token`,\n  ADD COLUMN `deviceId` varchar(255) AFTER `deviceType`;\n\nUPDATE `fcmTokens` SET `deviceType` = `platform` WHERE `deviceType` IS NULL;\n\nALTER TABLE `fcmTokens` MODIFY COLUMN `deviceType` enum('ios','android','web') NOT NULL;\n",
+  "returncode": 1,
+  "logs": [
+    "ERROR 1054 (42S22) at line 2: Unknown column 'devicetype' in 'fcmTokens'"
+  ]
+}

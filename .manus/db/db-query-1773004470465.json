@@ -1,0 +1,28 @@
+{
+  "query": "SELECT id, email, role, name FROM users WHERE role = 'admin' LIMIT 5;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4EV5ivwhyC7eCUY.ebc471170149 --database 4KwtmFvvd67FSFhQ5dyp9H --execute SELECT id, email, role, name FROM users WHERE role = 'admin' LIMIT 5;",
+  "rows": [
+    {
+      "id": "2970104",
+      "email": "admin@fastlygo.app",
+      "role": "admin",
+      "name": "Admin Userxxx"
+    },
+    {
+      "id": "2970302",
+      "email": "mevasoftware@gmail.com",
+      "role": "admin",
+      "name": "Meva Software"
+    },
+    {
+      "id": "3060999",
+      "email": "admin@fastlygo.mk",
+      "role": "admin",
+      "name": "Admin User"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\temail\trole\tname\n2970104\tadmin@fastlygo.app\tadmin\tAdmin Userxxx\n2970302\tmevasoftware@gmail.com\tadmin\tMeva Software\n3060999\tadmin@fastlygo.mk\tadmin\tAdmin User\n",
+  "stderr": "",
+  "execution_time_ms": 52
+}

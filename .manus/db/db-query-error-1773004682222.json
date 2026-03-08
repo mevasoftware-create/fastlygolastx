@@ -1,0 +1,8 @@
+{
+  "query": "INSERT INTO fcmTokens (userId, token, deviceType, deviceId, isActive) VALUES (2970104, 'TEST_TOKEN_MANUAL_123', 'android', 'test-device-001', 1);\nSELECT * FROM fcmTokens WHERE token = 'TEST_TOKEN_MANUAL_123';\nDELETE FROM fcmTokens WHERE token = 'TEST_TOKEN_MANUAL_123';",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4EV5ivwhyC7eCUY.ebc471170149 --database 4KwtmFvvd67FSFhQ5dyp9H --execute INSERT INTO fcmTokens (userId, token, deviceType, deviceId, isActive) VALUES (2970104, 'TEST_TOKEN_MANUAL_123', 'android', 'test-device-001', 1);\nSELECT * FROM fcmTokens WHERE token = 'TEST_TOKEN_MANUAL_123';\nDELETE FROM fcmTokens WHERE token = 'TEST_TOKEN_MANUAL_123';",
+  "returncode": 1,
+  "logs": [
+    "ERROR 1054 (42S22) at line 1: Unknown column 'isActive' in 'field list'"
+  ]
+}
