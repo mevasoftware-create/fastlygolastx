@@ -115,3 +115,7 @@
 
 ## Kurye Sipariş Kabul Hatası (03.03.2026)
 - [ ] acceptedAt datetime format hatası düzeltilecek (Failed query: update orders set acceptedAt)
+
+## Bildirim Sistemi Genişletme (09.03.2026)
+- [x] Admin paneli bildirimler bölümüne kayıtlı cihazlar sekmesi ekle (kullanıcı adı, cihaz tipi, platform, kayıt tarihi, aktif/pasif)
+- [x] Backend'e pushNotifications.getRegisteredDevices endpoint'i ekle

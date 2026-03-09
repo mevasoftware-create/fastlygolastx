@@ -2,8 +2,8 @@ import { z } from "zod";
 import { router, protectedProcedure, adminProcedure } from "../_core/trpc";
 import { TRPCError } from "@trpc/server";
 import { getDb } from "../db";
-import { fcmTokens } from "../../drizzle/schema";
-import { eq, and } from "drizzle-orm";
+import { fcmTokens, users } from "../../drizzle/schema";
+import { eq, and, desc } from "drizzle-orm";
 import { sendFcmToUser, sendFcmToToken, sendFcmToAllUsers, isFcmConfigured } from "../fcmService";
 
 export const pushNotificationRouter = router({
@@ -124,6 +124,67 @@ export const pushNotificationRouter = router({
       projectId: process.env.FCM_PROJECT_ID || "fastlygo1",
     };
   }),
+
+  /**
+   * Admin: List all registered devices with user info
+   */
+  getRegisteredDevices: adminProcedure
+    .input(z.object({
+      limit: z.number().default(50),
+      offset: z.number().default(0),
+      activeOnly: z.boolean().default(false),
+    }))
+    .query(async ({ input }) => {
+      const dbInstance = await getDb();
+      if (!dbInstance) return { devices: [], total: 0 };
+
+      const query = dbInstance
+        .select({
+          id: fcmTokens.id,
+          userId: fcmTokens.userId,
+          token: fcmTokens.token,
+          deviceType: fcmTokens.deviceType,
+          deviceId: fcmTokens.deviceId,
+          isActive: fcmTokens.isActive,
+          createdAt: fcmTokens.createdAt,
+          updatedAt: fcmTokens.updatedAt,
+          userName: users.name,
+          userEmail: users.email,
+          userRole: users.role,
+        })
+        .from(fcmTokens)
+        .leftJoin(users, eq(fcmTokens.userId, users.id))
+        .orderBy(desc(fcmTokens.createdAt))
+        .limit(input.limit)
+        .offset(input.offset);
+
+      if (input.activeOnly) {
+        const devices = await dbInstance
+          .select({
+            id: fcmTokens.id,
+            userId: fcmTokens.userId,
+            token: fcmTokens.token,
+            deviceType: fcmTokens.deviceType,
+            deviceId: fcmTokens.deviceId,
+            isActive: fcmTokens.isActive,
+            createdAt: fcmTokens.createdAt,
+            updatedAt: fcmTokens.updatedAt,
+            userName: users.name,
+            userEmail: users.email,
+            userRole: users.role,
+          })
+          .from(fcmTokens)
+          .leftJoin(users, eq(fcmTokens.userId, users.id))
+          .where(eq(fcmTokens.isActive, true))
+          .orderBy(desc(fcmTokens.createdAt))
+          .limit(input.limit)
+          .offset(input.offset);
+        return { devices, total: devices.length };
+      }
+
+      const devices = await query;
+      return { devices, total: devices.length };
+    }),
 
   /**
    * Admin: Send test notification to a specific user
