@@ -5,7 +5,7 @@ import { getDb } from "../db";
 import * as db from "../db";
 import { 
   users, couriers, businesses, orders, earnings, 
-  paymentRequests, siteSettings, appVersions, pushNotifications, pushTokens 
+  paymentRequests, siteSettings, appVersions, pushNotifications, pushTokens, fcmTokens 
 } from "../../drizzle/schema";
 import { eq, and, desc, sql, gte, lte } from "drizzle-orm";
 import { emitToUser } from "../_core/socket";
@@ -1134,6 +1134,56 @@ export const adminRouter = router({
           );
           sentCount += result.sent;
           failedCount += result.failed;
+        }
+      }
+
+      // Send FCM push notifications (mobile devices)
+      if (input.platform === "mobile" || input.platform === "all") {
+        const { sendFcmToAllUsers, sendFcmToUsers, isFcmConfigured } = await import("../fcmService");
+        if (isFcmConfigured()) {
+          let fcmResult: { sent: number; failed: number };
+          
+          if (input.targetAudience === "all") {
+            // Send to all active FCM tokens
+            const allResult = await sendFcmToAllUsers({
+              title: input.title,
+              body: input.body,
+              imageUrl: input.imageUrl,
+              data: input.actionUrl ? { actionUrl: input.actionUrl } : undefined,
+            });
+            fcmResult = { sent: allResult.sent, failed: allResult.failed };
+          } else {
+            // Get target user IDs for FCM
+            let fcmTargetUserIds: number[] = [];
+            if (input.targetAudience === "users") {
+              const usersList = await dbInstance.select({ id: users.id }).from(users).where(eq(users.role, "user"));
+              fcmTargetUserIds = usersList.map(u => u.id);
+            } else if (input.targetAudience === "couriers") {
+              const couriersList = await dbInstance.select({ userId: couriers.userId }).from(couriers);
+              fcmTargetUserIds = couriersList.map(c => c.userId);
+            } else if (input.targetAudience === "business") {
+              const businessList = await dbInstance.select({ userId: businesses.userId }).from(businesses);
+              fcmTargetUserIds = businessList.map(b => b.userId);
+            }
+            
+            if (fcmTargetUserIds.length > 0) {
+              const usersResult = await sendFcmToUsers(fcmTargetUserIds, {
+                title: input.title,
+                body: input.body,
+                imageUrl: input.imageUrl,
+                data: input.actionUrl ? { actionUrl: input.actionUrl } : undefined,
+              });
+              fcmResult = { sent: usersResult.totalSent, failed: usersResult.totalFailed };
+            } else {
+              fcmResult = { sent: 0, failed: 0 };
+            }
+          }
+          
+          sentCount += fcmResult.sent;
+          failedCount += fcmResult.failed;
+          console.log(`[Admin] FCM sent=${fcmResult.sent}, failed=${fcmResult.failed}`);
+        } else {
+          console.warn("[Admin] FCM not configured, skipping mobile push");
         }
       }
 

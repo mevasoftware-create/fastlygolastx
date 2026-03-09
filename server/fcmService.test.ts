@@ -4,27 +4,50 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 const mockFetch = vi.fn();
 global.fetch = mockFetch;
 
+// Mock fcmTokenManager
+vi.mock("./fcmTokenManager", () => ({
+  getFcmAccessToken: vi.fn().mockResolvedValue("test-access-token"),
+  isFcmAvailable: vi.fn().mockReturnValue(true),
+  getFcmTokenStatus: vi.fn().mockResolvedValue({
+    configured: true,
+    method: "manual_token",
+    tokenValid: true,
+    expiresIn: null,
+  }),
+  initFcmTokenManager: vi.fn().mockResolvedValue(undefined),
+}));
+
 describe("FCM Service", () => {
   beforeEach(() => {
     vi.resetAllMocks();
     // Set environment variables for tests
     process.env.FCM_PROJECT_ID = "fastlygo1";
     process.env.FCM_ACCESS_TOKEN = "test-access-token";
+
+    // Re-apply mocks after reset
+    const { getFcmAccessToken, isFcmAvailable } = require("./fcmTokenManager");
+    (getFcmAccessToken as ReturnType<typeof vi.fn>).mockResolvedValue("test-access-token");
+    (isFcmAvailable as ReturnType<typeof vi.fn>).mockReturnValue(true);
   });
 
-  it("should return configured=true when FCM_ACCESS_TOKEN is set", async () => {
+  it("should return configured=true when FCM is available", async () => {
     const { isFcmConfigured } = await import("./fcmService");
     expect(isFcmConfigured()).toBe(true);
   });
 
-  it("should return configured=false when FCM_ACCESS_TOKEN is not set", async () => {
-    delete process.env.FCM_ACCESS_TOKEN;
-    // Re-import to get fresh state
+  it("should return configured=false when FCM is not available", async () => {
+    const { isFcmAvailable } = await import("./fcmTokenManager");
+    (isFcmAvailable as ReturnType<typeof vi.fn>).mockReturnValue(false);
+
     vi.resetModules();
+    vi.mock("./fcmTokenManager", () => ({
+      getFcmAccessToken: vi.fn().mockResolvedValue(null),
+      isFcmAvailable: vi.fn().mockReturnValue(false),
+      getFcmTokenStatus: vi.fn().mockResolvedValue({ configured: false, method: "none", tokenValid: false, expiresIn: null }),
+      initFcmTokenManager: vi.fn().mockResolvedValue(undefined),
+    }));
     const { isFcmConfigured } = await import("./fcmService");
     expect(isFcmConfigured()).toBe(false);
-    // Restore
-    process.env.FCM_ACCESS_TOKEN = "test-access-token";
   });
 
   it("should send FCM notification successfully", async () => {
@@ -33,9 +56,8 @@ describe("FCM Service", () => {
       json: async () => ({ name: "projects/fastlygo1/messages/12345" }),
     });
 
-    vi.resetModules();
     const { sendFcmToToken } = await import("./fcmService");
-    
+
     const result = await sendFcmToToken(
       "test-device-token",
       { title: "Test", body: "Test body" },
@@ -54,7 +76,7 @@ describe("FCM Service", () => {
     );
   });
 
-  it("should handle invalid token error", async () => {
+  it("should handle invalid token error (UNREGISTERED)", async () => {
     mockFetch.mockResolvedValueOnce({
       ok: false,
       status: 404,
@@ -66,9 +88,8 @@ describe("FCM Service", () => {
       }),
     });
 
-    vi.resetModules();
     const { sendFcmToToken } = await import("./fcmService");
-    
+
     const result = await sendFcmToToken(
       "invalid-device-token",
       { title: "Test", body: "Test body" },
@@ -91,9 +112,8 @@ describe("FCM Service", () => {
       }),
     });
 
-    vi.resetModules();
     const { sendFcmToToken } = await import("./fcmService");
-    
+
     const result = await sendFcmToToken(
       "some-device-token",
       { title: "Test", body: "Test body" },
@@ -104,11 +124,12 @@ describe("FCM Service", () => {
     expect(result.error).toContain("AUTH_EXPIRED:");
   });
 
-  it("should return error when FCM_ACCESS_TOKEN is not configured", async () => {
-    delete process.env.FCM_ACCESS_TOKEN;
-    vi.resetModules();
+  it("should return error when FCM access token is null", async () => {
+    const { getFcmAccessToken } = await import("./fcmTokenManager");
+    (getFcmAccessToken as ReturnType<typeof vi.fn>).mockResolvedValue(null);
+
     const { sendFcmToToken } = await import("./fcmService");
-    
+
     const result = await sendFcmToToken(
       "some-device-token",
       { title: "Test", body: "Test body" },
@@ -116,9 +137,83 @@ describe("FCM Service", () => {
     );
 
     expect(result.success).toBe(false);
-    expect(result.error).toBe("FCM_ACCESS_TOKEN not configured");
-    
-    // Restore
-    process.env.FCM_ACCESS_TOKEN = "test-access-token";
+    expect(result.error).toBe("FCM not configured (no access token)");
+  });
+
+  it("should build correct message payload for iOS", async () => {
+    mockFetch.mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({ name: "projects/fastlygo1/messages/12345" }),
+    });
+
+    const { sendFcmToToken } = await import("./fcmService");
+
+    await sendFcmToToken(
+      "ios-device-token",
+      { title: "iOS Test", body: "iOS body", imageUrl: "https://example.com/img.png" },
+      "ios"
+    );
+
+    const callArgs = mockFetch.mock.calls[0];
+    const body = JSON.parse(callArgs[1].body);
+
+    expect(body.message.apns).toBeDefined();
+    expect(body.message.apns.headers["apns-priority"]).toBe("10");
+    expect(body.message.notification.image).toBe("https://example.com/img.png");
+  });
+
+  it("should build correct message payload for Android", async () => {
+    mockFetch.mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({ name: "projects/fastlygo1/messages/12345" }),
+    });
+
+    const { sendFcmToToken } = await import("./fcmService");
+
+    await sendFcmToToken(
+      "android-device-token",
+      { title: "Android Test", body: "Android body", data: { orderId: "123" } },
+      "android"
+    );
+
+    const callArgs = mockFetch.mock.calls[0];
+    const body = JSON.parse(callArgs[1].body);
+
+    expect(body.message.android).toBeDefined();
+    expect(body.message.android.priority).toBe("high");
+    expect(body.message.data.orderId).toBe("123");
+  });
+});
+
+describe("FCM Token Manager", () => {
+  it("should report configured=true when FCM_ACCESS_TOKEN is set", async () => {
+    process.env.FCM_ACCESS_TOKEN = "test-token-123";
+    delete process.env.FCM_SERVICE_ACCOUNT_JSON;
+
+    vi.resetModules();
+    const { isFcmAvailable } = await import("./fcmTokenManager");
+    expect(isFcmAvailable()).toBe(true);
+  });
+
+  it("should report configured=false when no token is set", async () => {
+    delete process.env.FCM_ACCESS_TOKEN;
+    delete process.env.FCM_SERVICE_ACCOUNT_JSON;
+
+    vi.resetModules();
+    const { isFcmAvailable } = await import("./fcmTokenManager");
+    expect(isFcmAvailable()).toBe(false);
+  });
+
+  it("should return token status with method=manual_token", async () => {
+    process.env.FCM_ACCESS_TOKEN = "manual-token-abc";
+    delete process.env.FCM_SERVICE_ACCOUNT_JSON;
+
+    vi.resetModules();
+    const { getFcmTokenStatus } = await import("./fcmTokenManager");
+    const status = await getFcmTokenStatus();
+
+    expect(status.configured).toBe(true);
+    expect(status.method).toBe("manual_token");
+    expect(status.tokenValid).toBe(true);
   });
 });

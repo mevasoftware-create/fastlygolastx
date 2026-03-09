@@ -1,5 +1,6 @@
 import "dotenv/config";
 import express from "express";
+import { initFcmTokenManager } from "../fcmTokenManager";
 import { createServer } from "http";
 import net from "net";
 import helmet from "helmet";
@@ -362,6 +363,11 @@ async function startServer() {
   if (port !== preferredPort) {
     console.log(`Port ${preferredPort} is busy, using port ${port} instead`);
   }
+
+  // Initialize FCM Token Manager (auto-refresh)
+  initFcmTokenManager().catch(err => {
+    console.error("[FCM] Failed to initialize token manager:", err);
+  });
 
   server.listen(port, () => {
     console.log(`Server running on http://localhost:${port}/`);

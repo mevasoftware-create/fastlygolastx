@@ -6,7 +6,7 @@ import { getDb } from "../db";
 import { couriers, users, priceOffers, orders } from "../../drizzle/schema";
 import { eq, and, desc, sql } from "drizzle-orm";
 import { emitToUser, emitToAdmins } from "../_core/socket";
-
+import { sendPushNotification } from "./pushNotificationRouter";
 export const courierRouter = router({
   /**
    * Apply to become a courier
@@ -414,12 +414,22 @@ export const courierRouter = router({
         })
         .where(eq(orders.id, input.orderId));
 
-      // Notify customer
+      // Notify customer via Socket.IO
       emitToUser(order[0].customerId, "order:accepted", {
         orderId: input.orderId,
         courierId: courier[0].id,
         courierName: ctx.user.name,
       });
+
+      // Notify customer via FCM push notification
+      if (order[0].customerId) {
+        sendPushNotification(
+          order[0].customerId,
+          "Kurye Atandı 🚴",
+          `${ctx.user.name || "Kurye"} siparişinizi aldı ve yola çıkıyor!`,
+          { orderId: String(input.orderId), type: "order_accepted" }
+        ).catch(err => console.error("[FCM] acceptOrder notification failed:", err));
+      }
 
       return { success: true, message: "Order accepted successfully" };
     }),

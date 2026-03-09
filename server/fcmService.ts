@@ -1,20 +1,22 @@
 /**
  * FCM HTTP v1 API Service
- * 
+ *
  * Firebase Cloud Messaging HTTP v1 API kullanarak mobil cihazlara
  * push notification gönderir.
- * 
- * Authentication: OAuth2 access token (gcloud auth print-access-token)
- * 
- * NOT: Token 1 saat geçerlidir. Yenilemek için:
- *   gcloud auth print-access-token
- * 
- * Uzun vadeli çözüm için Workload Identity Federation kullanılabilir.
+ *
+ * Authentication:
+ *   - Otomatik: FCM_SERVICE_ACCOUNT_JSON secret ile (önerilen)
+ *   - Manuel: FCM_ACCESS_TOKEN env değişkeni ile (1 saatte bir yenilenmeli)
+ *
+ * Service Account kurulumu:
+ *   Firebase Console > Project Settings > Service Accounts > Generate new private key
+ *   İndirilen JSON'u FCM_SERVICE_ACCOUNT_JSON secret'ına ekleyin
  */
 
 import { getDb } from "./db";
 import { fcmTokens } from "../drizzle/schema";
 import { eq, and } from "drizzle-orm";
+import { getFcmAccessToken, isFcmAvailable } from "./fcmTokenManager";
 
 const FCM_PROJECT_ID = process.env.FCM_PROJECT_ID || "fastlygo1";
 const FCM_V1_ENDPOINT = `https://fcm.googleapis.com/v1/projects/${FCM_PROJECT_ID}/messages:send`;
@@ -27,13 +29,6 @@ export interface FcmPayload {
 }
 
 /**
- * Get the current FCM access token from environment
- */
-function getAccessToken(): string | null {
-  return process.env.FCM_ACCESS_TOKEN || null;
-}
-
-/**
  * Send FCM notification to a single device token
  */
 async function sendToDevice(
@@ -41,9 +36,9 @@ async function sendToDevice(
   payload: FcmPayload,
   platform: "ios" | "android" | "web"
 ): Promise<{ success: boolean; error?: string }> {
-  const accessToken = getAccessToken();
+  const accessToken = await getFcmAccessToken();
   if (!accessToken) {
-    return { success: false, error: "FCM_ACCESS_TOKEN not configured" };
+    return { success: false, error: "FCM not configured (no access token)" };
   }
 
   const message: Record<string, unknown> = {
@@ -63,15 +58,31 @@ async function sendToDevice(
       notification: {
         sound: "default",
         click_action: "FLUTTER_NOTIFICATION_CLICK",
+        channel_id: "fastlygo_default",
       },
     };
   } else if (platform === "ios") {
     message.apns = {
+      headers: {
+        "apns-priority": "10",
+      },
       payload: {
         aps: {
           sound: "default",
           badge: 1,
+          "content-available": 1,
         },
+      },
+    };
+  } else if (platform === "web") {
+    message.webpush = {
+      headers: {
+        Urgency: "high",
+      },
+      notification: {
+        icon: "/icon-192x192.png",
+        badge: "/badge-72x72.png",
+        requireInteraction: true,
       },
     };
   }
@@ -92,7 +103,7 @@ async function sendToDevice(
       const errorInfo = responseData as { error?: { message?: string; status?: string } };
       const errorMsg = errorInfo?.error?.message || `HTTP ${response.status}`;
       const errorStatus = errorInfo?.error?.status || "";
-      
+
       // Token geçersiz veya kayıtlı değil - deaktive et
       if (
         errorStatus === "UNREGISTERED" ||
@@ -101,7 +112,7 @@ async function sendToDevice(
       ) {
         return { success: false, error: `TOKEN_INVALID:${errorMsg}` };
       }
-      
+
       // Token süresi dolmuş (401) - access token yenilenmeli
       if (response.status === 401) {
         return { success: false, error: `AUTH_EXPIRED:${errorMsg}` };
@@ -124,10 +135,9 @@ export async function sendFcmToUser(
   userId: number,
   payload: FcmPayload
 ): Promise<{ sent: number; failed: number; errors: string[] }> {
-  const accessToken = getAccessToken();
-  if (!accessToken) {
-    console.warn("[FCM] FCM_ACCESS_TOKEN not configured. Skipping FCM notification.");
-    return { sent: 0, failed: 0, errors: ["FCM_ACCESS_TOKEN not configured"] };
+  if (!isFcmAvailable()) {
+    console.warn("[FCM] Not configured. Skipping FCM notification.");
+    return { sent: 0, failed: 0, errors: ["FCM not configured"] };
   }
 
   const dbInstance = await getDb();
@@ -144,7 +154,6 @@ export async function sendFcmToUser(
     );
 
   if (tokens.length === 0) {
-    console.log(`[FCM] No active tokens for user ${userId}`);
     return { sent: 0, failed: 0, errors: [] };
   }
 
@@ -238,16 +247,14 @@ export async function sendFcmToAllUsers(
 
 /**
  * Send FCM notification to a specific device token directly
- * (Useful for testing)
  */
 export async function sendFcmToToken(
   token: string,
   payload: FcmPayload,
   platform: "ios" | "android" | "web" = "android"
 ): Promise<{ success: boolean; error?: string }> {
-  const accessToken = getAccessToken();
-  if (!accessToken) {
-    return { success: false, error: "FCM_ACCESS_TOKEN not configured" };
+  if (!isFcmAvailable()) {
+    return { success: false, error: "FCM not configured" };
   }
   return sendToDevice(token, payload, platform);
 }
@@ -256,5 +263,5 @@ export async function sendFcmToToken(
  * Check if FCM is configured and ready
  */
 export function isFcmConfigured(): boolean {
-  return !!getAccessToken();
+  return isFcmAvailable();
 }
