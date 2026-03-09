@@ -21,6 +21,7 @@ import { mobileAppRouter } from "./routers/mobileAppRouter";
 import { imageRouter } from "./routers/imageRouter";
 import { errorLogRouter } from "./errorLogRouter";
 import { pagesRouter } from "./routers/pagesRouter";
+import { scheduledNotificationRouter } from "./routers/scheduledNotificationRouter";
 
 
 import { publicProcedure, protectedProcedure, router } from "./_core/trpc";
@@ -214,6 +215,7 @@ export const appRouter = router({
   images: imageRouter,
   pages: pagesRouter,
   errorLogs: errorLogRouter,
+  scheduledNotifications: scheduledNotificationRouter,
 
 
   

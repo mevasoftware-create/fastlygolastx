@@ -1,6 +1,7 @@
 import "dotenv/config";
 import express from "express";
 import { initFcmTokenManager } from "../fcmTokenManager";
+import { startScheduledNotificationCron } from "../routers/scheduledNotificationRouter";
 import { createServer } from "http";
 import net from "net";
 import helmet from "helmet";
@@ -368,6 +369,9 @@ async function startServer() {
   initFcmTokenManager().catch(err => {
     console.error("[FCM] Failed to initialize token manager:", err);
   });
+
+  // Start scheduled notification cron job (runs every minute)
+  startScheduledNotificationCron();
 
   server.listen(port, () => {
     console.log(`Server running on http://localhost:${port}/`);

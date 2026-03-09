@@ -10,11 +10,13 @@ import { toast } from "sonner";
 import {
   Bell, Send, History, Smartphone, Globe, Monitor, RefreshCw,
   CheckCircle, XCircle, AlertCircle, Users, Zap, BarChart3,
-  Trash2, PowerOff, Eye, ChevronRight, Wifi, WifiOff, Settings,
+  Trash2, PowerOff, Eye, ChevronRight, Wifi, WifiOff, Settings, Calendar,
 } from "lucide-react";
-import { useState } from "react";
+import { useState, lazy, Suspense } from "react";
 
-type TabType = "send" | "history" | "devices" | "stats";
+const AdminScheduledNotifications = lazy(() => import("./AdminScheduledNotifications"));
+
+type TabType = "send" | "history" | "devices" | "stats" | "scheduled";
 
 const TEMPLATES = [
   { key: "order_received", label: "📦 Sipariş Alındı", title: "Siparişiniz Alındı 📦", body: "Siparişiniz başarıyla alındı ve işleme alındı." },
@@ -194,6 +196,7 @@ export default function AdminNotifications() {
           { id: "history" as TabType, icon: <History className="h-4 w-4" />, label: "Geçmiş" },
           { id: "devices" as TabType, icon: <Smartphone className="h-4 w-4" />, label: "Cihazlar", badge: statusData?.activeDeviceCount },
           { id: "stats" as TabType, icon: <BarChart3 className="h-4 w-4" />, label: "İstatistikler" },
+          { id: "scheduled" as TabType, icon: <Calendar className="h-4 w-4" />, label: "Zamanlama" },
         ].map(tab => (
           <button
             key={tab.id}
@@ -672,6 +675,17 @@ export default function AdminNotifications() {
             İstatistikleri Yenile
           </Button>
         </div>
+      )}
+
+      {activeTab === "scheduled" && (
+        <Suspense fallback={
+          <div className="flex items-center justify-center py-16 text-gray-400">
+            <RefreshCw className="h-6 w-6 animate-spin mr-2" />
+            Yükleniyor...
+          </div>
+        }>
+          <AdminScheduledNotifications />
+        </Suspense>
       )}
     </div>
   );

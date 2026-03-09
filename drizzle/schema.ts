@@ -781,3 +781,37 @@ export const pushNotifications = mysqlTable("push_notifications", {
 
 export type PushNotification = typeof pushNotifications.$inferSelect;
 export type InsertPushNotification = typeof pushNotifications.$inferInsert;
+
+// ─── Scheduled Notifications ─────────────────────────────────────────────────
+export const scheduledNotifications = mysqlTable("scheduled_notifications", {
+  id: int("id").autoincrement().primaryKey(),
+  title: varchar("title", { length: 255 }).notNull(),
+  body: text("body").notNull(),
+  imageUrl: text("imageUrl"),
+  actionUrl: text("actionUrl"),
+  platform: mysqlEnum("platform", ["web", "mobile", "all"]).notNull().default("all"),
+  targetAudience: mysqlEnum("targetAudience", ["all", "users", "couriers", "business"]).notNull().default("all"),
+  // Zamanlama
+  scheduledAt: timestamp("scheduledAt").notNull(), // Ne zaman gönderilecek
+  // Tekrar
+  repeatType: mysqlEnum("repeatType", ["once", "daily", "weekly"]).notNull().default("once"),
+  repeatDays: json("repeatDays"), // Haftalık için: [0,1,2,3,4,5,6] (0=Pazar)
+  repeatUntil: timestamp("repeatUntil"), // Tekrarın biteceği tarih
+  // Durum
+  status: mysqlEnum("status", ["pending", "sent", "cancelled", "failed"]).notNull().default("pending"),
+  lastSentAt: timestamp("lastSentAt"), // Son gönderim zamanı
+  sentCount: int("sentCount").default(0).notNull(), // Kaç cihaza ulaştı
+  failedCount: int("failedCount").default(0).notNull(),
+  errorMessage: text("errorMessage"), // Hata mesajı
+  // Meta
+  createdBy: int("createdBy").notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().notNull(),
+}, (table) => ({
+  statusIdx: index("sched_notif_status_idx").on(table.status),
+  scheduledAtIdx: index("sched_notif_scheduledAt_idx").on(table.scheduledAt),
+  createdByIdx: index("sched_notif_createdBy_idx").on(table.createdBy),
+}));
+
+export type ScheduledNotification = typeof scheduledNotifications.$inferSelect;
+export type InsertScheduledNotification = typeof scheduledNotifications.$inferInsert;
