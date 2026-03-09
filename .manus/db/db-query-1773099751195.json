@@ -1,0 +1,19 @@
+{
+  "query": "SELECT id, userId, deviceType, deviceId, isActive, createdAt, LEFT(token, 50) as tokenPreview FROM fcmTokens ORDER BY createdAt DESC LIMIT 10;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4EV5ivwhyC7eCUY.ebc471170149 --database 4KwtmFvvd67FSFhQ5dyp9H --execute SELECT id, userId, deviceType, deviceId, isActive, createdAt, LEFT(token, 50) as tokenPreview FROM fcmTokens ORDER BY createdAt DESC LIMIT 10;",
+  "rows": [
+    {
+      "id": "30002",
+      "userId": "2970265",
+      "deviceType": "android",
+      "deviceId": "android-36",
+      "isActive": "1",
+      "createdAt": "2026-03-09 23:32:22",
+      "tokenPreview": "eD1Ra3QATLO9hdiUSRQ1xN:APA91bE59zPVbnZloENyf5f0FDO"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tuserId\tdeviceType\tdeviceId\tisActive\tcreatedAt\ttokenPreview\n30002\t2970265\tandroid\tandroid-36\t1\t2026-03-09 23:32:22\teD1Ra3QATLO9hdiUSRQ1xN:APA91bE59zPVbnZloENyf5f0FDO\n",
+  "stderr": "",
+  "execution_time_ms": 53
+}

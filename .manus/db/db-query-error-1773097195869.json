@@ -1,0 +1,8 @@
+{
+  "query": "\nSELECT \n  ft.id,\n  ft.userId,\n  ft.deviceType,\n  ft.platform,\n  ft.isActive,\n  ft.lastUsed,\n  ft.createdAt,\n  LEFT(ft.fcmToken, 30) as tokenPreview\nFROM fcm_tokens ft\nORDER BY ft.createdAt DESC\nLIMIT 20;\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4EV5ivwhyC7eCUY.ebc471170149 --database 4KwtmFvvd67FSFhQ5dyp9H --execute \nSELECT \n  ft.id,\n  ft.userId,\n  ft.deviceType,\n  ft.platform,\n  ft.isActive,\n  ft.lastUsed,\n  ft.createdAt,\n  LEFT(ft.fcmToken, 30) as tokenPreview\nFROM fcm_tokens ft\nORDER BY ft.createdAt DESC\nLIMIT 20;\n",
+  "returncode": 1,
+  "logs": [
+    "ERROR 1146 (42S02) at line 2: Table '4kwtmfvvd67fsfhq5dyp9h.fcm_tokens' doesn't exist"
+  ]
+}

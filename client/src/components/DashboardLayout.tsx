@@ -25,6 +25,7 @@ import { LayoutDashboard, LogOut, PanelLeft, Users } from "lucide-react";
 import { CSSProperties, useEffect, useRef, useState } from "react";
 import { useLocation } from "wouter";
 import { DashboardLayoutSkeleton } from './DashboardLayoutSkeleton';
+import { NotificationPermissionBanner } from './NotificationPermissionBanner';
 import { Button } from "./ui/button";
 
 const menuItems = [
@@ -286,6 +287,7 @@ function DashboardLayoutContent({
             </div>
           </div>
         )}
+        <NotificationPermissionBanner />
         <main className="flex-1 p-4">{children}</main>
       </SidebarInset>
     </>

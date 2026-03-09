@@ -1,0 +1,25 @@
+{
+  "query": "SHOW TABLES LIKE '%fcm%'; SHOW TABLES LIKE '%push%'; SHOW TABLES LIKE '%device%';",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4EV5ivwhyC7eCUY.ebc471170149 --database 4KwtmFvvd67FSFhQ5dyp9H --execute SHOW TABLES LIKE '%fcm%'; SHOW TABLES LIKE '%push%'; SHOW TABLES LIKE '%device%';",
+  "rows": [
+    {
+      "Tables_in_4KwtmFvvd67FSFhQ5dyp9H (%fcm%)": "fcmTokens"
+    },
+    {
+      "Tables_in_4KwtmFvvd67FSFhQ5dyp9H (%fcm%)": "Tables_in_4KwtmFvvd67FSFhQ5dyp9H (%push%)"
+    },
+    {
+      "Tables_in_4KwtmFvvd67FSFhQ5dyp9H (%fcm%)": "pushNotificationTokens"
+    },
+    {
+      "Tables_in_4KwtmFvvd67FSFhQ5dyp9H (%fcm%)": "push_notifications"
+    },
+    {
+      "Tables_in_4KwtmFvvd67FSFhQ5dyp9H (%fcm%)": "push_tokens"
+    }
+  ],
+  "messages": [],
+  "stdout": "Tables_in_4KwtmFvvd67FSFhQ5dyp9H (%fcm%)\nfcmTokens\nTables_in_4KwtmFvvd67FSFhQ5dyp9H (%push%)\npushNotificationTokens\npush_notifications\npush_tokens\n",
+  "stderr": "",
+  "execution_time_ms": 65
+}

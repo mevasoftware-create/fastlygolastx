@@ -1,0 +1,18 @@
+{
+  "query": "\nSELECT 'push_tokens' as tbl, COUNT(*) as cnt FROM push_tokens\nUNION ALL\nSELECT 'push_notifications' as tbl, COUNT(*) as cnt FROM push_notifications;\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4EV5ivwhyC7eCUY.ebc471170149 --database 4KwtmFvvd67FSFhQ5dyp9H --execute \nSELECT 'push_tokens' as tbl, COUNT(*) as cnt FROM push_tokens\nUNION ALL\nSELECT 'push_notifications' as tbl, COUNT(*) as cnt FROM push_notifications;\n",
+  "rows": [
+    {
+      "tbl": "push_notifications",
+      "cnt": "23"
+    },
+    {
+      "tbl": "push_tokens",
+      "cnt": "0"
+    }
+  ],
+  "messages": [],
+  "stdout": "tbl\tcnt\npush_notifications\t23\npush_tokens\t0\n",
+  "stderr": "",
+  "execution_time_ms": 53
+}

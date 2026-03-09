@@ -1,0 +1,8 @@
+{
+  "query": "\nSELECT \n  id, userId, platform, deviceType, isActive, lastUsed, createdAt,\n  LEFT(token, 40) as tokenPreview\nFROM push_tokens\nORDER BY createdAt DESC\nLIMIT 10;\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4EV5ivwhyC7eCUY.ebc471170149 --database 4KwtmFvvd67FSFhQ5dyp9H --execute \nSELECT \n  id, userId, platform, deviceType, isActive, lastUsed, createdAt,\n  LEFT(token, 40) as tokenPreview\nFROM push_tokens\nORDER BY createdAt DESC\nLIMIT 10;\n",
+  "returncode": 1,
+  "logs": [
+    "ERROR 1054 (42S22) at line 2: Unknown column 'devicetype' in 'field list'"
+  ]
+}

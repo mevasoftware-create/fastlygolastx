@@ -119,3 +119,14 @@
 ## Bildirim Sistemi Genişletme (09.03.2026)
 - [x] Admin paneli bildirimler bölümüne kayıtlı cihazlar sekmesi ekle (kullanıcı adı, cihaz tipi, platform, kayıt tarihi, aktif/pasif)
 - [x] Backend'e pushNotifications.getRegisteredDevices endpoint'i ekle
+
+## Web Push + FCM Tam Entegrasyon (10.03.2026)
+- [ ] Web Push bildirim izni bileşeni oluştur (NotificationPermissionBanner)
+- [ ] Kullanıcı oturum açtıktan sonra otomatik bildirim izni iste
+- [ ] DashboardLayout ve kullanıcı paneline bildirim izni banner'ı ekle
+- [ ] sendNotification endpoint'i hem push_tokens (web) hem fcmTokens (mobil) kullanıyor - doğrula
+- [ ] Admin paneli Kayıtlı Cihazlar sekmesine web push tokenlarını da ekle
+- [ ] Bildirim istatistiklerini güncelle (web + mobil ayrı göster)
+- [ ] sendNotification endpoint'i notifications tablosuna da kayıt yapsın (uygulama içi bildirim geçmişi)
+- [ ] Hedef kitleye göre her kullanıcıya ayrı notifications kaydı ekle
+- [x] sendNotification endpoint'i push gönderdikten sonra hedef kullanıcılara notifications tablosuna da kayıt eklesin (uygulama içi bildirim listesi için)

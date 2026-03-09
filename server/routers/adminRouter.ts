@@ -5,7 +5,8 @@ import { getDb } from "../db";
 import * as db from "../db";
 import { 
   users, couriers, businesses, orders, earnings, 
-  paymentRequests, siteSettings, appVersions, pushNotifications, pushTokens, fcmTokens 
+  paymentRequests, siteSettings, appVersions, pushNotifications, pushTokens, fcmTokens,
+  notifications
 } from "../../drizzle/schema";
 import { eq, and, desc, sql, gte, lte } from "drizzle-orm";
 import { emitToUser } from "../_core/socket";
@@ -1191,6 +1192,37 @@ export const adminRouter = router({
       await dbInstance.update(pushNotifications)
         .set({ sentCount, failedCount })
         .where(eq(pushNotifications.id, notification.insertId));
+
+      // Save to notifications table so mobile app can list them
+      // Determine target user IDs
+      let notifUserIds: number[] = [];
+      if (input.targetAudience === "all") {
+        const allUsers = await dbInstance.select({ id: users.id }).from(users);
+        notifUserIds = allUsers.map(u => u.id);
+      } else if (input.targetAudience === "users") {
+        const usersList = await dbInstance.select({ id: users.id }).from(users).where(eq(users.role, "user"));
+        notifUserIds = usersList.map(u => u.id);
+      } else if (input.targetAudience === "couriers") {
+        const couriersList = await dbInstance.select({ userId: couriers.userId }).from(couriers);
+        notifUserIds = couriersList.map(c => c.userId);
+      } else if (input.targetAudience === "business") {
+        const businessList = await dbInstance.select({ userId: businesses.userId }).from(businesses);
+        notifUserIds = businessList.map(b => b.userId);
+      }
+
+      if (notifUserIds.length > 0) {
+        const notifRows = notifUserIds.map(userId => ({
+          userId,
+          title: input.title,
+          message: input.body,
+          type: "system" as const,
+          isRead: false,
+        }));
+        // Insert in batches of 100 to avoid query size limits
+        for (let i = 0; i < notifRows.length; i += 100) {
+          await dbInstance.insert(notifications).values(notifRows.slice(i, i + 100));
+        }
+      }
 
       return {
         success: true,
