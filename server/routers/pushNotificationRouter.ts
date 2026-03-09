@@ -4,7 +4,7 @@ import { TRPCError } from "@trpc/server";
 import { getDb } from "../db";
 import { fcmTokens } from "../../drizzle/schema";
 import { eq, and } from "drizzle-orm";
-import { sendFcmToUser, sendFcmToToken, isFcmConfigured } from "../fcmService";
+import { sendFcmToUser, sendFcmToToken, sendFcmToAllUsers, isFcmConfigured } from "../fcmService";
 
 export const pushNotificationRouter = router({
   /**
@@ -172,6 +172,39 @@ export const pushNotificationRouter = router({
         sent: result.sent,
         failed: result.failed,
         message: `Sent to ${result.sent} device(s), failed: ${result.failed}`,
+        errors: result.errors,
+      };
+    }),
+
+  /**
+   * Admin: Send notification to ALL users with active tokens
+   */
+  sendToAll: adminProcedure
+    .input(z.object({
+      title: z.string(),
+      body: z.string(),
+      data: z.record(z.string(), z.string()).optional(),
+    }))
+    .mutation(async ({ input }) => {
+      if (!isFcmConfigured()) {
+        throw new TRPCError({ 
+          code: "PRECONDITION_FAILED", 
+          message: "FCM not configured. Please set FCM_ACCESS_TOKEN environment variable." 
+        });
+      }
+
+      const result = await sendFcmToAllUsers({
+        title: input.title,
+        body: input.body,
+        data: input.data as Record<string, string> | undefined,
+      });
+
+      return { 
+        success: result.sent > 0,
+        sent: result.sent,
+        failed: result.failed,
+        total: result.total,
+        message: `Sent to ${result.sent}/${result.total} device(s), failed: ${result.failed}`,
         errors: result.errors,
       };
     }),

@@ -1,0 +1,9 @@
+{
+  "query": "DELETE FROM fcmTokens WHERE token LIKE 'test-token-%';",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4EV5ivwhyC7eCUY.ebc471170149 --database 4KwtmFvvd67FSFhQ5dyp9H --execute DELETE FROM fcmTokens WHERE token LIKE 'test-token-%';",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 60
+}

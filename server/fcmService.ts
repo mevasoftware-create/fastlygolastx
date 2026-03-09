@@ -199,6 +199,44 @@ export async function sendFcmToUsers(
 }
 
 /**
+ * Send FCM notification to ALL users with active tokens
+ */
+export async function sendFcmToAllUsers(
+  payload: FcmPayload
+): Promise<{ sent: number; failed: number; total: number; errors: string[] }> {
+  const dbInstance = await getDb();
+  if (!dbInstance) return { sent: 0, failed: 0, total: 0, errors: ["Database not available"] };
+
+  const allTokens = await dbInstance
+    .select()
+    .from(fcmTokens)
+    .where(eq(fcmTokens.isActive, true));
+
+  let sent = 0;
+  let failed = 0;
+  const errors: string[] = [];
+
+  for (const tokenRow of allTokens) {
+    if (!tokenRow.token) continue;
+    const platform = (tokenRow.deviceType as "ios" | "android" | "web") || "android";
+    const result = await sendToDevice(tokenRow.token, payload, platform);
+    if (result.success) {
+      sent++;
+    } else {
+      failed++;
+      if (result.error) errors.push(result.error);
+      // Deactivate invalid tokens
+      if (result.error?.startsWith("TOKEN_INVALID:")) {
+        await dbInstance.update(fcmTokens).set({ isActive: false }).where(eq(fcmTokens.id, tokenRow.id));
+      }
+    }
+  }
+
+  console.log(`[FCM] sendToAll: total=${allTokens.length}, sent=${sent}, failed=${failed}`);
+  return { sent, failed, total: allTokens.length, errors };
+}
+
+/**
  * Send FCM notification to a specific device token directly
  * (Useful for testing)
  */

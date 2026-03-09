@@ -1,0 +1,70 @@
+{
+  "query": "SELECT COLUMN_NAME, COLUMN_TYPE FROM information_schema.COLUMNS WHERE TABLE_NAME = 'notifications' AND TABLE_SCHEMA = DATABASE() ORDER BY ORDINAL_POSITION;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4EV5ivwhyC7eCUY.ebc471170149 --database 4KwtmFvvd67FSFhQ5dyp9H --execute SELECT COLUMN_NAME, COLUMN_TYPE FROM information_schema.COLUMNS WHERE TABLE_NAME = 'notifications' AND TABLE_SCHEMA = DATABASE() ORDER BY ORDINAL_POSITION;",
+  "rows": [
+    {
+      "COLUMN_NAME": "id",
+      "COLUMN_TYPE": "int"
+    },
+    {
+      "COLUMN_NAME": "userId",
+      "COLUMN_TYPE": "int"
+    },
+    {
+      "COLUMN_NAME": "title",
+      "COLUMN_TYPE": "varchar(255)"
+    },
+    {
+      "COLUMN_NAME": "message",
+      "COLUMN_TYPE": "text"
+    },
+    {
+      "COLUMN_NAME": "type",
+      "COLUMN_TYPE": "enum('order','delivery','system','payment')"
+    },
+    {
+      "COLUMN_NAME": "isRead",
+      "COLUMN_TYPE": "tinyint(1)"
+    },
+    {
+      "COLUMN_NAME": "data",
+      "COLUMN_TYPE": "json"
+    },
+    {
+      "COLUMN_NAME": "createdAt",
+      "COLUMN_TYPE": "timestamp"
+    },
+    {
+      "COLUMN_NAME": "relatedOrderId",
+      "COLUMN_TYPE": "int"
+    },
+    {
+      "COLUMN_NAME": "platform",
+      "COLUMN_TYPE": "varchar(50)"
+    },
+    {
+      "COLUMN_NAME": "sentAt",
+      "COLUMN_TYPE": "timestamp"
+    },
+    {
+      "COLUMN_NAME": "sentCount",
+      "COLUMN_TYPE": "int"
+    },
+    {
+      "COLUMN_NAME": "failedCount",
+      "COLUMN_TYPE": "int"
+    },
+    {
+      "COLUMN_NAME": "body",
+      "COLUMN_TYPE": "text"
+    },
+    {
+      "COLUMN_NAME": "heading",
+      "COLUMN_TYPE": "varchar(255)"
+    }
+  ],
+  "messages": [],
+  "stdout": "COLUMN_NAME\tCOLUMN_TYPE\nid\tint\nuserId\tint\ntitle\tvarchar(255)\nmessage\ttext\ntype\tenum('order','delivery','system','payment')\nisRead\ttinyint(1)\ndata\tjson\ncreatedAt\ttimestamp\nrelatedOrderId\tint\nplatform\tvarchar(50)\nsentAt\ttimestamp\nsentCount\tint\nfailedCount\tint\nbody\ttext\nheading\tvarchar(255)\n",
+  "stderr": "",
+  "execution_time_ms": 59
+}
