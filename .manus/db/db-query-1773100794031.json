@@ -1,0 +1,9 @@
+{
+  "query": "\nINSERT INTO paymentRequests (courierId, amount, status, requestedAt, processedAt, notes) VALUES\n(210008, 10.11, 'pending', NOW() - INTERVAL 2 HOUR, NULL, NULL),\n(210008, 25.50, 'approved', NOW() - INTERVAL 5 DAY, NOW() - INTERVAL 4 DAY, 'IBAN hesabına aktarıldı'),\n(210008, 18.75, 'approved', NOW() - INTERVAL 15 DAY, NOW() - INTERVAL 14 DAY, 'Ödeme tamamlandı'),\n(210010, 32.00, 'pending', NOW() - INTERVAL 1 HOUR, NULL, NULL),\n(210010, 45.20, 'approved', NOW() - INTERVAL 7 DAY, NOW() - INTERVAL 6 DAY, 'Ödeme tamamlandı'),\n(210010, 12.80, 'rejected', NOW() - INTERVAL 20 DAY, NOW() - INTERVAL 19 DAY, 'Yetersiz bakiye'),\n(240001, 8.50, 'pending', NOW() - INTERVAL 30 MINUTE, NULL, NULL);\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4EV5ivwhyC7eCUY.ebc471170149 --database 4KwtmFvvd67FSFhQ5dyp9H --execute \nINSERT INTO paymentRequests (courierId, amount, status, requestedAt, processedAt, notes) VALUES\n(210008, 10.11, 'pending', NOW() - INTERVAL 2 HOUR, NULL, NULL),\n(210008, 25.50, 'approved', NOW() - INTERVAL 5 DAY, NOW() - INTERVAL 4 DAY, 'IBAN hesabına aktarıldı'),\n(210008, 18.75, 'approved', NOW() - INTERVAL 15 DAY, NOW() - INTERVAL 14 DAY, 'Ödeme tamamlandı'),\n(210010, 32.00, 'pending', NOW() - INTERVAL 1 HOUR, NULL, NULL),\n(210010, 45.20, 'approved', NOW() - INTERVAL 7 DAY, NOW() - INTERVAL 6 DAY, 'Ödeme tamamlandı'),\n(210010, 12.80, 'rejected', NOW() - INTERVAL 20 DAY, NOW() - INTERVAL 19 DAY, 'Yetersiz bakiye'),\n(240001, 8.50, 'pending', NOW() - INTERVAL 30 MINUTE, NULL, NULL);\n",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 105
+}

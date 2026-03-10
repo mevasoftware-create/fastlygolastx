@@ -58,7 +58,7 @@ export default function AdminNotifications() {
     );
 
   // Mutations
-  const sendMutation = trpc.pushNotifications.sendToAudience.useMutation();
+  const sendMutation = trpc.admin.sendNotification.useMutation();
   const deactivateMutation = trpc.pushNotifications.deactivateDevice.useMutation();
   const deleteMutation = trpc.pushNotifications.deleteDevice.useMutation();
 
@@ -70,18 +70,18 @@ export default function AdminNotifications() {
 
     try {
       const result = await sendMutation.mutateAsync({
-        audience: form.targetAudience,
-        platform: form.platform,
         title: form.title,
         body: form.body,
         imageUrl: form.imageUrl || undefined,
         actionUrl: form.actionUrl || undefined,
+        platform: form.platform,
+        targetAudience: form.targetAudience,
       });
 
-      if (result.total === 0) {
-        toast.warning("Kayıtlı aktif cihaz bulunamadı. Mobil uygulamadan giriş yapılıp bildirim izni verilmesi gerekiyor.");
+      if (result.sentCount === 0) {
+        toast.warning("Kayıtlı aktif cihaz bulunamadı. Bildirim uygulama içi listeye kaydedildi.");
       } else {
-        toast.success(`✅ ${result.sent} cihaza gönderildi${result.failed > 0 ? ` (${result.failed} başarısız)` : ""}`);
+        toast.success(`✅ ${result.sentCount} cihaza gönderildi${result.failedCount > 0 ? ` (${result.failedCount} başarısız)` : ""}`);
       }
 
       setForm({ title: "", body: "", imageUrl: "", actionUrl: "", platform: "all", targetAudience: "all" });

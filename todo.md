@@ -130,3 +130,17 @@
 - [ ] sendNotification endpoint'i notifications tablosuna da kayıt yapsın (uygulama içi bildirim geçmişi)
 - [ ] Hedef kitleye göre her kullanıcıya ayrı notifications kaydı ekle
 - [x] sendNotification endpoint'i push gönderdikten sonra hedef kullanıcılara notifications tablosuna da kayıt eklesin (uygulama içi bildirim listesi için)
+
+## Para Çekme Sistemi (10.03.2026)
+- [ ] Backend: createPaymentRequest, listPaymentRequests, approvePaymentRequest, rejectPaymentRequest endpoint'leri
+- [ ] Backend: çekilebilir bakiye hesaplama (toplam kazanç - onaylanan çekimler)
+- [ ] Frontend: CourierPayments sayfası - IBAN girişi, miktar, talep geçmişi aktif
+- [ ] Admin paneli: para çekme talepleri listesi, onay/red butonları
+
+## Bildirim Sistemi Tamamlama (10.03.2026)
+- [x] Kullanıcı bildirim listesi sayfası (web) - okundu/okunmadı, silme
+- [x] DashboardLayout bildirim zili - okunmamış sayıcı göster
+- [x] Admin bildirim gönderme formu - hedef kitle, platform, önizleme
+- [x] Admin bildirim geçmişi listesi
+- [x] Web push izin banner'ı - kayıtlı kullanıcılara göster
+- [x] NotificationPermissionBanner bileşeni DashboardLayout'a entegre

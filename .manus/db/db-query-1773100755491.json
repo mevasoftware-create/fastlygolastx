@@ -1,0 +1,70 @@
+{
+  "query": "SELECT id, name, email, role FROM users WHERE role IN ('user', 'courier', 'business') ORDER BY id LIMIT 10;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4EV5ivwhyC7eCUY.ebc471170149 --database 4KwtmFvvd67FSFhQ5dyp9H --execute SELECT id, name, email, role FROM users WHERE role IN ('user', 'courier', 'business') ORDER BY id LIMIT 10;",
+  "rows": [
+    {
+      "id": "2970221",
+      "name": "Hakan",
+      "email": "trhizmetlercom@gmail.com",
+      "role": "business"
+    },
+    {
+      "id": "2970265",
+      "name": "Rs Ö",
+      "email": "resulozlu@gmail.com",
+      "role": "courier"
+    },
+    {
+      "id": "2970308",
+      "name": "NULL",
+      "email": "harunyldz44@gmail.com",
+      "role": "courier"
+    },
+    {
+      "id": "3000043",
+      "name": "NULL",
+      "email": "yusufreis.775@gmail.com",
+      "role": "courier"
+    },
+    {
+      "id": "3000044",
+      "name": "D V",
+      "email": "buli_mkd@hotmail.com",
+      "role": "user"
+    },
+    {
+      "id": "3060326",
+      "name": "NULL",
+      "email": "user@fastlygo.mk",
+      "role": "courier"
+    },
+    {
+      "id": "3060335",
+      "name": "Noko",
+      "email": "davutcakcakla@gmail.com",
+      "role": "business"
+    },
+    {
+      "id": "3060451",
+      "name": "ELÄ°T GARAGE",
+      "email": "elitgarage3453@gmail.com",
+      "role": "user"
+    },
+    {
+      "id": "3060455",
+      "name": "Simona Nikolovska",
+      "email": "simona1nikolovska@gmail.com",
+      "role": "user"
+    },
+    {
+      "id": "3060483",
+      "name": "Daniel",
+      "email": "lp.daniel@yahoo.com",
+      "role": "business"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tname\temail\trole\n2970221\tHakan\ttrhizmetlercom@gmail.com\tbusiness\n2970265\tRs Ö\tresulozlu@gmail.com\tcourier\n2970308\tNULL\tharunyldz44@gmail.com\tcourier\n3000043\tNULL\tyusufreis.775@gmail.com\tcourier\n3000044\tD V\tbuli_mkd@hotmail.com\tuser\n3060326\tNULL\tuser@fastlygo.mk\tcourier\n3060335\tNoko\tdavutcakcakla@gmail.com\tbusiness\n3060451\tELÄ°T GARAGE\telitgarage3453@gmail.com\tuser\n3060455\tSimona Nikolovska\tsimona1nikolovska@gmail.com\tuser\n3060483\tDaniel\tlp.daniel@yahoo.com\tbusiness\n",
+  "stderr": "",
+  "execution_time_ms": 54
+}

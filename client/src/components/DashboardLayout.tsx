@@ -26,6 +26,7 @@ import { CSSProperties, useEffect, useRef, useState } from "react";
 import { useLocation } from "wouter";
 import { DashboardLayoutSkeleton } from './DashboardLayoutSkeleton';
 import { NotificationPermissionBanner } from './NotificationPermissionBanner';
+import { NotificationDropdown } from './NotificationDropdown';
 import { Button } from "./ui/button";
 
 const menuItems = [
@@ -285,6 +286,7 @@ function DashboardLayoutContent({
                 </div>
               </div>
             </div>
+            <NotificationDropdown />
           </div>
         )}
         <NotificationPermissionBanner />

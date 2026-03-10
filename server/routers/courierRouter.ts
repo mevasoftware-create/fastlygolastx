@@ -3,7 +3,7 @@ import { router, protectedProcedure, publicProcedure } from "../_core/trpc";
 import { TRPCError } from "@trpc/server";
 import * as db from "../db";
 import { getDb } from "../db";
-import { couriers, users, priceOffers, orders } from "../../drizzle/schema";
+import { couriers, users, priceOffers, orders, paymentRequests, earnings } from "../../drizzle/schema";
 import { eq, and, desc, sql } from "drizzle-orm";
 import { emitToUser, emitToAdmins } from "../_core/socket";
 import { sendPushNotification } from "./pushNotificationRouter";
@@ -486,4 +486,142 @@ export const courierRouter = router({
       totalEarnings: 0, // TODO: Calculate from earnings table
     };
   }),
+
+  /**
+   * Get payment requests for current courier
+   */
+  getPaymentRequests: protectedProcedure.query(async ({ ctx }) => {
+    const dbInstance = await getDb();
+    if (!dbInstance) return [];
+
+    const courier = await dbInstance
+      .select()
+      .from(couriers)
+      .where(eq(couriers.userId, ctx.user.id))
+      .limit(1);
+
+    if (courier.length === 0) return [];
+
+    return await dbInstance
+      .select()
+      .from(paymentRequests)
+      .where(eq(paymentRequests.courierId, courier[0].id))
+      .orderBy(desc(paymentRequests.requestedAt));
+  }),
+
+  /**
+   * Get earnings summary (total earned, total withdrawn, available balance)
+   */
+  getEarningsSummary: protectedProcedure.query(async ({ ctx }) => {
+    const dbInstance = await getDb();
+    if (!dbInstance) return { totalEarnings: 0, totalWithdrawn: 0, availableBalance: 0, totalDeliveries: 0 };
+
+    const courier = await dbInstance
+      .select()
+      .from(couriers)
+      .where(eq(couriers.userId, ctx.user.id))
+      .limit(1);
+
+    if (courier.length === 0) return { totalEarnings: 0, totalWithdrawn: 0, availableBalance: 0, totalDeliveries: 0 };
+
+    const courierId = courier[0].id;
+
+    // Total earnings from earnings table
+    const earningsResult = await dbInstance
+      .select({ total: sql<number>`COALESCE(SUM(amount), 0)` })
+      .from(earnings)
+      .where(eq(earnings.courierId, courierId));
+
+    // Total approved/paid withdrawals
+    const withdrawnResult = await dbInstance
+      .select({ total: sql<number>`COALESCE(SUM(amount), 0)` })
+      .from(paymentRequests)
+      .where(
+        and(
+          eq(paymentRequests.courierId, courierId),
+          sql`${paymentRequests.status} IN ('approved', 'paid')`
+        )
+      );
+
+    // Pending withdrawal requests
+    const pendingResult = await dbInstance
+      .select({ total: sql<number>`COALESCE(SUM(amount), 0)` })
+      .from(paymentRequests)
+      .where(
+        and(
+          eq(paymentRequests.courierId, courierId),
+          eq(paymentRequests.status, 'pending')
+        )
+      );
+
+    const totalEarnings = Number(earningsResult[0]?.total || 0);
+    const totalWithdrawn = Number(withdrawnResult[0]?.total || 0);
+    const pendingAmount = Number(pendingResult[0]?.total || 0);
+    const availableBalance = Math.max(0, totalEarnings - totalWithdrawn - pendingAmount);
+
+    return {
+      totalEarnings,
+      totalWithdrawn,
+      pendingAmount,
+      availableBalance,
+      totalDeliveries: courier[0].totalDeliveries || 0,
+    };
+  }),
+
+  /**
+   * Create a new payment request
+   */
+  requestPayment: protectedProcedure
+    .input(z.object({
+      amount: z.number().min(100), // minimum 1 EUR in cents
+    }))
+    .mutation(async ({ ctx, input }) => {
+      const dbInstance = await getDb();
+      if (!dbInstance) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: 'Database unavailable' });
+
+      const courier = await dbInstance
+        .select()
+        .from(couriers)
+        .where(eq(couriers.userId, ctx.user.id))
+        .limit(1);
+
+      if (courier.length === 0) throw new TRPCError({ code: 'NOT_FOUND', message: 'Kurye profili bulunamadı' });
+
+      const courierId = courier[0].id;
+
+      // Check available balance
+      const earningsResult = await dbInstance
+        .select({ total: sql<number>`COALESCE(SUM(amount), 0)` })
+        .from(earnings)
+        .where(eq(earnings.courierId, courierId));
+
+      const withdrawnResult = await dbInstance
+        .select({ total: sql<number>`COALESCE(SUM(amount), 0)` })
+        .from(paymentRequests)
+        .where(
+          and(
+            eq(paymentRequests.courierId, courierId),
+            sql`${paymentRequests.status} IN ('approved', 'paid', 'pending')`
+          )
+        );
+
+      const totalEarnings = Number(earningsResult[0]?.total || 0);
+      const totalCommitted = Number(withdrawnResult[0]?.total || 0);
+      const available = totalEarnings - totalCommitted;
+
+      if (input.amount > available) {
+        throw new TRPCError({
+          code: 'BAD_REQUEST',
+          message: `Yetersiz bakiye. Çekilebilir bakiye: €${(available / 100).toFixed(2)}`,
+        });
+      }
+
+      await dbInstance.insert(paymentRequests).values({
+        courierId,
+        amount: input.amount,
+        status: 'pending',
+      });
+
+      return { success: true };
+    }),
 });

@@ -9,304 +9,313 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { toast } from 'sonner';
-import { DollarSign, CheckCircle, XCircle, Clock, AlertCircle, Loader2, TrendingUp } from 'lucide-react';
+import { DollarSign, CheckCircle, XCircle, Clock, AlertCircle, Loader2, TrendingUp, Wallet, ArrowDownCircle } from 'lucide-react';
+
+function formatEUR(cents: number) {
+  return `€${(cents / 100).toFixed(2)}`;
+}
 
 export default function CourierPayments() {
   const { user } = useAuth();
   const [requestAmount, setRequestAmount] = useState('');
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
-  // Get courier info
-  const { data: courierData } = trpc.courier.getProfile.useQuery();
+  // Get earnings summary
+  const { data: summary, isLoading: summaryLoading, refetch: refetchSummary } = trpc.courierV2.getEarningsSummary.useQuery();
 
   // Get payment requests
-  const { data: paymentRequests, isLoading: requestsLoading, refetch } = trpc.courier.getPaymentRequests.useQuery();
+  const { data: paymentRequests, isLoading: requestsLoading, refetch } = trpc.courierV2.getPaymentRequests.useQuery();
 
-  // Mutations
-  const requestPaymentMutation = trpc.courier.requestPayment.useMutation({
+  // Create payment request mutation
+  const requestPaymentMutation = trpc.courierV2.requestPayment.useMutation({
     onSuccess: () => {
-      toast.success('Ödeme talebiniz başarıyla gönderildi');
+      toast.success('Para çekme talebiniz başarıyla gönderildi');
       setRequestAmount('');
       setIsDialogOpen(false);
       refetch();
+      refetchSummary();
     },
     onError: (error) => {
-      toast.error('Hata: ' + (error.message || 'Ödeme talebiniz gönderilemedi'));
+      toast.error(error.message || 'Para çekme talebi gönderilemedi');
     },
   });
 
   const handleRequestPayment = async () => {
-    if (!requestAmount || parseFloat(requestAmount) <= 0) {
+    const amount = parseFloat(requestAmount);
+    if (!requestAmount || amount <= 0) {
       toast.error('Lütfen geçerli bir tutar girin');
       return;
     }
-
-    const amountInCents = Math.round(parseFloat(requestAmount) * 100);
-    
-    await requestPaymentMutation.mutateAsync({
-      amount: amountInCents,
-    });
+    if (amount < 1) {
+      toast.error('Minimum çekim tutarı €1.00');
+      return;
+    }
+    const amountInCents = Math.round(amount * 100);
+    await requestPaymentMutation.mutateAsync({ amount: amountInCents });
   };
 
   const getStatusBadge = (status: string) => {
     switch (status) {
       case 'pending':
-        return <Badge variant="outline" className="bg-yellow-50 text-yellow-800 border-yellow-200"><Clock className="h-3 w-3 mr-1" /> Beklemede</Badge>;
+        return <Badge variant="outline" className="bg-yellow-50 text-yellow-800 border-yellow-200 dark:bg-yellow-950 dark:text-yellow-300 dark:border-yellow-800"><Clock className="h-3 w-3 mr-1" /> Beklemede</Badge>;
       case 'approved':
-        return <Badge variant="outline" className="bg-green-50 text-green-800 border-green-200"><CheckCircle className="h-3 w-3 mr-1" /> Onaylandı</Badge>;
+        return <Badge variant="outline" className="bg-green-50 text-green-800 border-green-200 dark:bg-green-950 dark:text-green-300 dark:border-green-800"><CheckCircle className="h-3 w-3 mr-1" /> Onaylandı</Badge>;
       case 'rejected':
-        return <Badge variant="outline" className="bg-red-50 text-red-800 border-red-200"><XCircle className="h-3 w-3 mr-1" /> Reddedildi</Badge>;
+        return <Badge variant="outline" className="bg-red-50 text-red-800 border-red-200 dark:bg-red-950 dark:text-red-300 dark:border-red-800"><XCircle className="h-3 w-3 mr-1" /> Reddedildi</Badge>;
       case 'paid':
-        return <Badge variant="outline" className="bg-blue-50 text-blue-800 border-blue-200"><DollarSign className="h-3 w-3 mr-1" /> Ödendi</Badge>;
+        return <Badge variant="outline" className="bg-blue-50 text-blue-800 border-blue-200 dark:bg-blue-950 dark:text-blue-300 dark:border-blue-800"><DollarSign className="h-3 w-3 mr-1" /> Ödendi</Badge>;
       default:
         return <Badge>{status}</Badge>;
     }
   };
 
-  // Calculate statistics
-  const stats = {
-    totalRequested: paymentRequests?.reduce((sum: number, r: any) => sum + (r.amount || 0), 0) || 0,
-    pending: paymentRequests?.filter((r: any) => r.status === 'pending').length || 0,
-    approved: paymentRequests?.filter((r: any) => r.status === 'approved').length || 0,
-    paid: paymentRequests?.filter((r: any) => r.status === 'paid').length || 0,
-    pendingAmount: paymentRequests?.filter((r: any) => r.status === 'pending').reduce((sum: number, r: any) => sum + (r.amount || 0), 0) || 0,
-  };
-
   if (!user || user.role !== 'courier') {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <div className="flex items-center justify-center min-h-[60vh]">
         <Card className="w-full max-w-md">
           <CardHeader>
             <CardTitle>Erişim Reddedildi</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-gray-600">Bu sayfaya erişim için kurye yetkisi gereklidir.</p>
+            <p className="text-muted-foreground">Bu sayfaya erişim için kurye yetkisi gereklidir.</p>
           </CardContent>
         </Card>
       </div>
     );
   }
 
+  const availableBalance = summary?.availableBalance ?? 0;
+
   return (
-    <div className="min-h-screen bg-gray-50 p-4 md:p-8">
-      <div className="max-w-6xl mx-auto space-y-6">
-        {/* Header */}
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900">Ödeme Yönetimi</h1>
-          <p className="text-gray-600 mt-2">Kazançlarınızı talep edin ve ödeme durumunuzu takip edin</p>
-        </div>
+    <div className="space-y-6">
+      {/* Header */}
+      <div>
+        <h1 className="text-2xl font-bold">Para Çekme</h1>
+        <p className="text-muted-foreground">Kazancınızı çekin</p>
+      </div>
 
-        {/* Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-gray-600">Toplam Talep</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">₺{(stats.totalRequested / 100).toFixed(2)}</div>
-              <p className="text-xs text-gray-500 mt-1">{paymentRequests?.length || 0} talep</p>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-gray-600">Beklemede</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-yellow-600">₺{(stats.pendingAmount / 100).toFixed(2)}</div>
-              <p className="text-xs text-gray-500 mt-1">{stats.pending} talep</p>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-gray-600">Onaylandı</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-green-600">{stats.approved}</div>
-              <p className="text-xs text-gray-500 mt-1">talep</p>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-gray-600">Ödendi</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-blue-600">{stats.paid}</div>
-              <p className="text-xs text-gray-500 mt-1">talep</p>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Action Button */}
+      {/* Summary Cards */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <Card>
-          <CardHeader>
-            <CardTitle>Yeni Ödeme Talebinde Bulun</CardTitle>
-            <CardDescription>Kazançlarınızdan bir miktar talep edin</CardDescription>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
+              <TrendingUp className="h-4 w-4" /> Toplam Kazanç
+            </CardTitle>
           </CardHeader>
           <CardContent>
-            <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-              <DialogTrigger asChild>
-                <Button className="bg-orange-600 hover:bg-orange-700">
-                  <DollarSign className="h-4 w-4 mr-2" />
-                  Ödeme Talep Et
-                </Button>
-              </DialogTrigger>
-              <DialogContent>
-                <DialogHeader>
-                  <DialogTitle>Ödeme Talebinde Bulun</DialogTitle>
-                  <DialogDescription>
-                    Talep etmek istediğiniz tutarı girin
-                  </DialogDescription>
-                </DialogHeader>
-
-                <div className="space-y-4">
-                  <div>
-                    <Label htmlFor="amount" className="text-sm font-medium">
-                      Tutar (₺)
-                    </Label>
-                    <div className="relative mt-2">
-                      <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">₺</span>
-                      <Input
-                        id="amount"
-                        type="number"
-                        step="0.01"
-                        min="0"
-                        value={requestAmount}
-                        onChange={(e) => setRequestAmount(e.target.value)}
-                        placeholder="0.00"
-                        className="pl-8"
-                      />
-                    </div>
-                    <p className="text-xs text-gray-500 mt-1">
-                      En az ₺10.00 talep edebilirsiniz
-                    </p>
-                  </div>
-
-                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                    <p className="text-sm text-blue-800">
-                      <strong>Not:</strong> Ödeme talebiniz admin tarafından incelenecek ve onaylanacaktır. Onay sonrası belirlenen ödeme yöntemine göre ödenecektir.
-                    </p>
-                  </div>
-
-                  <Button
-                    onClick={handleRequestPayment}
-                    disabled={requestPaymentMutation.isPending || !requestAmount || parseFloat(requestAmount) <= 0}
-                    className="w-full bg-orange-600 hover:bg-orange-700"
-                  >
-                    {requestPaymentMutation.isPending ? (
-                      <>
-                        <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                        Gönderiliyor...
-                      </>
-                    ) : (
-                      <>
-                        <DollarSign className="h-4 w-4 mr-2" />
-                        Talep Et
-                      </>
-                    )}
-                  </Button>
-                </div>
-              </DialogContent>
-            </Dialog>
-          </CardContent>
-        </Card>
-
-        {/* Payment Requests History */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Ödeme Talep Geçmişi</CardTitle>
-            <CardDescription>Tüm ödeme taleplerini ve durumlarını görüntüleyin</CardDescription>
-          </CardHeader>
-          <CardContent>
-            {requestsLoading ? (
-              <div className="flex items-center justify-center py-8">
-                <Loader2 className="h-8 w-8 animate-spin text-orange-600" />
-              </div>
-            ) : !paymentRequests || paymentRequests.length === 0 ? (
-              <div className="text-center py-8 text-gray-500">
-                <AlertCircle className="h-8 w-8 mx-auto mb-2 opacity-50" />
-                <p>Henüz ödeme talebiniz yok</p>
-              </div>
+            {summaryLoading ? (
+              <div className="h-8 w-24 bg-muted animate-pulse rounded" />
             ) : (
-              <div className="overflow-x-auto">
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Tutar</TableHead>
-                      <TableHead>Durum</TableHead>
-                      <TableHead>Talep Tarihi</TableHead>
-                      <TableHead>İşlem Tarihi</TableHead>
-                      <TableHead>Açıklama</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {paymentRequests.map((request: any) => (
-                      <TableRow key={request.id}>
-                        <TableCell className="font-bold">₺{(request.amount / 100).toFixed(2)}</TableCell>
-                        <TableCell>{getStatusBadge(request.status)}</TableCell>
-                        <TableCell className="text-sm text-gray-600">
-                          {new Date(request.requestedAt).toLocaleDateString('tr-TR')}
-                        </TableCell>
-                        <TableCell className="text-sm text-gray-600">
-                          {request.processedAt ? new Date(request.processedAt).toLocaleDateString('tr-TR') : '-'}
-                        </TableCell>
-                        <TableCell className="text-sm text-gray-600">
-                          {request.status === 'rejected' && request.rejectionReason ? (
-                            <div className="text-red-600">
-                              <p className="font-medium">Red Nedeni:</p>
-                              <p>{request.rejectionReason}</p>
-                            </div>
-                          ) : request.notes ? (
-                            <p>{request.notes}</p>
-                          ) : (
-                            '-'
-                          )}
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </div>
+              <>
+                <div className="text-2xl font-bold text-orange-600">{formatEUR(summary?.totalEarnings ?? 0)}</div>
+                <p className="text-xs text-muted-foreground mt-1">{summary?.totalDeliveries ?? 0} teslim tamamlandı</p>
+              </>
             )}
           </CardContent>
         </Card>
 
-        {/* Payment Info */}
         <Card>
-          <CardHeader>
-            <CardTitle>Ödeme Bilgileri</CardTitle>
-            <CardDescription>Ödeme hesabı bilgileriniz</CardDescription>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
+              <Wallet className="h-4 w-4" /> Çekilebilir Bakiye
+            </CardTitle>
           </CardHeader>
           <CardContent>
-            {courierData?.iban ? (
-              <div className="space-y-2">
-                <div>
-                  <Label className="text-sm text-gray-600">IBAN</Label>
-                  <p className="font-mono text-sm">{courierData.iban}</p>
-                </div>
-                <div>
-                  <Label className="text-sm text-gray-600">Kimlik Türü</Label>
-                  <p className="text-sm">{courierData.identityType === 'tc' ? 'TC Kimlik' : 'Pasaport'}</p>
-                </div>
-                <div>
-                  <Label className="text-sm text-gray-600">Kimlik Doğrulama</Label>
-                  <Badge variant={courierData.identityVerified ? "default" : "outline"}>
-                    {courierData.identityVerified ? 'Doğrulandı' : 'Beklemede'}
-                  </Badge>
-                </div>
-              </div>
+            {summaryLoading ? (
+              <div className="h-8 w-24 bg-muted animate-pulse rounded" />
             ) : (
-              <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-                <p className="text-sm text-yellow-800">
-                  <strong>Uyarı:</strong> Ödeme bilgilerinizi tamamlamadınız. Ödeme talebinde bulunabilmek için lütfen profil ayarlarından ödeme bilgilerinizi girin.
-                </p>
-              </div>
+              <>
+                <div className="text-2xl font-bold text-green-600">{formatEUR(availableBalance)}</div>
+                <p className="text-xs text-muted-foreground mt-1">Çekim için hazır</p>
+              </>
+            )}
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
+              <Clock className="h-4 w-4" /> Bekleyen Talepler
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            {summaryLoading ? (
+              <div className="h-8 w-24 bg-muted animate-pulse rounded" />
+            ) : (
+              <>
+                <div className="text-2xl font-bold text-yellow-600">{formatEUR(summary?.pendingAmount ?? 0)}</div>
+                <p className="text-xs text-muted-foreground mt-1">İncelemede</p>
+              </>
+            )}
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
+              <ArrowDownCircle className="h-4 w-4" /> Toplam Çekilen
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            {summaryLoading ? (
+              <div className="h-8 w-24 bg-muted animate-pulse rounded" />
+            ) : (
+              <>
+                <div className="text-2xl font-bold">{formatEUR(summary?.totalWithdrawn ?? 0)}</div>
+                <p className="text-xs text-muted-foreground mt-1">Onaylanan ödemeler</p>
+              </>
             )}
           </CardContent>
         </Card>
       </div>
+
+      {/* Withdrawal Request Form */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Para Çekme Talebi</CardTitle>
+          <CardDescription>Ödeme bilgilerinizi kontrol edin ve çekim talebinde bulunun</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-4 max-w-sm">
+            <div>
+              <Label htmlFor="amount">Miktar (€)</Label>
+              <Input
+                id="amount"
+                type="number"
+                step="0.01"
+                min="1"
+                max={availableBalance / 100}
+                value={requestAmount}
+                onChange={(e) => setRequestAmount(e.target.value)}
+                placeholder="Çekmek istediğiniz miktar"
+                className="mt-1"
+              />
+              {availableBalance > 0 && (
+                <p className="text-xs text-muted-foreground mt-1">
+                  Kullanılabilir: <span className="font-medium text-green-600">{formatEUR(availableBalance)}</span>
+                  {' · '}
+                  <button
+                    type="button"
+                    className="text-orange-600 hover:underline"
+                    onClick={() => setRequestAmount((availableBalance / 100).toFixed(2))}
+                  >
+                    Tamamını çek
+                  </button>
+                </p>
+              )}
+            </div>
+
+            <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+              <DialogTrigger asChild>
+                <Button
+                  className="w-full bg-orange-600 hover:bg-orange-700"
+                  disabled={!requestAmount || parseFloat(requestAmount) <= 0 || availableBalance <= 0}
+                  onClick={() => {
+                    if (!requestAmount || parseFloat(requestAmount) <= 0) {
+                      toast.error('Lütfen bir miktar girin');
+                      return;
+                    }
+                    setIsDialogOpen(true);
+                  }}
+                >
+                  <DollarSign className="h-4 w-4 mr-2" />
+                  Çekim Talebi Oluştur
+                </Button>
+              </DialogTrigger>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>Para Çekme Onayı</DialogTitle>
+                  <DialogDescription>
+                    Aşağıdaki tutarı çekmek istediğinizi onaylıyor musunuz?
+                  </DialogDescription>
+                </DialogHeader>
+                <div className="space-y-4">
+                  <div className="bg-muted rounded-lg p-4 text-center">
+                    <p className="text-3xl font-bold text-orange-600">€{parseFloat(requestAmount || '0').toFixed(2)}</p>
+                    <p className="text-sm text-muted-foreground mt-1">IBAN hesabınıza aktarılacak</p>
+                  </div>
+                  <div className="bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-800 rounded-lg p-3">
+                    <p className="text-sm text-blue-800 dark:text-blue-300">
+                      Talebiniz admin tarafından incelenecek ve onaylanacaktır.
+                    </p>
+                  </div>
+                  <div className="flex gap-2">
+                    <Button variant="outline" className="flex-1" onClick={() => setIsDialogOpen(false)}>
+                      İptal
+                    </Button>
+                    <Button
+                      className="flex-1 bg-orange-600 hover:bg-orange-700"
+                      onClick={handleRequestPayment}
+                      disabled={requestPaymentMutation.isPending}
+                    >
+                      {requestPaymentMutation.isPending ? (
+                        <><Loader2 className="h-4 w-4 mr-2 animate-spin" /> Gönderiliyor...</>
+                      ) : (
+                        <><CheckCircle className="h-4 w-4 mr-2" /> Onayla</>
+                      )}
+                    </Button>
+                  </div>
+                </div>
+              </DialogContent>
+            </Dialog>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Payment History */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Çekim Geçmişi</CardTitle>
+          <CardDescription>Tüm para çekme talepleriniz</CardDescription>
+        </CardHeader>
+        <CardContent>
+          {requestsLoading ? (
+            <div className="flex items-center justify-center py-8">
+              <Loader2 className="h-8 w-8 animate-spin text-orange-600" />
+            </div>
+          ) : !paymentRequests || paymentRequests.length === 0 ? (
+            <div className="text-center py-8 text-muted-foreground">
+              <AlertCircle className="h-8 w-8 mx-auto mb-2 opacity-50" />
+              <p>Henüz para çekme talebiniz yok</p>
+            </div>
+          ) : (
+            <div className="overflow-x-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Tutar</TableHead>
+                    <TableHead>Durum</TableHead>
+                    <TableHead>Talep Tarihi</TableHead>
+                    <TableHead>İşlem Tarihi</TableHead>
+                    <TableHead>Açıklama</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {paymentRequests.map((request: any) => (
+                    <TableRow key={request.id}>
+                      <TableCell className="font-bold">{formatEUR(request.amount)}</TableCell>
+                      <TableCell>{getStatusBadge(request.status)}</TableCell>
+                      <TableCell className="text-sm text-muted-foreground">
+                        {new Date(request.requestedAt).toLocaleDateString('tr-TR')}
+                      </TableCell>
+                      <TableCell className="text-sm text-muted-foreground">
+                        {request.processedAt ? new Date(request.processedAt).toLocaleDateString('tr-TR') : '-'}
+                      </TableCell>
+                      <TableCell className="text-sm text-muted-foreground">
+                        {request.rejectionReason ? (
+                          <span className="text-red-600">{request.rejectionReason}</span>
+                        ) : request.notes ? (
+                          request.notes
+                        ) : '-'}
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+          )}
+        </CardContent>
+      </Card>
     </div>
   );
 }
