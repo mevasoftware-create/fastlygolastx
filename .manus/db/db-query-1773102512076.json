@@ -1,0 +1,18 @@
+{
+  "query": "SELECT COLUMN_NAME, DATA_TYPE FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'orders' AND COLUMN_NAME IN ('courierId', 'courier_id', 'acceptedAt', 'accepted_at') ORDER BY COLUMN_NAME;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4EV5ivwhyC7eCUY.ebc471170149 --database 4KwtmFvvd67FSFhQ5dyp9H --execute SELECT COLUMN_NAME, DATA_TYPE FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'orders' AND COLUMN_NAME IN ('courierId', 'courier_id', 'acceptedAt', 'accepted_at') ORDER BY COLUMN_NAME;",
+  "rows": [
+    {
+      "COLUMN_NAME": "acceptedAt",
+      "DATA_TYPE": "timestamp"
+    },
+    {
+      "COLUMN_NAME": "courierId",
+      "DATA_TYPE": "int"
+    }
+  ],
+  "messages": [],
+  "stdout": "COLUMN_NAME\tDATA_TYPE\nacceptedAt\ttimestamp\ncourierId\tint\n",
+  "stderr": "",
+  "execution_time_ms": 51
+}

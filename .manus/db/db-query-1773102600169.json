@@ -1,0 +1,9 @@
+{
+  "query": "ALTER TABLE orders ADD COLUMN IF NOT EXISTS acceptedAt DATETIME NULL;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4EV5ivwhyC7eCUY.ebc471170149 --database 4KwtmFvvd67FSFhQ5dyp9H --execute ALTER TABLE orders ADD COLUMN IF NOT EXISTS acceptedAt DATETIME NULL;",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 51
+}

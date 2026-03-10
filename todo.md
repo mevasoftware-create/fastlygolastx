@@ -144,3 +144,4 @@
 - [x] Admin bildirim geçmişi listesi
 - [x] Web push izin banner'ı - kayıtlı kullanıcılara göster
 - [x] NotificationPermissionBanner bileşeni DashboardLayout'a entegre
+- [x] orders tablosuna acceptedAt kolonu eksik - migration ile ekle (sipariş kabul hatası)

@@ -1,0 +1,514 @@
+{
+  "query": "DESCRIBE orders;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4EV5ivwhyC7eCUY.ebc471170149 --database 4KwtmFvvd67FSFhQ5dyp9H --execute DESCRIBE orders;",
+  "rows": [
+    {
+      "Field": "id",
+      "Type": "int",
+      "Null": "NO",
+      "Key": "PRI",
+      "Default": "NULL",
+      "Extra": "auto_increment"
+    },
+    {
+      "Field": "orderNumber",
+      "Type": "varchar(50)",
+      "Null": "NO",
+      "Key": "UNI",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "courierId",
+      "Type": "int",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "status",
+      "Type": "enum('pending','confirmed','assigned','picked_up','in_transit','delivered','cancelled','failed')",
+      "Null": "NO",
+      "Key": "",
+      "Default": "pending",
+      "Extra": ""
+    },
+    {
+      "Field": "pickupAddress",
+      "Type": "text",
+      "Null": "NO",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "pickupLat",
+      "Type": "decimal(10,8)",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "pickupLng",
+      "Type": "decimal(11,8)",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "deliveryAddress",
+      "Type": "text",
+      "Null": "NO",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "deliveryLat",
+      "Type": "decimal(10,8)",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "deliveryLng",
+      "Type": "decimal(11,8)",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "categoryId",
+      "Type": "int",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "areaId",
+      "Type": "int",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "distance",
+      "Type": "decimal(8,2)",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "paymentMethod",
+      "Type": "enum('cash','card','wallet')",
+      "Null": "NO",
+      "Key": "",
+      "Default": "cash",
+      "Extra": ""
+    },
+    {
+      "Field": "paymentStatus",
+      "Type": "enum('pending','paid','refunded')",
+      "Null": "NO",
+      "Key": "",
+      "Default": "pending",
+      "Extra": ""
+    },
+    {
+      "Field": "estimatedDeliveryTime",
+      "Type": "timestamp",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "actualDeliveryTime",
+      "Type": "timestamp",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "cancelReason",
+      "Type": "text",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "createdAt",
+      "Type": "timestamp",
+      "Null": "NO",
+      "Key": "",
+      "Default": "CURRENT_TIMESTAMP",
+      "Extra": ""
+    },
+    {
+      "Field": "updatedAt",
+      "Type": "timestamp",
+      "Null": "NO",
+      "Key": "",
+      "Default": "CURRENT_TIMESTAMP",
+      "Extra": "DEFAULT_GENERATED on update CURRENT_TIMESTAMP"
+    },
+    {
+      "Field": "customerId",
+      "Type": "int",
+      "Null": "NO",
+      "Key": "",
+      "Default": "0",
+      "Extra": ""
+    },
+    {
+      "Field": "restaurantId",
+      "Type": "int",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "orderType",
+      "Type": "enum('restaurant','market','pharmacy','individual','express')",
+      "Null": "NO",
+      "Key": "",
+      "Default": "individual",
+      "Extra": ""
+    },
+    {
+      "Field": "distanceFee",
+      "Type": "int",
+      "Null": "NO",
+      "Key": "",
+      "Default": "0",
+      "Extra": ""
+    },
+    {
+      "Field": "pricingScenario",
+      "Type": "enum('A','B','C')",
+      "Null": "YES",
+      "Key": "",
+      "Default": "A",
+      "Extra": ""
+    },
+    {
+      "Field": "commissionRate",
+      "Type": "int",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "acceptedAt",
+      "Type": "timestamp",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "pickedUpAt",
+      "Type": "timestamp",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "pickupPhotoUrl",
+      "Type": "text",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "deliveryPhotoUrl",
+      "Type": "text",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "deliveryNotes",
+      "Type": "text",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "customerSignature",
+      "Type": "text",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "customerRating",
+      "Type": "int",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "customerReview",
+      "Type": "text",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "paymentType",
+      "Type": "enum('sender_pays','receiver_pays')",
+      "Null": "NO",
+      "Key": "",
+      "Default": "sender_pays",
+      "Extra": ""
+    },
+    {
+      "Field": "collectedAmount",
+      "Type": "int",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "collectedAt",
+      "Type": "timestamp",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "collectedBy",
+      "Type": "int",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "deliveryTimeType",
+      "Type": "enum('now','scheduled')",
+      "Null": "NO",
+      "Key": "",
+      "Default": "now",
+      "Extra": ""
+    },
+    {
+      "Field": "scheduledDeliveryDate",
+      "Type": "timestamp",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "scheduledTimeSlot",
+      "Type": "varchar(20)",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "isArchived",
+      "Type": "tinyint(1)",
+      "Null": "NO",
+      "Key": "",
+      "Default": "0",
+      "Extra": ""
+    },
+    {
+      "Field": "archivedAt",
+      "Type": "timestamp",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "archivedBy",
+      "Type": "int",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "calculatedPrice",
+      "Type": "int",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "offeredPrice",
+      "Type": "int",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "currentPrice",
+      "Type": "int",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "priceMultiplier",
+      "Type": "int",
+      "Null": "YES",
+      "Key": "",
+      "Default": "100",
+      "Extra": ""
+    },
+    {
+      "Field": "packageSize",
+      "Type": "enum('small','medium','large')",
+      "Null": "YES",
+      "Key": "",
+      "Default": "medium",
+      "Extra": ""
+    },
+    {
+      "Field": "pickupPhone",
+      "Type": "varchar(20)",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "deliveryPhone",
+      "Type": "varchar(20)",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "pickupFullName",
+      "Type": "varchar(255)",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "deliveryFullName",
+      "Type": "varchar(255)",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "pickupLatitude",
+      "Type": "varchar(50)",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "pickupLongitude",
+      "Type": "varchar(50)",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "deliveryLatitude",
+      "Type": "varchar(50)",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "deliveryLongitude",
+      "Type": "varchar(50)",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "vehicleType",
+      "Type": "enum('bicycle','motorcycle','car','any')",
+      "Null": "YES",
+      "Key": "",
+      "Default": "any",
+      "Extra": ""
+    },
+    {
+      "Field": "packageDescription",
+      "Type": "text",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "specialInstructions",
+      "Type": "text",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "baseFee",
+      "Type": "int",
+      "Null": "NO",
+      "Key": "",
+      "Default": "0",
+      "Extra": ""
+    },
+    {
+      "Field": "totalFee",
+      "Type": "int",
+      "Null": "NO",
+      "Key": "",
+      "Default": "0",
+      "Extra": ""
+    },
+    {
+      "Field": "deliveredAt",
+      "Type": "timestamp",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    }
+  ],
+  "messages": [],
+  "stdout": "Field\tType\tNull\tKey\tDefault\tExtra\nid\tint\tNO\tPRI\tNULL\tauto_increment\norderNumber\tvarchar(50)\tNO\tUNI\tNULL\t\ncourierId\tint\tYES\t\tNULL\t\nstatus\tenum('pending','confirmed','assigned','picked_up','in_transit','delivered','cancelled','failed')\tNO\t\tpending\t\npickupAddress\ttext\tNO\t\tNULL\t\npickupLat\tdecimal(10,8)\tYES\t\tNULL\t\npickupLng\tdecimal(11,8)\tYES\t\tNULL\t\ndeliveryAddress\ttext\tNO\t\tNULL\t\ndeliveryLat\tdecimal(10,8)\tYES\t\tNULL\t\ndeliveryLng\tdecimal(11,8)\tYES\t\tNULL\t\ncategoryId\tint\tYES\t\tNULL\t\nareaId\tint\tYES\t\tNULL\t\ndistance\tdecimal(8,2)\tYES\t\tNULL\t\npaymentMethod\tenum('cash','card','wallet')\tNO\t\tcash\t\npaymentStatus\tenum('pending','paid','refunded')\tNO\t\tpending\t\nestimatedDeliveryTime\ttimestamp\tYES\t\tNULL\t\nactualDeliveryTime\ttimestamp\tYES\t\tNULL\t\ncancelReason\ttext\tYES\t\tNULL\t\ncreatedAt\ttimestamp\tNO\t\tCURRENT_TIMESTAMP\t\nupdatedAt\ttimestamp\tNO\t\tCURRENT_TIMESTAMP\tDEFAULT_GENERATED on update CURRENT_TIMESTAMP\ncustomerId\tint\tNO\t\t0\t\nrestaurantId\tint\tYES\t\tNULL\t\norderType\tenum('restaurant','market','pharmacy','individual','express')\tNO\t\tindividual\t\ndistanceFee\tint\tNO\t\t0\t\npricingScenario\tenum('A','B','C')\tYES\t\tA\t\ncommissionRate\tint\tYES\t\tNULL\t\nacceptedAt\ttimestamp\tYES\t\tNULL\t\npickedUpAt\ttimestamp\tYES\t\tNULL\t\npickupPhotoUrl\ttext\tYES\t\tNULL\t\ndeliveryPhotoUrl\ttext\tYES\t\tNULL\t\ndeliveryNotes\ttext\tYES\t\tNULL\t\ncustomerSignature\ttext\tYES\t\tNULL\t\ncustomerRating\tint\tYES\t\tNULL\t\ncustomerReview\ttext\tYES\t\tNULL\t\npaymentType\tenum('sender_pays','receiver_pays')\tNO\t\tsender_pays\t\ncollectedAmount\tint\tYES\t\tNULL\t\ncollectedAt\ttimestamp\tYES\t\tNULL\t\ncollectedBy\tint\tYES\t\tNULL\t\ndeliveryTimeType\tenum('now','scheduled')\tNO\t\tnow\t\nscheduledDeliveryDate\ttimestamp\tYES\t\tNULL\t\nscheduledTimeSlot\tvarchar(20)\tYES\t\tNULL\t\nisArchived\ttinyint(1)\tNO\t\t0\t\narchivedAt\ttimestamp\tYES\t\tNULL\t\narchivedBy\tint\tYES\t\tNULL\t\ncalculatedPrice\tint\tYES\t\tNULL\t\nofferedPrice\tint\tYES\t\tNULL\t\ncurrentPrice\tint\tYES\t\tNULL\t\npriceMultiplier\tint\tYES\t\t100\t\npackageSize\tenum('small','medium','large')\tYES\t\tmedium\t\npickupPhone\tvarchar(20)\tYES\t\tNULL\t\ndeliveryPhone\tvarchar(20)\tYES\t\tNULL\t\npickupFullName\tvarchar(255)\tYES\t\tNULL\t\ndeliveryFullName\tvarchar(255)\tYES\t\tNULL\t\npickupLatitude\tvarchar(50)\tYES\t\tNULL\t\npickupLongitude\tvarchar(50)\tYES\t\tNULL\t\ndeliveryLatitude\tvarchar(50)\tYES\t\tNULL\t\ndeliveryLongitude\tvarchar(50)\tYES\t\tNULL\t\nvehicleType\tenum('bicycle','motorcycle','car','any')\tYES\t\tany\t\npackageDescription\ttext\tYES\t\tNULL\t\nspecialInstructions\ttext\tYES\t\tNULL\t\nbaseFee\tint\tNO\t\t0\t\ntotalFee\tint\tNO\t\t0\t\ndeliveredAt\ttimestamp\tYES\t\tNULL\t\n",
+  "stderr": "",
+  "execution_time_ms": 119
+}
