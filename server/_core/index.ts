@@ -349,6 +349,68 @@ async function startServer() {
       res.json(courier[0]);
     } catch (e) { res.status(500).json({ error: "Server error" }); }
   });
+  // GET /api/profile - Get current user profile (with avatarUrl)
+  app.get("/api/profile", async (req: any, res: any) => {
+    const user = verifyToken(req, res);
+    if (!user) return;
+    try {
+      const db = await getDb();
+      if (!db) return res.status(500).json({ error: "DB unavailable" });
+      const { users: usersTable } = await import("../../drizzle/schema");
+      const { eq } = await import("drizzle-orm");
+      const result = await db.select({
+        id: usersTable.id,
+        name: usersTable.name,
+        email: usersTable.email,
+        phone: usersTable.phone,
+        avatarUrl: usersTable.avatarUrl,
+        role: usersTable.role,
+        createdAt: usersTable.createdAt,
+      }).from(usersTable).where(eq(usersTable.id, user.id)).limit(1);
+      if (!result.length) return res.status(404).json({ error: "User not found" });
+      res.json(result[0]);
+    } catch (e) { res.status(500).json({ error: "Server error" }); }
+  });
+
+  // PUT /api/profile - Update profile (name, phone)
+  app.put("/api/profile", async (req: any, res: any) => {
+    const user = verifyToken(req, res);
+    if (!user) return;
+    try {
+      const db = await getDb();
+      if (!db) return res.status(500).json({ error: "DB unavailable" });
+      const { users: usersTable } = await import("../../drizzle/schema");
+      const { eq, sql } = await import("drizzle-orm");
+      const { name, phone } = req.body;
+      const updateData: any = { updatedAt: sql`NOW()` };
+      if (name !== undefined) updateData.name = name;
+      if (phone !== undefined) updateData.phone = phone;
+      await db.update(usersTable).set(updateData).where(eq(usersTable.id, user.id));
+      res.json({ success: true });
+    } catch (e) { res.status(500).json({ error: "Server error" }); }
+  });
+
+  // POST /api/profile/avatar - Upload avatar (base64)
+  app.post("/api/profile/avatar", async (req: any, res: any) => {
+    const user = verifyToken(req, res);
+    if (!user) return;
+    try {
+      const { base64Image, mimeType } = req.body;
+      if (!base64Image || !mimeType) return res.status(400).json({ error: "base64Image and mimeType required" });
+      const { storagePut } = await import("../storage");
+      const base64Data = base64Image.replace(/^data:image\/\w+;base64,/, "");
+      const buffer = Buffer.from(base64Data, "base64");
+      const ext = mimeType.split("/")[1] || "jpg";
+      const filename = `avatars/${user.id}-${Date.now()}.${ext}`;
+      const { url } = await storagePut(filename, buffer, mimeType);
+      const db = await getDb();
+      if (!db) return res.status(500).json({ error: "DB unavailable" });
+      const { users: usersTable } = await import("../../drizzle/schema");
+      const { eq, sql } = await import("drizzle-orm");
+      await db.update(usersTable).set({ avatarUrl: url, updatedAt: sql`NOW()` }).where(eq(usersTable.id, user.id));
+      res.json({ success: true, avatarUrl: url });
+    } catch (e) { console.error("[Avatar upload]", e); res.status(500).json({ error: "Upload failed" }); }
+  });
   // ─────────────────────────────────────────────────────────────────────────
   
   // development mode uses Vite, production mode uses static files
