@@ -6,7 +6,7 @@ import * as db from "../db";
 import { 
   users, couriers, businesses, orders, earnings, 
   paymentRequests, siteSettings, appVersions, pushNotifications, pushTokens, fcmTokens,
-  notifications
+  notifications, supportTickets, supportTicketMessages, redirects, referrals, userWallets
 } from "../../drizzle/schema";
 import { eq, and, desc, sql, gte, lte } from "drizzle-orm";
 import { emitToUser } from "../_core/socket";
@@ -1260,8 +1260,248 @@ export const adminRouter = router({
       .select()
       .from(pushNotifications)
       .orderBy(desc(pushNotifications.createdAt))
-      .limit(50);
-
+       .limit(50);
     return notifications;
   }),
+
+  // ===== SUPPORT TICKETS =====
+  getSupportTickets: adminProcedure.query(async () => {
+    const dbInstance = await getDb();
+    if (!dbInstance) return [];
+    const tickets = await dbInstance
+      .select({
+        id: supportTickets.id,
+        ticketNumber: supportTickets.ticketNumber,
+        userId: supportTickets.userId,
+        orderId: supportTickets.orderId,
+        category: supportTickets.category,
+        priority: supportTickets.priority,
+        status: supportTickets.status,
+        subject: supportTickets.subject,
+        description: supportTickets.description,
+        assignedTo: supportTickets.assignedTo,
+        createdAt: supportTickets.createdAt,
+        updatedAt: supportTickets.updatedAt,
+        resolvedAt: supportTickets.resolvedAt,
+        userName: users.name,
+        userEmail: users.email,
+      })
+      .from(supportTickets)
+      .leftJoin(users, eq(supportTickets.userId, users.id))
+      .orderBy(desc(supportTickets.createdAt));
+    return tickets;
+  }),
+
+  getSupportTicketMessages: adminProcedure
+    .input(z.object({ ticketId: z.number() }))
+    .query(async ({ input }) => {
+      const dbInstance = await getDb();
+      if (!dbInstance) return [];
+      const msgs = await dbInstance
+        .select({
+          id: supportTicketMessages.id,
+          ticketId: supportTicketMessages.ticketId,
+          userId: supportTicketMessages.userId,
+          message: supportTicketMessages.message,
+          isInternal: supportTicketMessages.isInternal,
+          createdAt: supportTicketMessages.createdAt,
+          userName: users.name,
+        })
+        .from(supportTicketMessages)
+        .leftJoin(users, eq(supportTicketMessages.userId, users.id))
+        .where(eq(supportTicketMessages.ticketId, input.ticketId))
+        .orderBy(supportTicketMessages.createdAt);
+      // Mark admin messages
+      const adminUsers = await dbInstance.select({ id: users.id }).from(users).where(eq(users.role, "admin"));
+      const adminIds = new Set(adminUsers.map(a => a.id));
+      return msgs.map(m => ({ ...m, isAdmin: adminIds.has(m.userId) }));
+    }),
+
+  replySupportTicket: adminProcedure
+    .input(z.object({ ticketId: z.number(), message: z.string(), isInternal: z.boolean().optional() }))
+    .mutation(async ({ ctx, input }) => {
+      const dbInstance = await getDb();
+      if (!dbInstance) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database not available" });
+      await dbInstance.insert(supportTicketMessages).values({
+        ticketId: input.ticketId,
+        userId: ctx.user!.id,
+        message: input.message,
+        isInternal: input.isInternal || false,
+      });
+      // Auto-update status to in_progress if open
+      const ticket = await dbInstance.select().from(supportTickets).where(eq(supportTickets.id, input.ticketId));
+      if (ticket[0]?.status === "open") {
+        await dbInstance.update(supportTickets).set({ status: "in_progress" }).where(eq(supportTickets.id, input.ticketId));
+      }
+      return { success: true };
+    }),
+
+  updateSupportTicketStatus: adminProcedure
+    .input(z.object({ ticketId: z.number(), status: z.string() }))
+    .mutation(async ({ input }) => {
+      const dbInstance = await getDb();
+      if (!dbInstance) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database not available" });
+      const updateData: any = { status: input.status };
+      if (input.status === "resolved" || input.status === "closed") {
+        updateData.resolvedAt = new Date();
+      }
+      await dbInstance.update(supportTickets).set(updateData).where(eq(supportTickets.id, input.ticketId));
+      return { success: true };
+    }),
+
+  // ===== SITE SETTINGS =====
+  getAllSettings: adminProcedure.query(async () => {
+    const dbInstance = await getDb();
+    if (!dbInstance) return [];
+    return await dbInstance.select().from(siteSettings).orderBy(siteSettings.key);
+  }),
+
+  upsertSiteSetting: adminProcedure
+    .input(z.object({ key: z.string(), value: z.string().nullable(), type: z.string().optional(), description: z.string().optional() }))
+    .mutation(async ({ ctx, input }) => {
+      const dbInstance = await getDb();
+      if (!dbInstance) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database not available" });
+      const existing = await dbInstance.select().from(siteSettings).where(eq(siteSettings.key, input.key));
+      if (existing.length > 0) {
+        await dbInstance.update(siteSettings).set({ value: input.value, updatedBy: ctx.user!.id }).where(eq(siteSettings.key, input.key));
+      } else {
+        await dbInstance.insert(siteSettings).values({
+          key: input.key,
+          value: input.value,
+          type: (input.type as any) || "string",
+          description: input.description,
+          updatedBy: ctx.user!.id,
+        });
+      }
+      return { success: true };
+    }),
+
+  deleteSetting: adminProcedure
+    .input(z.object({ key: z.string() }))
+    .mutation(async ({ input }) => {
+      const dbInstance = await getDb();
+      if (!dbInstance) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database not available" });
+      await dbInstance.delete(siteSettings).where(eq(siteSettings.key, input.key));
+      return { success: true };
+    }),
+
+  // ===== REDIRECTS =====
+  getAllRedirects: adminProcedure.query(async () => {
+    const dbInstance = await getDb();
+    if (!dbInstance) return [];
+    return await dbInstance.select().from(redirects).orderBy(desc(redirects.createdAt));
+  }),
+
+  createRedirect: adminProcedure
+    .input(z.object({ sourceUrl: z.string(), targetUrl: z.string(), redirectType: z.enum(["301", "302"]), description: z.string().optional() }))
+    .mutation(async ({ ctx, input }) => {
+      const dbInstance = await getDb();
+      if (!dbInstance) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database not available" });
+      await dbInstance.insert(redirects).values({
+        sourceUrl: input.sourceUrl,
+        targetUrl: input.targetUrl,
+        redirectType: input.redirectType,
+        description: input.description,
+        isActive: true,
+        hitCount: 0,
+        createdBy: ctx.user!.id,
+      });
+      return { success: true };
+    }),
+
+  updateRedirect: adminProcedure
+    .input(z.object({ id: z.number(), sourceUrl: z.string().optional(), targetUrl: z.string().optional(), redirectType: z.enum(["301", "302"]).optional(), isActive: z.boolean().optional(), description: z.string().optional() }))
+    .mutation(async ({ input }) => {
+      const dbInstance = await getDb();
+      if (!dbInstance) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database not available" });
+      const { id, ...data } = input;
+      await dbInstance.update(redirects).set(data).where(eq(redirects.id, id));
+      return { success: true };
+    }),
+
+  deleteRedirect: adminProcedure
+    .input(z.object({ id: z.number() }))
+    .mutation(async ({ input }) => {
+      const dbInstance = await getDb();
+      if (!dbInstance) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database not available" });
+      await dbInstance.delete(redirects).where(eq(redirects.id, input.id));
+      return { success: true };
+    }),
+
+  // ===== REFERRALS =====
+  getAllReferrals: adminProcedure.query(async () => {
+    const dbInstance = await getDb();
+    if (!dbInstance) return [];
+    const refs = await dbInstance
+      .select({
+        id: referrals.id,
+        referrerId: referrals.referrerId,
+        referredId: referrals.referredId,
+        referralCode: referrals.referralCode,
+        status: referrals.status,
+        rewardAmount: referrals.rewardAmount,
+        createdAt: referrals.createdAt,
+        // completedAt: referrals.completedAt, // not in schema
+      })
+      .from(referrals)
+      .orderBy(desc(referrals.createdAt));
+    // Get user names
+    const userIdSet = new Set([...refs.map(r => r.referrerId), ...refs.map(r => r.referredId)]);
+    const userIds = Array.from(userIdSet);
+    if (userIds.length === 0) return [];
+    const userList = await dbInstance.select({ id: users.id, name: users.name, email: users.email }).from(users);
+    const userMap = new Map(userList.map(u => [u.id, u]));
+    return refs.map(r => ({
+      ...r,
+      referrerName: userMap.get(r.referrerId)?.name || "—",
+      referrerEmail: userMap.get(r.referrerId)?.email || "—",
+      referredName: userMap.get(r.referredId)?.name || "—",
+      referredEmail: userMap.get(r.referredId)?.email || "—",
+    }));
+  }),
+
+  getReferralStats: adminProcedure.query(async () => {
+    const dbInstance = await getDb();
+    if (!dbInstance) return { total: 0, pending: 0, completed: 0, rewarded: 0, totalRewards: 0 };
+    const stats = await dbInstance.select({
+      total: sql<number>`COUNT(*)`,
+      pending: sql<number>`SUM(CASE WHEN ${referrals.status} = 'pending' THEN 1 ELSE 0 END)`,
+      completed: sql<number>`SUM(CASE WHEN ${referrals.status} = 'completed' THEN 1 ELSE 0 END)`,
+      rewarded: sql<number>`SUM(CASE WHEN ${referrals.status} = 'rewarded' THEN 1 ELSE 0 END)`,
+      totalRewards: sql<number>`COALESCE(SUM(${referrals.rewardAmount}), 0)`,
+    }).from(referrals);
+    return {
+      total: Number(stats[0]?.total || 0),
+      pending: Number(stats[0]?.pending || 0),
+      completed: Number(stats[0]?.completed || 0),
+      rewarded: Number(stats[0]?.rewarded || 0),
+      totalRewards: Number(stats[0]?.totalRewards || 0),
+    };
+  }),
+
+  // ===== APP VERSIONS =====
+  getAllAppVersions: adminProcedure.query(async () => {
+    const dbInstance = await getDb();
+    if (!dbInstance) return [];
+    return await dbInstance.select().from(appVersions).orderBy(desc(appVersions.createdAt));
+  }),
+
+  updateAppVersion: adminProcedure
+    .input(z.object({ id: z.number(), forceUpdate: z.boolean().optional(), isActive: z.boolean().optional(), releaseNotes: z.string().optional() }))
+    .mutation(async ({ input }) => {
+      const dbInstance = await getDb();
+      if (!dbInstance) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database not available" });
+      const { id, ...data } = input;
+      await dbInstance.update(appVersions).set(data).where(eq(appVersions.id, id));
+      return { success: true };
+    }),
+
+  deleteAppVersion: adminProcedure
+    .input(z.object({ id: z.number() }))
+    .mutation(async ({ input }) => {
+      const dbInstance = await getDb();
+      if (!dbInstance) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database not available" });
+      await dbInstance.delete(appVersions).where(eq(appVersions.id, input.id));
+      return { success: true };
+    }),
 });

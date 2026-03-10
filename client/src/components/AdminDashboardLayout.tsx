@@ -30,6 +30,11 @@ import {
   MessageSquare,
   DollarSign,
   FileText,
+  Ticket,
+  HeadphonesIcon,
+  Wrench,
+  Gift,
+  Smartphone,
 } from "lucide-react";
 import { APP_LOGO, APP_TITLE } from "@/const";
 import { trpc } from "@/lib/trpc";
@@ -103,12 +108,30 @@ const menuGroups: MenuItem[] = [
     path: "/admin/error-logs",
   },
   {
+    icon: Ticket,
+    label: "Kuponlar",
+    path: "/admin/coupons",
+  },
+  {
+    icon: HeadphonesIcon,
+    label: "Destek Talepleri",
+    path: "/admin/support",
+  },
+  {
+    icon: Gift,
+    label: "Referanslar",
+    path: "/admin/referrals",
+  },
+  {
     icon: Settings,
     label: "Ayarlar",
     children: [
       { icon: Grid3x3, label: "Kategoriler", path: "/admin/categories" },
       { icon: MapPin, label: "Hizmet Bölgeleri", path: "/admin/areas" },
       { icon: FileText, label: "Sayfalar (SEO)", path: "/admin/pages" },
+      { icon: Wrench, label: "Site Ayarları", path: "/admin/site-settings" },
+      { icon: ArrowLeftRight, label: "Yönlendirmeler", path: "/admin/redirects" },
+      { icon: Smartphone, label: "Uygulama Versiyonları", path: "/admin/app-versions" },
     ],
   },
 ];

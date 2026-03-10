@@ -162,3 +162,17 @@
 - [x] updateLocation endpoint'i isOnline=true olarak günceller
 - [x] getAllPaymentRequests endpoint'ine kurye adı ve IBAN bilgisi eklendi
 - [x] markPaymentCollected hook'u render dışına taşındı (React hooks kuralı)
+
+## Admin Panel Genişletme (10.03.2026)
+- [x] Admin Kuponlar sayfası (/admin/coupons) - CRUD, istatistikler, kullanım geçmişi
+- [x] Admin Destek Talepleri sayfası (/admin/support) - ticket listesi, mesajlaşma, durum yönetimi
+- [x] Admin Site Ayarları sayfası (/admin/site-settings) - branding, SMTP, OAuth, sistem ayarları
+- [x] Admin Yönlendirmeler sayfası (/admin/redirects) - URL redirect CRUD, hit sayacı
+- [x] Admin Referans Sistemi sayfası (/admin/referrals) - referans istatistikleri, tamamlama
+- [x] Admin Uygulama Versiyonları sayfası (/admin/app-versions) - versiyon CRUD
+- [x] Backend: destek talepleri admin endpoint'leri (listAll, getById, reply, updateStatus)
+- [x] Backend: site ayarları admin endpoint'leri (getAll, upsert, delete)
+- [x] Backend: yönlendirmeler admin endpoint'leri (listAll, create, update, delete)
+- [x] Backend: referans admin endpoint'leri (listAll, getStats)
+- [x] Backend: uygulama versiyonları admin endpoint'leri (listAll, update, delete)
+- [x] AdminDashboard route ve sidebar güncellemeleri

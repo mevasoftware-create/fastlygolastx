@@ -20,6 +20,12 @@ import { ReviewsPage } from "./Reviews";
 import AdminMap from "./AdminMap";
 import { CustomersPage } from "./Customers";
 import ErrorLogs from "./ErrorLogs";
+import { AdminCoupons } from "./AdminCoupons";
+import { AdminSupport } from "./AdminSupport";
+import { AdminSiteSettings } from "./AdminSiteSettings";
+import { AdminRedirects } from "./AdminRedirects";
+import { AdminReferrals } from "./AdminReferrals";
+import { AdminAppVersions } from "./AdminAppVersions";
 import { io, Socket } from "socket.io-client";
 import { toast } from "sonner";
 
@@ -119,6 +125,12 @@ export default function AdminDashboard() {
         <Route path="/admin/customers" component={CustomersPage} />
         <Route path="/admin/error-logs" component={ErrorLogs} />
         <Route path="/admin/reviews" component={ReviewsPage} />
+        <Route path="/admin/coupons" component={AdminCoupons} />
+        <Route path="/admin/support" component={AdminSupport} />
+        <Route path="/admin/site-settings" component={AdminSiteSettings} />
+        <Route path="/admin/redirects" component={AdminRedirects} />
+        <Route path="/admin/referrals" component={AdminReferrals} />
+        <Route path="/admin/app-versions" component={AdminAppVersions} />
       </Switch>
     </AdminDashboardLayout>
   );
