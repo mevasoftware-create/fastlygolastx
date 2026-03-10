@@ -152,3 +152,7 @@
 - [x] Kurye anlık konum güncelleme sistemi - test edildi ve çalışıyor
 - [x] Para çekme: "Ödeme sistemi yakında" placeholder toast'u kaldırıldı, CourierPayments bileşeni entegre edildi
 - [x] Konum güncelleme: test edildi ve çalışıyor (veritabanına yazılıyor)
+- [ ] Track-order haritasında kurye konumu yanlış gösteriyor - couriers.currentLatitude/Longitude kullan
+- [ ] courierLocations tablosu boş - updateLocation endpoint'i buraya da kayıt yapsın (konum geçmişi)
+- [ ] Admin paneli: kurye son giriş zamanı ve son online zamanı göster
+- [ ] Veritabanı analizi: kullanılmayan/yarım kalan tabloları tespit et

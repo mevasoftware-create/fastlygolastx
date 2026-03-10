@@ -502,7 +502,7 @@ export const appRouter = router({
       const ordersWithCourier = await Promise.all(orders.map(async (order) => {
         if (!order.courierId) return order;
         
-        const courier = await db.getCourierByUserId(order.courierId);
+        const courier = await db.getCourierById(order.courierId);
         if (!courier) return order;
         
         const courierUser = await db.getUserById(courier.userId);
@@ -529,7 +529,7 @@ export const appRouter = router({
       const ordersWithCourier = await Promise.all(orders.map(async (order) => {
         if (!order.courierId) return order;
         
-        const courier = await db.getCourierByUserId(order.courierId);
+        const courier = await db.getCourierById(order.courierId);
         if (!courier) return order;
         
         const courierUser = await db.getUserById(courier.userId);
@@ -553,7 +553,7 @@ export const appRouter = router({
       const orders = await db.getOrdersByCustomerId(ctx.user.id);
       const ordersWithCourier = await Promise.all(orders.map(async (order) => {
         if (!order.courierId) return order;
-        const courier = await db.getCourierByUserId(order.courierId);
+        const courier = await db.getCourierById(order.courierId);
         if (!courier) return order;
         const courierUser = await db.getUserById(courier.userId);
         return {
@@ -574,7 +574,7 @@ export const appRouter = router({
       const orders = await db.getOrdersByCustomerId(ctx.user.id);
       const ordersWithCourier = await Promise.all(orders.map(async (order) => {
         if (!order.courierId) return order;
-        const courier = await db.getCourierByUserId(order.courierId);
+        const courier = await db.getCourierById(order.courierId);
         if (!courier) return order;
         const courierUser = await db.getUserById(courier.userId);
         return {
@@ -595,7 +595,7 @@ export const appRouter = router({
       const orders = await db.getOrdersByCustomerId(ctx.user.id);
       const ordersWithCourier = await Promise.all(orders.map(async (order) => {
         if (!order.courierId) return order;
-        const courier = await db.getCourierByUserId(order.courierId);
+        const courier = await db.getCourierById(order.courierId);
         if (!courier) return order;
         const courierUser = await db.getUserById(courier.userId);
         return {
@@ -616,7 +616,7 @@ export const appRouter = router({
       const orders = await db.getOrdersByCustomerId(ctx.user.id);
       const ordersWithCourier = await Promise.all(orders.map(async (order) => {
         if (!order.courierId) return order;
-        const courier = await db.getCourierByUserId(order.courierId);
+        const courier = await db.getCourierById(order.courierId);
         if (!courier) return order;
         const courierUser = await db.getUserById(courier.userId);
         return {
@@ -637,7 +637,7 @@ export const appRouter = router({
       const orders = await db.getOrdersByCustomerId(ctx.user.id);
       const ordersWithCourier = await Promise.all(orders.map(async (order) => {
         if (!order.courierId) return order;
-        const courier = await db.getCourierByUserId(order.courierId);
+        const courier = await db.getCourierById(order.courierId);
         if (!courier) return order;
         const courierUser = await db.getUserById(courier.userId);
         return {
@@ -668,7 +668,7 @@ export const appRouter = router({
         // Check if user is the assigned courier - courierId is courier.id, not userId
         let isAssignedCourier = false;
         if (order.courierId) {
-          const courier = await db.getCourierByUserId(order.courierId);
+          const courier = await db.getCourierById(order.courierId);
           if (courier && courier.userId === ctx.user.id) {
             isAssignedCourier = true;
           }
@@ -682,7 +682,7 @@ export const appRouter = router({
         // Add courier information if courier is assigned
         let courierInfo = null;
         if (order.courierId) {
-          const courier = await db.getCourierByUserId(order.courierId);
+          const courier = await db.getCourierById(order.courierId);
           if (courier) {
             const courierUser = await db.getUserById(courier.userId);
             courierInfo = {
@@ -718,7 +718,7 @@ export const appRouter = router({
         const isAdmin = ctx.user.role === "admin";
         let isAssignedCourier = false;
         if (order.courierId) {
-          const courier = await db.getCourierByUserId(order.courierId);
+          const courier = await db.getCourierById(order.courierId);
           if (courier && courier.userId === ctx.user.id) {
             isAssignedCourier = true;
           }
@@ -751,7 +751,7 @@ export const appRouter = router({
         // Add courier information if courier is assigned
         let courierInfo = null;
         if (order.courierId) {
-          const courier = await db.getCourierByUserId(order.courierId);
+          const courier = await db.getCourierById(order.courierId);
           if (courier) {
             const courierUser = await db.getUserById(courier.userId);
             courierInfo = {
@@ -861,7 +861,7 @@ export const appRouter = router({
         
         // Update courier's average rating
         const { average } = await db.getCourierAverageRating(order.courierId);
-        const courier = await db.getCourierByUserId(order.courierId);
+        const courier = await db.getCourierById(order.courierId);
         if (courier) {
           const dbInstance = await db.getDb();
           if (dbInstance) {

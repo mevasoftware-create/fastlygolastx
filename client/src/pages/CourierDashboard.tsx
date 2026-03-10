@@ -77,6 +77,16 @@ export default function CourierDashboard() {
     },
   });
 
+  const markPaymentCollectedMutation = trpc.courier.markPaymentCollected.useMutation({
+    onSuccess: () => {
+      toast.success("Ödeme alındı olarak işaretlendi!");
+      utils.courier.myOrders.invalidate();
+    },
+    onError: (error) => {
+      toast.error(`Hata: ${error.message}`);
+    },
+  });
+
   const setOnlineStatusMutation = trpc.courier.setOnlineStatus.useMutation({
     onSuccess: (_, variables) => {
       toast.success(variables.isOnline ? "🟢 Çevrimiçi oldunuz" : "⚫ Çevrimdışı oldunuz");
@@ -663,20 +673,12 @@ export default function CourierDashboard() {
                               {order.paymentType === "receiver_pays" && order.paymentStatus !== "collected" && order.status !== "pending" && (
                                 <Button
                                   onClick={() => {
-                                    const markPaymentMutation = trpc.courier.markPaymentCollected.useMutation({
-                                      onSuccess: () => {
-                                        toast.success("Ödeme alındı olarak işaretlendi!");
-                                        utils.courier.myOrders.invalidate();
-                                      },
-                                      onError: (error) => {
-                                        toast.error(`Hata: ${error.message}`);
-                                      },
-                                    });
-                                    markPaymentMutation.mutate({
+                                    markPaymentCollectedMutation.mutate({
                                       orderId: order.id,
                                       collectedAmount: order.totalFee,
                                     });
                                   }}
+                                  disabled={markPaymentCollectedMutation.isPending}
                                   className="w-full bg-yellow-500 hover:bg-yellow-600 text-white font-semibold"
                                 >
                                   💰 {t('paymentCollectedButton')} (€{(order.totalFee / 100).toFixed(2)})

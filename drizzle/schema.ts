@@ -45,6 +45,8 @@ export const couriers = mysqlTable("couriers", {
   totalDeliveries: int("totalDeliveries").default(0),
   currentLatitude: varchar("currentLatitude", { length: 50 }),
   currentLongitude: varchar("currentLongitude", { length: 50 }),
+  lastLocationUpdate: timestamp("lastLocationUpdate"),
+  isOnline: boolean("isOnline").default(false).notNull(),
   // Payment information
   iban: varchar("iban", { length: 34 }),
   identityNumber: varchar("identityNumber", { length: 20 }),

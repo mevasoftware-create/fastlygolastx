@@ -557,18 +557,20 @@ export const adminRouter = router({
         vehiclePlate: couriers.vehiclePlate,
         status: couriers.status,
         isAvailable: couriers.isAvailable,
-        isOnline: couriers.isAvailable,
+        isOnline: couriers.isOnline,
         rating: couriers.rating,
         totalDeliveries: couriers.totalDeliveries,
         phone: couriers.phone,
         currentLatitude: couriers.currentLatitude,
         currentLongitude: couriers.currentLongitude,
+        lastLocationUpdate: couriers.lastLocationUpdate,
         isDemo: couriers.isDemo,
         createdAt: couriers.createdAt,
         updatedAt: couriers.updatedAt,
         userName: users.name,
         userEmail: users.email,
         userPhone: couriers.phone,
+        lastSignedIn: users.lastSignedIn,
       })
       .from(couriers)
       .leftJoin(users, eq(couriers.userId, users.id))
@@ -877,8 +879,23 @@ export const adminRouter = router({
     if (!dbInstance) return [];
 
     const requests = await dbInstance
-      .select()
+      .select({
+        id: paymentRequests.id,
+        courierId: paymentRequests.courierId,
+        amount: paymentRequests.amount,
+        status: paymentRequests.status,
+        requestedAt: paymentRequests.requestedAt,
+        processedAt: paymentRequests.processedAt,
+        notes: paymentRequests.notes,
+        rejectionReason: paymentRequests.rejectionReason,
+        processedBy: paymentRequests.processedBy,
+        iban: couriers.iban,
+        courierName: users.name,
+        courierEmail: users.email,
+      })
       .from(paymentRequests)
+      .leftJoin(couriers, eq(paymentRequests.courierId, couriers.id))
+      .leftJoin(users, eq(couriers.userId, users.id))
       .orderBy(desc(paymentRequests.requestedAt));
 
     return requests;

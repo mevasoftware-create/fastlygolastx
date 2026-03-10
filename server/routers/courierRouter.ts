@@ -3,7 +3,7 @@ import { router, protectedProcedure, publicProcedure } from "../_core/trpc";
 import { TRPCError } from "@trpc/server";
 import * as db from "../db";
 import { getDb } from "../db";
-import { couriers, users, priceOffers, orders, paymentRequests, earnings } from "../../drizzle/schema";
+import { couriers, users, priceOffers, orders, paymentRequests, earnings, courierLocations } from "../../drizzle/schema";
 import { eq, and, desc, sql } from "drizzle-orm";
 import { emitToUser, emitToAdmins } from "../_core/socket";
 import { sendPushNotification } from "./pushNotificationRouter";
@@ -186,13 +186,40 @@ export const courierRouter = router({
         throw new TRPCError({ code: "FORBIDDEN", message: "Only couriers can update location" });
       }
 
+      // Get courier profile to get courierId
+      const courierProfile = await dbInstance
+        .select({ id: couriers.id })
+        .from(couriers)
+        .where(eq(couriers.userId, ctx.user.id))
+        .limit(1);
+
+      if (courierProfile.length === 0) {
+        throw new TRPCError({ code: "NOT_FOUND", message: "Courier profile not found" });
+      }
+
+      const now = new Date();
+
+      // Update current location on couriers table
       await dbInstance
         .update(couriers)
         .set({
           currentLatitude: input.latitude,
           currentLongitude: input.longitude,
+          lastLocationUpdate: now,
+          isOnline: true,
         })
         .where(eq(couriers.userId, ctx.user.id));
+
+      // Insert into courierLocations for history tracking
+      await dbInstance
+        .insert(courierLocations)
+        .values({
+          courierId: courierProfile[0].id,
+          latitude: input.latitude,
+          longitude: input.longitude,
+          timestamp: now,
+          createdAt: now,
+        } as any);
 
       return { success: true };
     }),

@@ -116,6 +116,13 @@ export async function createCourier(courier: InsertCourier) {
   await db.insert(couriers).values(courierWithDefaults);
 }
 
+export async function getCourierById(id: number): Promise<Courier | undefined> {
+  const db = await getDb();
+  if (!db) return undefined;
+  const result = await db.select().from(couriers).where(eq(couriers.id, id)).limit(1);
+  return result.length > 0 ? result[0] : undefined;
+}
+
 export async function getCourierByUserId(userId: number): Promise<Courier | undefined> {
   const db = await getDb();
   if (!db) return undefined;
@@ -218,7 +225,7 @@ export async function getOrderDetailsById(id: number) {
   // Get courier details if assigned
   let courierDetails = null;
   if (order.courierId) {
-    const courierProfile = await getCourierByUserId(order.courierId);
+    const courierProfile = await getCourierById(order.courierId);
     const courierUser = await getUserById(order.courierId);
     if (courierProfile && courierUser) {
       courierDetails = {

@@ -125,8 +125,8 @@ export function CouriersPage() {
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-gray-100 bg-gray-50/60">
-                  {["Kurye","Araç","Konum","Puan","Onay","Durum",""].map((h, i) => (
-                    <th key={i} className={`px-4 py-3 font-medium text-gray-500 text-xs uppercase tracking-wide ${i === 6 ? "text-right" : "text-left"}`}>{h}</th>
+                  {["Kurye","Araç","Konum","Puan","Onay","Durum","Son Giriş",""].map((h, i) => (
+                    <th key={i} className={`px-4 py-3 font-medium text-gray-500 text-xs uppercase tracking-wide ${i === 7 ? "text-right" : "text-left"}`}>{h}</th>
                   ))}
                 </tr>
               </thead>
@@ -149,8 +149,13 @@ export function CouriersPage() {
                       {c.isDemo && <span className="ml-1.5 text-xs bg-purple-50 text-purple-600 border border-purple-200 px-1.5 py-0.5 rounded-full">Demo</span>}
                     </td>
                     <td className="px-4 py-3 text-xs text-gray-500">
-                      {c.currentLat && c.currentLng ? (
-                        <span className="flex items-center gap-1 text-green-600"><MapPin className="h-3 w-3" />Aktif</span>
+                      {c.currentLatitude && c.currentLongitude ? (
+                        <div>
+                          <span className="flex items-center gap-1 text-green-600"><MapPin className="h-3 w-3" />Aktif</span>
+                          {c.lastLocationUpdate && (
+                            <span className="text-gray-400 text-xs">{new Date(c.lastLocationUpdate).toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' })}</span>
+                          )}
+                        </div>
                       ) : <span className="text-gray-300">—</span>}
                     </td>
                     <td className="px-4 py-3">
@@ -163,8 +168,17 @@ export function CouriersPage() {
                     <td className="px-4 py-3"><StatusBadge status={c.status} /></td>
                     <td className="px-4 py-3">
                       <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium border ${c.isOnline ? "bg-blue-50 border-blue-200 text-blue-700" : "bg-gray-50 border-gray-200 text-gray-500"}`}>
+                        <span className={`w-1.5 h-1.5 rounded-full mr-1 ${c.isOnline ? 'bg-blue-500' : 'bg-gray-400'}`}></span>
                         {c.isOnline ? "Çevrimiçi" : "Çevrimdışı"}
                       </span>
+                    </td>
+                    <td className="px-4 py-3 text-xs text-gray-500">
+                      {c.lastSignedIn ? (
+                        <div>
+                          <div>{new Date(c.lastSignedIn).toLocaleDateString('tr-TR')}</div>
+                          <div className="text-gray-400">{new Date(c.lastSignedIn).toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' })}</div>
+                        </div>
+                      ) : <span className="text-gray-300">—</span>}
                     </td>
                     <td className="px-4 py-3 text-right">
                       <div className="flex items-center justify-end gap-1">
