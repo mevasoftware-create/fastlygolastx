@@ -152,7 +152,13 @@
 - [x] Kurye anlık konum güncelleme sistemi - test edildi ve çalışıyor
 - [x] Para çekme: "Ödeme sistemi yakında" placeholder toast'u kaldırıldı, CourierPayments bileşeni entegre edildi
 - [x] Konum güncelleme: test edildi ve çalışıyor (veritabanına yazılıyor)
-- [ ] Track-order haritasında kurye konumu yanlış gösteriyor - couriers.currentLatitude/Longitude kullan
-- [ ] courierLocations tablosu boş - updateLocation endpoint'i buraya da kayıt yapsın (konum geçmişi)
-- [ ] Admin paneli: kurye son giriş zamanı ve son online zamanı göster
+- [x] Track-order haritasında kurye konumu yanlış gösteriyor - getByOrderNumber endpoint'i getCourierById kullanıyor (doğru)
+- [x] courierLocations tablosu boş - updateLocation endpoint'i latitude/longitude ile kayıt yapıyor
+- [x] Admin paneli: kurye son giriş zamanı (lastSignedIn) ve online durumu (isOnline) eklendi
 - [ ] Veritabanı analizi: kullanılmayan/yarım kalan tabloları tespit et
+
+## Kurye Konum ve Admin Güncellemeleri (10.03.2026)
+- [x] couriers tablosuna lastLocationUpdate ve isOnline kolonları eklendi
+- [x] updateLocation endpoint'i isOnline=true olarak günceller
+- [x] getAllPaymentRequests endpoint'ine kurye adı ve IBAN bilgisi eklendi
+- [x] markPaymentCollected hook'u render dışına taşındı (React hooks kuralı)
