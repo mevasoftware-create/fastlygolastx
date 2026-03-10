@@ -26,6 +26,29 @@ export default function Header() {
   // Fetch categories and areas from database
   const { data: categories = [] } = trpc.categories.list.useQuery();
   const { data: areas = [] } = trpc.areas.list.useQuery();
+
+  // Notifications
+  const { data: notifUnreadCount = 0 } = trpc.notifications.unreadCount.useQuery(undefined, {
+    enabled: isAuthenticated,
+    refetchInterval: 30000,
+  });
+  const { data: recentNotifications = [] } = trpc.notifications.list.useQuery(
+    { limit: 5, offset: 0, unreadOnly: false },
+    { enabled: isAuthenticated }
+  );
+  const notifUtils = trpc.useUtils();
+  const markAllAsReadMutation = trpc.notifications.markAllAsRead.useMutation({
+    onSuccess: () => {
+      notifUtils.notifications.unreadCount.invalidate();
+      notifUtils.notifications.list.invalidate();
+    },
+  });
+  const markAsReadMutation = trpc.notifications.markAsRead.useMutation({
+    onSuccess: () => {
+      notifUtils.notifications.unreadCount.invalidate();
+      notifUtils.notifications.list.invalidate();
+    },
+  });
   
   // Check if user is courier or business
   const { data: courierProfile } = trpc.courier.getProfile.useQuery(undefined, {
@@ -283,20 +306,63 @@ export default function Header() {
                 <DropdownMenuTrigger asChild>
                   <Button variant="ghost" size="sm" className="relative hover:bg-accent/50 rounded-xl h-10 w-10 p-0">
                     <Bell className="h-5 w-5 text-muted-foreground" />
-                    <span className="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full ring-2 ring-background"></span>
+                    {notifUnreadCount > 0 && (
+                      <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-bold">
+                        {notifUnreadCount > 9 ? '9+' : notifUnreadCount}
+                      </span>
+                    )}
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-80 glass-card border-border/50">
-                  <DropdownMenuLabel className="font-semibold">{t('notifications')}</DropdownMenuLabel>
+                  <DropdownMenuLabel className="flex items-center justify-between">
+                    <span className="font-semibold">{t('notifications')}</span>
+                    {notifUnreadCount > 0 && (
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="h-auto p-1 text-xs text-orange-600"
+                        onClick={(e) => { e.stopPropagation(); markAllAsReadMutation.mutate(); }}
+                      >
+                        Tümünü Okundu İşaretle
+                      </Button>
+                    )}
+                  </DropdownMenuLabel>
                   <DropdownMenuSeparator />
-                  <div className="max-h-96 overflow-y-auto">
-                    <DropdownMenuItem onClick={() => setLocation('/notifications')} className="cursor-pointer hover:bg-accent/50 rounded-lg">
-                      <div className="flex flex-col gap-1">
-                        <span className="font-medium text-sm">{t('viewAllNotifications')}</span>
-                        <span className="text-xs text-muted-foreground">{t('clickToSeeAll')}</span>
+                  <div className="max-h-80 overflow-y-auto">
+                    {recentNotifications.length === 0 ? (
+                      <div className="p-4 text-center text-sm text-muted-foreground">
+                        Henüz bildirim yok
                       </div>
-                    </DropdownMenuItem>
+                    ) : (
+                      recentNotifications.map((notif: any) => (
+                        <DropdownMenuItem
+                          key={notif.id}
+                          className={`cursor-pointer p-3 rounded-lg ${!notif.isRead ? 'bg-orange-50' : ''}`}
+                          onClick={() => {
+                            if (!notif.isRead) markAsReadMutation.mutate({ id: notif.id });
+                            setLocation('/notifications');
+                          }}
+                        >
+                          <div className="flex gap-2 w-full">
+                            <div className="flex-1 min-w-0">
+                              <div className="flex items-start justify-between gap-1">
+                                <p className="font-medium text-sm line-clamp-1">{notif.title}</p>
+                                {!notif.isRead && <span className="h-2 w-2 bg-orange-500 rounded-full flex-shrink-0 mt-1" />}
+                              </div>
+                              <p className="text-xs text-muted-foreground line-clamp-2 mt-0.5">{notif.message}</p>
+                            </div>
+                          </div>
+                        </DropdownMenuItem>
+                      ))
+                    )}
                   </div>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem
+                    className="cursor-pointer justify-center text-orange-600 font-medium"
+                    onClick={() => setLocation('/notifications')}
+                  >
+                    {t('viewAllNotifications')}
+                  </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
             )}

@@ -1,0 +1,13 @@
+{
+  "query": "SELECT COLUMN_TYPE FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'orders' AND COLUMN_NAME = 'status';",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4EV5ivwhyC7eCUY.ebc471170149 --database 4KwtmFvvd67FSFhQ5dyp9H --execute SELECT COLUMN_TYPE FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'orders' AND COLUMN_NAME = 'status';",
+  "rows": [
+    {
+      "COLUMN_TYPE": "enum('pending','confirmed','assigned','picked_up','in_transit','delivered','cancelled','failed')"
+    }
+  ],
+  "messages": [],
+  "stdout": "COLUMN_TYPE\nenum('pending','confirmed','assigned','picked_up','in_transit','delivered','cancelled','failed')\n",
+  "stderr": "",
+  "execution_time_ms": 58
+}

@@ -145,3 +145,6 @@
 - [x] Web push izin banner'ı - kayıtlı kullanıcılara göster
 - [x] NotificationPermissionBanner bileşeni DashboardLayout'a entegre
 - [x] orders tablosuna acceptedAt kolonu eksik - migration ile ekle (sipariş kabul hatası)
+- [x] Müşteri tarafı bildirim dropdown'ı boş görünüyor - notifications.list bağlandı, okunmamış sayıcı eklendi
+- [x] "Tüm Bildirimleri Gör" linki düzeltildi - setLocation kullanılıyor
+- [x] orders status ENUM'a 'accepted' değeri eklendi (veritabanında eksikti)

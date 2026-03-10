@@ -1,0 +1,70 @@
+{
+  "query": "SELECT id, userId, status, isAvailable FROM couriers LIMIT 10;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4EV5ivwhyC7eCUY.ebc471170149 --database 4KwtmFvvd67FSFhQ5dyp9H --execute SELECT id, userId, status, isAvailable FROM couriers LIMIT 10;",
+  "rows": [
+    {
+      "id": "210008",
+      "userId": "2970265",
+      "status": "active",
+      "isAvailable": "1"
+    },
+    {
+      "id": "210010",
+      "userId": "2970104",
+      "status": "active",
+      "isAvailable": "1"
+    },
+    {
+      "id": "240001",
+      "userId": "3000043",
+      "status": "active",
+      "isAvailable": "1"
+    },
+    {
+      "id": "270002",
+      "userId": "3060511",
+      "status": "active",
+      "isAvailable": "1"
+    },
+    {
+      "id": "270003",
+      "userId": "3060512",
+      "status": "active",
+      "isAvailable": "1"
+    },
+    {
+      "id": "270005",
+      "userId": "3060514",
+      "status": "active",
+      "isAvailable": "1"
+    },
+    {
+      "id": "270006",
+      "userId": "3060515",
+      "status": "active",
+      "isAvailable": "1"
+    },
+    {
+      "id": "270007",
+      "userId": "3060516",
+      "status": "active",
+      "isAvailable": "1"
+    },
+    {
+      "id": "270008",
+      "userId": "3060519",
+      "status": "active",
+      "isAvailable": "1"
+    },
+    {
+      "id": "270010",
+      "userId": "3060656",
+      "status": "active",
+      "isAvailable": "1"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tuserId\tstatus\tisAvailable\n210008\t2970265\tactive\t1\n210010\t2970104\tactive\t1\n240001\t3000043\tactive\t1\n270002\t3060511\tactive\t1\n270003\t3060512\tactive\t1\n270005\t3060514\tactive\t1\n270006\t3060515\tactive\t1\n270007\t3060516\tactive\t1\n270008\t3060519\tactive\t1\n270010\t3060656\tactive\t1\n",
+  "stderr": "",
+  "execution_time_ms": 54
+}
