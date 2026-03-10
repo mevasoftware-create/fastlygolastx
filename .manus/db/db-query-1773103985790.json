@@ -1,0 +1,15 @@
+{
+  "query": "SELECT c.id as courierId, c.userId, u.email FROM couriers c JOIN users u ON c.userId = u.id WHERE u.email = 'resulozlu@gmail.com';",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4EV5ivwhyC7eCUY.ebc471170149 --database 4KwtmFvvd67FSFhQ5dyp9H --execute SELECT c.id as courierId, c.userId, u.email FROM couriers c JOIN users u ON c.userId = u.id WHERE u.email = 'resulozlu@gmail.com';",
+  "rows": [
+    {
+      "courierId": "210008",
+      "userId": "2970265",
+      "email": "resulozlu@gmail.com"
+    }
+  ],
+  "messages": [],
+  "stdout": "courierId\tuserId\temail\n210008\t2970265\tresulozlu@gmail.com\n",
+  "stderr": "",
+  "execution_time_ms": 79
+}

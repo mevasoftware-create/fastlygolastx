@@ -149,3 +149,6 @@
 - [x] "Tüm Bildirimleri Gör" linki düzeltildi - setLocation kullanılıyor
 - [x] orders status ENUM'a 'accepted' değeri eklendi (veritabanında eksikti)
 - [x] Mobil API: profil fotoğrafı görüntleme ve değiştirme endpoint'leri eklendi (GET/PUT /api/profile, POST /api/profile/avatar)
+- [x] Kurye anlık konum güncelleme sistemi - test edildi ve çalışıyor
+- [x] Para çekme: "Ödeme sistemi yakında" placeholder toast'u kaldırıldı, CourierPayments bileşeni entegre edildi
+- [x] Konum güncelleme: test edildi ve çalışıyor (veritabanına yazılıyor)

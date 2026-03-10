@@ -16,6 +16,7 @@ import { useLocation } from "wouter";
 import { toast } from "sonner";
 import { PhotoUploadModal } from "@/components/PhotoUploadModal";
 import { EarningsReport } from "@/components/EarningsReport";
+import CourierPaymentsInline from "@/pages/CourierPayments";
 import { Camera } from "lucide-react";
 import { useTranslation } from "@/lib/i18n";
 
@@ -780,71 +781,7 @@ export default function CourierDashboard() {
 
           {/* Withdraw Page */}
           {activePage === "withdraw" && (
-            <div className="space-y-6">
-              <div>
-                <h1 className="text-3xl font-bold text-gray-900">Para Çekme</h1>
-                <p className="text-gray-600 mt-1">Kazancınızı çekin</p>
-              </div>
-
-              <div className="grid md:grid-cols-2 gap-6">
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Toplam Kazanç</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="text-3xl font-bold text-orange-600">
-                      €{(earnings?.total || 0).toFixed(2)}
-                    </div>
-                    <p className="text-sm text-muted-foreground mt-2">
-                      {earnings?.earnings?.length || 0} teslim tamamlandı
-                    </p>
-                  </CardContent>
-                </Card>
-
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Çekilebilir Bakiye</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="text-3xl font-bold text-green-600">
-                      €{(earnings?.total || 0).toFixed(2)}
-                    </div>
-                    <p className="text-sm text-muted-foreground mt-2">
-                      Çekim için hazır
-                    </p>
-                  </CardContent>
-                </Card>
-              </div>
-
-              <Card>
-                <CardHeader>
-                  <CardTitle>Para Çekme Talebi</CardTitle>
-                  <CardDescription>Ödeme bilgilerinizi kontrol edin ve çekim talebinde bulunun</CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="withdraw-amount">Miktar (€)</Label>
-                    <Input
-                      id="withdraw-amount"
-                      type="number"
-                      value={withdrawAmount}
-                      onChange={(e) => setWithdrawAmount(e.target.value)}
-                      placeholder="Çekmek istediğiniz miktar"
-                    />
-                  </div>
-                  <Button
-                    className="w-full bg-gradient-to-r from-orange-500 to-orange-600"
-                    onClick={() => {
-                      toast.info("Ödeme sistemi yakında! Para çekmek için admin ile iletişime geçin.");
-                      setWithdrawAmount("");
-                    }}
-                  >
-                    <Wallet className="w-4 h-4 mr-2" />
-                    Çekim Talebi Oluştur
-                  </Button>
-                </CardContent>
-              </Card>
-            </div>
+            <CourierPaymentsInline />
           )}
 
           {/* Earnings Page */}
