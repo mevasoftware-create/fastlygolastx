@@ -9,6 +9,7 @@ import { CouriersPage } from "./Couriers";
 import BusinessesPage from "./Businesses";
 import { AdminCategories } from "./AdminCategories";
 import { AdminAreas } from "./AdminAreas";
+import { AdminPages } from "./AdminPages";
 import AdminPayments from "./AdminPayments";
 import CourierRatings from "./CourierRatings";
 import Pricing from "./Pricing";
@@ -106,6 +107,7 @@ export default function AdminDashboard() {
         <Route path="/admin/businesses" component={BusinessesPage} />
         <Route path="/admin/categories" component={AdminCategories} />
         <Route path="/admin/areas" component={AdminAreas} />
+        <Route path="/admin/pages" component={AdminPages} />
         <Route path="/admin/payments" component={AdminPayments} />
         <Route path="/admin/pricing" component={Pricing} />
         <Route path="/admin/revenue" component={RevenueAnalytics} />

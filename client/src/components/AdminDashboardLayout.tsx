@@ -108,6 +108,7 @@ const menuGroups: MenuItem[] = [
     children: [
       { icon: Grid3x3, label: "Kategoriler", path: "/admin/categories" },
       { icon: MapPin, label: "Hizmet Bölgeleri", path: "/admin/areas" },
+      { icon: FileText, label: "Sayfalar (SEO)", path: "/admin/pages" },
     ],
   },
 ];

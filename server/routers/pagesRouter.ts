@@ -1,22 +1,61 @@
-import { router, publicProcedure } from "../_core/trpc";
+import { router, publicProcedure, protectedProcedure } from "../_core/trpc";
 import { z } from "zod";
-import { getDb } from "../db";
-import { pages } from "../../drizzle/schema";
-import { eq } from "drizzle-orm";
+import * as db from "../db";
+import { TRPCError } from "@trpc/server";
+
+const adminProcedure = protectedProcedure.use(({ ctx, next }) => {
+  if (ctx.user.role !== 'admin') {
+    throw new TRPCError({ code: 'FORBIDDEN', message: 'Admin access required' });
+  }
+  return next({ ctx });
+});
 
 export const pagesRouter = router({
   getBySlug: publicProcedure
     .input(z.object({ slug: z.string() }))
     .query(async ({ input }) => {
-      const db = await getDb();
-      if (!db) return null;
+      return await db.getPageBySlug(input.slug);
+    }),
 
-      const result = await db
-        .select()
-        .from(pages)
-        .where(eq(pages.slug, input.slug))
-        .limit(1);
+  listAll: adminProcedure.query(async () => {
+    return await db.getAllPages();
+  }),
 
-      return result.length > 0 ? result[0] : null;
+  getById: adminProcedure
+    .input(z.object({ id: z.number() }))
+    .query(async ({ input }) => {
+      const page = await db.getPageById(input.id);
+      if (!page) throw new TRPCError({ code: 'NOT_FOUND', message: 'Page not found' });
+      return page;
+    }),
+
+  create: adminProcedure
+    .input(z.object({
+      slug: z.string().min(1),
+      seoMeta: z.string(),
+      active: z.boolean().default(true),
+    }))
+    .mutation(async ({ input }) => {
+      return await db.createPage(input);
+    }),
+
+  update: adminProcedure
+    .input(z.object({
+      id: z.number(),
+      slug: z.string().optional(),
+      seoMeta: z.string().optional(),
+      active: z.boolean().optional(),
+    }))
+    .mutation(async ({ input }) => {
+      const { id, ...updates } = input;
+      await db.updatePage(id, updates);
+      return { success: true };
+    }),
+
+  delete: adminProcedure
+    .input(z.object({ id: z.number() }))
+    .mutation(async ({ input }) => {
+      await db.deletePage(input.id);
+      return { success: true };
     }),
 });
