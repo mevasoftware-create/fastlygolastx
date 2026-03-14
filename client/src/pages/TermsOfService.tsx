@@ -8,7 +8,7 @@ import { useSeoFromDatabase } from "@/hooks/useSeoFromDatabase";
 export default function TermsOfService() {
   const { language } = useLanguage();
   const { t } = useTranslation();
-  const { data: pageData } = trpc.pages.getBySlug.useQuery({ slug: 'terms' }, {
+  const { data: pageData, isLoading: isPageLoading } = trpc.pages.getBySlug.useQuery({ slug: 'terms' }, {
     retry: false,
     refetchOnWindowFocus: false,
   });
@@ -181,10 +181,11 @@ export default function TermsOfService() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-orange-50/30 via-white to-orange-50/20">
       <SEOHead 
-        title={seoData.title || 'Terms of Service - FastlyGo Courier & Delivery Agreement'}
-        description={seoData.description || 'FastlyGo terms of service and conditions of use. Read our complete service agreement, user responsibilities, and liability terms.'}
+        title={seoData.title || ''}
+        description={seoData.description || ''}
         keywords={seoData.keywords}
         structuredData={structuredData}
+        isLoading={isPageLoading}
       />
       <Header />
       

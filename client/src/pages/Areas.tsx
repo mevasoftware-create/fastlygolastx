@@ -47,7 +47,7 @@ export default function Areas() {
   const markersRef = useRef<Map<number, any>>(new Map());
   const infoWindowRef = useRef<any>(null);
 
-  const { data: pageData } = trpc.pages.getBySlug.useQuery({ slug: 'areas' });
+  const { data: pageData, isLoading: isPageLoading } = trpc.pages.getBySlug.useQuery({ slug: 'areas' });
   const pageSeoMeta = pageData?.seoMeta ? (typeof pageData.seoMeta === 'string' ? JSON.parse(pageData.seoMeta) : pageData.seoMeta) : null;
   const seoData = pageSeoMeta?.[language] || pageSeoMeta?.en || {};
 
@@ -161,9 +161,10 @@ export default function Areas() {
   return (
     <>
       <SEOHead
-        title={seoData.title || 'Delivery Areas - FastlyGo'}
-        description={seoData.description || 'Explore our delivery coverage areas across North Macedonia.'}
-        keywords={seoData.keywords || 'delivery areas, Skopje delivery, courier service'}
+        title={seoData.title || ''}
+        description={seoData.description || ''}
+        keywords={seoData.keywords || ''}
+        isLoading={isPageLoading}
       />
 
       <div className="min-h-screen flex flex-col bg-white">

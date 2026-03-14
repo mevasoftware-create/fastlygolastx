@@ -8,7 +8,7 @@ import { useSeoFromDatabase } from "@/hooks/useSeoFromDatabase";
 export default function PrivacyPolicy() {
   const { language } = useLanguage();
   const { t } = useTranslation();
-  const { data: pageData } = trpc.pages.getBySlug.useQuery({ slug: 'privacy' }, {
+  const { data: pageData, isLoading: isPageLoading } = trpc.pages.getBySlug.useQuery({ slug: 'privacy' }, {
     retry: false,
     refetchOnWindowFocus: false,
   });
@@ -181,10 +181,11 @@ export default function PrivacyPolicy() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-orange-50/30 via-white to-orange-50/20">
       <SEOHead 
-        title={seoData.title || 'Privacy Policy - FastlyGo Courier & Delivery Service'}
-        description={seoData.description || 'FastlyGo privacy policy and data protection information. Learn how we collect, use, and protect your personal data.'}
+        title={seoData.title || ''}
+        description={seoData.description || ''}
         keywords={seoData.keywords}
         structuredData={structuredData}
+        isLoading={isPageLoading}
       />
       <Header />
       

@@ -29,19 +29,6 @@ function detectLanguageFromUrl(url: string, acceptLanguage?: string): string {
   return "en";
 }
 
-function buildHreflangTags(pathname: string, baseUrl: string = "https://fastlygo.mk"): string {
-  const tags: string[] = [];
-  // x-default and EN point to the base URL without lang param
-  tags.push(`<link rel="alternate" hreflang="x-default" href="${baseUrl}${pathname}"/>`);
-  tags.push(`<link rel="alternate" hreflang="en" href="${baseUrl}${pathname}"/>`);
-  // Other languages use ?lang= param
-  for (const lang of ["tr", "mk", "sq"] as const) {
-    const sep = pathname.includes("?") ? "&" : "?";
-    tags.push(`<link rel="alternate" hreflang="${lang}" href="${baseUrl}${pathname}${sep}lang=${lang}"/>`);
-  }
-  return tags.join("\n  ");
-}
-
 function parseSeoMeta(seoMetaRaw: any, language: string): { title: string; description: string } {
   try {
     const seoMeta = typeof seoMetaRaw === "string" ? JSON.parse(seoMetaRaw) : seoMetaRaw;
@@ -91,7 +78,10 @@ async function getSeoForUrl(url: string, acceptLanguage?: string): Promise<{ tit
   }
 }
 
-function injectSeoIntoHtml(html: string, title: string, description: string, pathname?: string): string {
+// Server-side SEO injection: only injects title + description into static HTML
+// so Google bot sees correct content before JS executes.
+// hreflang tags are handled by SEOHead component (React 19 head hoisting) - no duplication needed.
+function injectSeoIntoHtml(html: string, title: string, description: string): string {
   if (!title) return html;
   const esc = (s: string) => s.replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
   const safeTitle = esc(title);
@@ -102,13 +92,6 @@ function injectSeoIntoHtml(html: string, title: string, description: string, pat
     if (html.includes('name="description"')) html = html.replace(/<meta name="description"[^>]*\/?>/, `<meta name="description" content="${safeDesc}"/>`);
     else html = html.replace("</head>", `  <meta name="description" content="${safeDesc}"/>\n</head>`);
     if (html.includes('property="og:description"')) html = html.replace(/<meta property="og:description"[^>]*\/?>/, `<meta property="og:description" content="${safeDesc}"/>`);
-  }
-  // Inject hreflang tags for multilingual pages
-  if (pathname) {
-    // Remove any existing hreflang tags first to avoid duplicates
-    html = html.replace(/<link rel="alternate" hreflang="[^"]*"[^>]*\/?>\n?/g, "");
-    const hreflangTags = buildHreflangTags(pathname);
-    html = html.replace("</head>", `  ${hreflangTags}\n</head>`);
   }
   return html;
 }
@@ -158,10 +141,10 @@ export async function setupVite(app: Express, server: Server) {
       );
       let page = await vite.transformIndexHtml(url, template);
       // Server-side SEO injection - inject correct title/description for Google bot
+      // Language detection: ?lang= param → Accept-Language header → default EN
       const acceptLang = req.headers["accept-language"] as string | undefined;
       const seoData = await getSeoForUrl(url, acceptLang);
-      const pathname = url.split("?")[0];
-      if (seoData?.title) page = injectSeoIntoHtml(page, seoData.title, seoData.description, pathname);
+      if (seoData?.title) page = injectSeoIntoHtml(page, seoData.title, seoData.description);
       res.status(200).set({ "Content-Type": "text/html" }).end(page);
     } catch (e) {
       vite.ssrFixStacktrace(e as Error);
@@ -192,8 +175,7 @@ export function serveStatic(app: Express) {
       // Server-side SEO injection
       const acceptLang = (req as any).headers?.["accept-language"] as string | undefined;
       const seoData = await getSeoForUrl(url, acceptLang).catch(() => null);
-      const pathname2 = url.split("?")[0];
-      if (seoData?.title) html = injectSeoIntoHtml(html, seoData.title, seoData.description, pathname2);
+      if (seoData?.title) html = injectSeoIntoHtml(html, seoData.title, seoData.description);
       res.status(200).set({ "Content-Type": "text/html" }).end(html);
     });
   });
