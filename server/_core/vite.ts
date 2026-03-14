@@ -13,11 +13,33 @@ import { eq } from "drizzle-orm";
 const seoCache = new Map<string, { title: string; description: string; expiry: number }>();
 const CACHE_TTL = 10 * 60 * 1000; // 10 minutes
 
-function detectLanguageFromUrl(url: string): string {
+const SUPPORTED_LANGS = ["en", "tr", "mk", "sq"] as const;
+type SupportedLang = typeof SUPPORTED_LANGS[number];
+
+function detectLanguageFromUrl(url: string, acceptLanguage?: string): string {
+  // 1. ?lang= query param takes priority
   const params = new URLSearchParams(url.includes("?") ? url.split("?")[1] : "");
   const lang = params.get("lang");
-  if (lang && ["tr", "mk", "sq", "en"].includes(lang)) return lang;
+  if (lang && SUPPORTED_LANGS.includes(lang as SupportedLang)) return lang;
+  // 2. Accept-Language header fallback
+  if (acceptLanguage) {
+    const preferred = acceptLanguage.split(",")[0].split("-")[0].toLowerCase();
+    if (SUPPORTED_LANGS.includes(preferred as SupportedLang)) return preferred;
+  }
   return "en";
+}
+
+function buildHreflangTags(pathname: string, baseUrl: string = "https://fastlygo.mk"): string {
+  const tags: string[] = [];
+  // x-default and EN point to the base URL without lang param
+  tags.push(`<link rel="alternate" hreflang="x-default" href="${baseUrl}${pathname}"/>`);
+  tags.push(`<link rel="alternate" hreflang="en" href="${baseUrl}${pathname}"/>`);
+  // Other languages use ?lang= param
+  for (const lang of ["tr", "mk", "sq"] as const) {
+    const sep = pathname.includes("?") ? "&" : "?";
+    tags.push(`<link rel="alternate" hreflang="${lang}" href="${baseUrl}${pathname}${sep}lang=${lang}"/>`);
+  }
+  return tags.join("\n  ");
 }
 
 function parseSeoMeta(seoMetaRaw: any, language: string): { title: string; description: string } {
@@ -30,12 +52,14 @@ function parseSeoMeta(seoMetaRaw: any, language: string): { title: string; descr
   }
 }
 
-async function getSeoForUrl(url: string): Promise<{ title: string; description: string } | null> {
+async function getSeoForUrl(url: string, acceptLanguage?: string): Promise<{ title: string; description: string } | null> {
   const pathname = url.split("?")[0];
-  const language = detectLanguageFromUrl(url);
+  const language = detectLanguageFromUrl(url, acceptLanguage);
   const cacheKey = `${pathname}:${language}`;
   const cached = seoCache.get(cacheKey);
   if (cached && cached.expiry > Date.now()) return { title: cached.title, description: cached.description };
+  // Also cache all languages at once for this pathname to reduce DB hits
+  const allLangsCacheKey = `${pathname}:__all`;
   try {
     const db = await getDb();
     if (!db) return null;
@@ -67,7 +91,7 @@ async function getSeoForUrl(url: string): Promise<{ title: string; description: 
   }
 }
 
-function injectSeoIntoHtml(html: string, title: string, description: string): string {
+function injectSeoIntoHtml(html: string, title: string, description: string, pathname?: string): string {
   if (!title) return html;
   const esc = (s: string) => s.replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
   const safeTitle = esc(title);
@@ -78,6 +102,13 @@ function injectSeoIntoHtml(html: string, title: string, description: string): st
     if (html.includes('name="description"')) html = html.replace(/<meta name="description"[^>]*\/?>/, `<meta name="description" content="${safeDesc}"/>`);
     else html = html.replace("</head>", `  <meta name="description" content="${safeDesc}"/>\n</head>`);
     if (html.includes('property="og:description"')) html = html.replace(/<meta property="og:description"[^>]*\/?>/, `<meta property="og:description" content="${safeDesc}"/>`);
+  }
+  // Inject hreflang tags for multilingual pages
+  if (pathname) {
+    // Remove any existing hreflang tags first to avoid duplicates
+    html = html.replace(/<link rel="alternate" hreflang="[^"]*"[^>]*\/?>\n?/g, "");
+    const hreflangTags = buildHreflangTags(pathname);
+    html = html.replace("</head>", `  ${hreflangTags}\n</head>`);
   }
   return html;
 }
@@ -127,8 +158,10 @@ export async function setupVite(app: Express, server: Server) {
       );
       let page = await vite.transformIndexHtml(url, template);
       // Server-side SEO injection - inject correct title/description for Google bot
-      const seoData = await getSeoForUrl(url);
-      if (seoData?.title) page = injectSeoIntoHtml(page, seoData.title, seoData.description);
+      const acceptLang = req.headers["accept-language"] as string | undefined;
+      const seoData = await getSeoForUrl(url, acceptLang);
+      const pathname = url.split("?")[0];
+      if (seoData?.title) page = injectSeoIntoHtml(page, seoData.title, seoData.description, pathname);
       res.status(200).set({ "Content-Type": "text/html" }).end(page);
     } catch (e) {
       vite.ssrFixStacktrace(e as Error);
@@ -157,8 +190,10 @@ export function serveStatic(app: Express) {
     fs.readFile(indexPath, "utf-8", async (err, html) => {
       if (err) { res.sendFile(indexPath); return; }
       // Server-side SEO injection
-      const seoData = await getSeoForUrl(url).catch(() => null);
-      if (seoData?.title) html = injectSeoIntoHtml(html, seoData.title, seoData.description);
+      const acceptLang = (req as any).headers?.["accept-language"] as string | undefined;
+      const seoData = await getSeoForUrl(url, acceptLang).catch(() => null);
+      const pathname2 = url.split("?")[0];
+      if (seoData?.title) html = injectSeoIntoHtml(html, seoData.title, seoData.description, pathname2);
       res.status(200).set({ "Content-Type": "text/html" }).end(html);
     });
   });
