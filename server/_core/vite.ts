@@ -5,8 +5,82 @@ import { nanoid } from "nanoid";
 import path from "path";
 import { createServer as createViteServer } from "vite";
 import viteConfig from "../../vite.config";
-// injectSeoTags DISABLED - Manus auto SEO removed, site uses custom SEO
-// import { injectSeoTags } from "./seoMiddleware";
+import { getDb } from "../db";
+import { areas, categories, pages } from "../../drizzle/schema";
+import { eq } from "drizzle-orm";
+
+// SEO cache to avoid DB hits on every request
+const seoCache = new Map<string, { title: string; description: string; expiry: number }>();
+const CACHE_TTL = 10 * 60 * 1000; // 10 minutes
+
+function detectLanguageFromUrl(url: string): string {
+  const params = new URLSearchParams(url.includes("?") ? url.split("?")[1] : "");
+  const lang = params.get("lang");
+  if (lang && ["tr", "mk", "sq", "en"].includes(lang)) return lang;
+  return "en";
+}
+
+function parseSeoMeta(seoMetaRaw: any, language: string): { title: string; description: string } {
+  try {
+    const seoMeta = typeof seoMetaRaw === "string" ? JSON.parse(seoMetaRaw) : seoMetaRaw;
+    const data = seoMeta?.[language] || seoMeta?.en || {};
+    return { title: data.title || "", description: data.description || "" };
+  } catch {
+    return { title: "", description: "" };
+  }
+}
+
+async function getSeoForUrl(url: string): Promise<{ title: string; description: string } | null> {
+  const pathname = url.split("?")[0];
+  const language = detectLanguageFromUrl(url);
+  const cacheKey = `${pathname}:${language}`;
+  const cached = seoCache.get(cacheKey);
+  if (cached && cached.expiry > Date.now()) return { title: cached.title, description: cached.description };
+  try {
+    const db = await getDb();
+    if (!db) return null;
+    let result: { title: string; description: string } | null = null;
+    const areaMatch = pathname.match(/^\/areas\/([^/?]+)$/);
+    if (areaMatch) {
+      const rows = await db.select({ seoMeta: areas.seoMeta }).from(areas).where(eq(areas.slug, areaMatch[1])).limit(1);
+      if (rows[0]) result = parseSeoMeta(rows[0].seoMeta, language);
+    }
+    const catMatch = pathname.match(/^\/categories\/([^/?]+)$/);
+    if (catMatch) {
+      const rows = await db.select({ seoMeta: categories.seoMeta }).from(categories).where(eq(categories.slug, catMatch[1])).limit(1);
+      if (rows[0]) result = parseSeoMeta(rows[0].seoMeta, language);
+    }
+    const staticPageSlugs: Record<string, string> = {
+      "/": "home", "/areas": "areas", "/categories": "categories",
+      "/about-us": "about-us", "/how-it-works": "how-it-works",
+      "/services": "services", "/privacy-policy": "privacy-policy",
+      "/terms-of-service": "terms-of-service",
+    };
+    if (staticPageSlugs[pathname]) {
+      const rows = await db.select({ seoMeta: pages.seoMeta }).from(pages).where(eq(pages.slug, staticPageSlugs[pathname])).limit(1);
+      if (rows[0]) result = parseSeoMeta(rows[0].seoMeta, language);
+    }
+    if (result?.title) seoCache.set(cacheKey, { ...result, expiry: Date.now() + CACHE_TTL });
+    return result;
+  } catch {
+    return null;
+  }
+}
+
+function injectSeoIntoHtml(html: string, title: string, description: string): string {
+  if (!title) return html;
+  const esc = (s: string) => s.replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  const safeTitle = esc(title);
+  const safeDesc = esc(description || "");
+  html = html.replace(/<title>[^<]*<\/title>/, `<title>${safeTitle}</title>`);
+  if (html.includes('property="og:title"')) html = html.replace(/<meta property="og:title"[^>]*\/?>/, `<meta property="og:title" content="${safeTitle}"/>`);
+  if (safeDesc) {
+    if (html.includes('name="description"')) html = html.replace(/<meta name="description"[^>]*\/?>/, `<meta name="description" content="${safeDesc}"/>`);
+    else html = html.replace("</head>", `  <meta name="description" content="${safeDesc}"/>\n</head>`);
+    if (html.includes('property="og:description"')) html = html.replace(/<meta property="og:description"[^>]*\/?>/, `<meta property="og:description" content="${safeDesc}"/>`);
+  }
+  return html;
+}
 
 export async function setupVite(app: Express, server: Server) {
   const serverPort = parseInt(process.env.PORT || "3000");
@@ -52,8 +126,9 @@ export async function setupVite(app: Express, server: Server) {
         `src="/src/main.tsx?v=${nanoid()}"`
       );
       let page = await vite.transformIndexHtml(url, template);
-      // SEO tag injection DISABLED - Manus auto SEO removed, site uses custom SEO
-      // page = injectSeoTags(page, url);
+      // Server-side SEO injection - inject correct title/description for Google bot
+      const seoData = await getSeoForUrl(url);
+      if (seoData?.title) page = injectSeoIntoHtml(page, seoData.title, seoData.description);
       res.status(200).set({ "Content-Type": "text/html" }).end(page);
     } catch (e) {
       vite.ssrFixStacktrace(e as Error);
@@ -78,14 +153,12 @@ export function serveStatic(app: Express) {
   // fall through to index.html if the file doesn't exist
   app.use("*", (req, res) => {
     const indexPath = path.resolve(distPath, "index.html");
-    fs.readFile(indexPath, "utf-8", (err, html) => {
-      if (err) {
-        res.sendFile(indexPath);
-        return;
-      }
-      // SEO tag injection DISABLED - Manus auto SEO removed, site uses custom SEO
-      // const url = req.originalUrl || req.url;
-      // const injectedHtml = injectSeoTags(html, url);
+    const url = req.originalUrl || req.url;
+    fs.readFile(indexPath, "utf-8", async (err, html) => {
+      if (err) { res.sendFile(indexPath); return; }
+      // Server-side SEO injection
+      const seoData = await getSeoForUrl(url).catch(() => null);
+      if (seoData?.title) html = injectSeoIntoHtml(html, seoData.title, seoData.description);
       res.status(200).set({ "Content-Type": "text/html" }).end(html);
     });
   });

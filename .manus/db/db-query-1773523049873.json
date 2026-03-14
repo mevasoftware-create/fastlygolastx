@@ -1,0 +1,18 @@
+{
+  "query": "SELECT slug, LEFT(seoMeta, 500) as seoMeta_preview FROM pages WHERE slug IN ('areas', 'categories', 'home') LIMIT 10;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4EV5ivwhyC7eCUY.ebc471170149 --database 4KwtmFvvd67FSFhQ5dyp9H --execute SELECT slug, LEFT(seoMeta, 500) as seoMeta_preview FROM pages WHERE slug IN ('areas', 'categories', 'home') LIMIT 10;",
+  "rows": [
+    {
+      "slug": "areas",
+      "seoMeta_preview": "{\"tr\": {\"title\": \"Teslimat B\\u00f6lgeleri | FastlyGo\", \"description\": \"Kuzey Makedonya genelinde h\\u0131zl\\u0131 ve g\\u00fcvenilir teslimat hizmeti. \\u00dcsk\\u00fcp, Tetovo, Bitola, Ohri ve daha fazla \\u015fehirde teslimat b\\u00f6lgelerimizi ke\\u015ffedin.\", \"keywords\": \"teslimat b\\u00f6lgeleri, \\u00dcsk\\u00fcp teslimat, Tetovo teslimat, Bitola teslimat, Ohri teslimat, kurye hizmet alanlar\\u0131\", \"heading\": \"Teslimat Yapt\\u0131\\u011f\\u0131m\\u0131z B\\u00f6lgeler\"}, \"en\": {\"title\": \"Delivery Area"
+    },
+    {
+      "slug": "home",
+      "seoMeta_preview": "{\"en\": {\"title\": \"FastlyGo - Food Delivery, Courier & Cargo Service in Skopje\", \"description\": \"Professional food delivery, courier and cargo service in Skopje, Macedonia. Fast delivery in 15 minutes, real-time tracking, affordable prices. Order courier now!\", \"keywords\": \"food delivery, courier service, cargo delivery, Skopje, Macedonia, fast delivery, package delivery, motorcycle courier, express delivery, delivery service\"}, \"tr\": {\"title\": \"FastlyGo - Yemek Teslimatı, Kurye ve Kargo Hizmeti "
+    }
+  ],
+  "messages": [],
+  "stdout": "slug\tseoMeta_preview\nareas\t{\"tr\": {\"title\": \"Teslimat B\\u00f6lgeleri | FastlyGo\", \"description\": \"Kuzey Makedonya genelinde h\\u0131zl\\u0131 ve g\\u00fcvenilir teslimat hizmeti. \\u00dcsk\\u00fcp, Tetovo, Bitola, Ohri ve daha fazla \\u015fehirde teslimat b\\u00f6lgelerimizi ke\\u015ffedin.\", \"keywords\": \"teslimat b\\u00f6lgeleri, \\u00dcsk\\u00fcp teslimat, Tetovo teslimat, Bitola teslimat, Ohri teslimat, kurye hizmet alanlar\\u0131\", \"heading\": \"Teslimat Yapt\\u0131\\u011f\\u0131m\\u0131z B\\u00f6lgeler\"}, \"en\": {\"title\": \"Delivery Area\nhome\t{\"en\": {\"title\": \"FastlyGo - Food Delivery, Courier & Cargo Service in Skopje\", \"description\": \"Professional food delivery, courier and cargo service in Skopje, Macedonia. Fast delivery in 15 minutes, real-time tracking, affordable prices. Order courier now!\", \"keywords\": \"food delivery, courier service, cargo delivery, Skopje, Macedonia, fast delivery, package delivery, motorcycle courier, express delivery, delivery service\"}, \"tr\": {\"title\": \"FastlyGo - Yemek Teslimatı, Kurye ve Kargo Hizmeti \n",
+  "stderr": "",
+  "execution_time_ms": 64
+}

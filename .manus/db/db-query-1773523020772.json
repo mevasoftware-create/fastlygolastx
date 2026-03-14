@@ -1,0 +1,30 @@
+{
+  "query": "SELECT slug, LEFT(seoMeta, 300) as seoMeta_preview FROM areas LIMIT 5;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4EV5ivwhyC7eCUY.ebc471170149 --database 4KwtmFvvd67FSFhQ5dyp9H --execute SELECT slug, LEFT(seoMeta, 300) as seoMeta_preview FROM areas LIMIT 5;",
+  "rows": [
+    {
+      "slug": "aerodrom",
+      "seoMeta_preview": "{\"en\": {\"description\": \"FastlyGo delivers in Aerodrom — food, groceries, pharmacy & parcels. Near Skopje Airport. 15-min express courier, 7 days a week, live GPS tracking.\", \"heading\": \"Aerodrom\", \"keywords\": \"delivery aerodrom skopje, courier aerodrom, food delivery aerodrom, express delivery skopj"
+    },
+    {
+      "slug": "centar",
+      "seoMeta_preview": "{\"en\": {\"description\": \"FastlyGo delivers in Centar, Skopje city center — food, groceries, pharmacy & packages. 15-min express courier with live GPS tracking, 7 days a week.\", \"heading\": \"Centar\", \"keywords\": \"delivery centar skopje, courier city center skopje, food delivery centar, express delivery"
+    },
+    {
+      "slug": "karpos",
+      "seoMeta_preview": "{\"en\": {\"description\": \"FastlyGo delivers in Karpos, Skopje's most prestigious residential area — food, groceries, pharmacy & packages. 15-min courier, GPS tracking, 7 days.\", \"heading\": \"Karpos\", \"keywords\": \"delivery karpos skopje, courier karpos, food delivery karpos, express delivery karpos skop"
+    },
+    {
+      "slug": "kisela-voda",
+      "seoMeta_preview": "{\"en\": {\"description\": \"FastlyGo delivers in Kisela Voda, Skopje's largest municipality — food, groceries, pharmacy & parcels. 15-min express courier, live GPS, 7 days a week.\", \"heading\": \"Kisela Voda\", \"keywords\": \"delivery kisela voda skopje, courier kisela voda, food delivery kisela voda, fastly"
+    },
+    {
+      "slug": "cair",
+      "seoMeta_preview": "{\"en\": {\"description\": \"FastlyGo delivers in Cair, Skopje's historic and cultural neighborhood — food, groceries, pharmacy & packages. Express courier in 15 min, 7 days a week.\", \"heading\": \"Cair\", \"keywords\": \"delivery cair skopje, courier cair, food delivery cair skopje, express delivery cair, fas"
+    }
+  ],
+  "messages": [],
+  "stdout": "slug\tseoMeta_preview\naerodrom\t{\"en\": {\"description\": \"FastlyGo delivers in Aerodrom — food, groceries, pharmacy & parcels. Near Skopje Airport. 15-min express courier, 7 days a week, live GPS tracking.\", \"heading\": \"Aerodrom\", \"keywords\": \"delivery aerodrom skopje, courier aerodrom, food delivery aerodrom, express delivery skopj\ncentar\t{\"en\": {\"description\": \"FastlyGo delivers in Centar, Skopje city center — food, groceries, pharmacy & packages. 15-min express courier with live GPS tracking, 7 days a week.\", \"heading\": \"Centar\", \"keywords\": \"delivery centar skopje, courier city center skopje, food delivery centar, express delivery\nkarpos\t{\"en\": {\"description\": \"FastlyGo delivers in Karpos, Skopje's most prestigious residential area — food, groceries, pharmacy & packages. 15-min courier, GPS tracking, 7 days.\", \"heading\": \"Karpos\", \"keywords\": \"delivery karpos skopje, courier karpos, food delivery karpos, express delivery karpos skop\nkisela-voda\t{\"en\": {\"description\": \"FastlyGo delivers in Kisela Voda, Skopje's largest municipality — food, groceries, pharmacy & parcels. 15-min express courier, live GPS, 7 days a week.\", \"heading\": \"Kisela Voda\", \"keywords\": \"delivery kisela voda skopje, courier kisela voda, food delivery kisela voda, fastly\ncair\t{\"en\": {\"description\": \"FastlyGo delivers in Cair, Skopje's historic and cultural neighborhood — food, groceries, pharmacy & packages. Express courier in 15 min, 7 days a week.\", \"heading\": \"Cair\", \"keywords\": \"delivery cair skopje, courier cair, food delivery cair skopje, express delivery cair, fas\n",
+  "stderr": "",
+  "execution_time_ms": 54
+}

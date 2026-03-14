@@ -13,7 +13,7 @@ import { createContext } from "./context";
 import { serveStatic, setupVite } from "./vite";
 import { initializeSocketIO } from "./socket";
 import { defaultRateLimit, lenientRateLimit, logRateLimitInfo } from "./rateLimit";
-import { seoMiddleware } from "./seoMiddleware";
+import { seoMiddleware, seoMiddlewareHandler } from "./seoMiddleware";
 import jwt from "jsonwebtoken";
 import { getDb } from "../db";
 
@@ -177,8 +177,9 @@ async function startServer() {
     });
   });
 
-  // robots.txt and sitemap.xml - DISABLED (Manus auto SEO removed)
-  // Custom robots.txt and sitemap.xml should be placed in client/public/ folder
+  // Dynamic sitemap.xml - serves all area and category URLs with hreflang
+  const { default: sitemapRouter } = await import("../sitemapRouter");
+  app.use(sitemapRouter);
 
   // OAuth routes handled separately
   
