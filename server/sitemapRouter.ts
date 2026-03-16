@@ -6,6 +6,8 @@ import { Router, Request, Response } from "express";
 import { getDb } from "./db";
 import { areas, categories } from "../drizzle/schema";
 import { eq } from "drizzle-orm";
+import path from "path";
+import fs from "fs";
 
 const router = Router();
 
@@ -17,7 +19,7 @@ let sitemapCache: string | null = null;
 let sitemapCacheExpiry = 0;
 const SITEMAP_CACHE_TTL = 60 * 60 * 1000; // 1 hour
 
-async function generateSitemap(): Promise<string> {
+export async function generateSitemap(): Promise<string> {
   if (sitemapCache && sitemapCacheExpiry > Date.now()) {
     return sitemapCache;
   }
@@ -110,6 +112,40 @@ async function generateSitemap(): Promise<string> {
   sitemapCacheExpiry = Date.now() + SITEMAP_CACHE_TTL;
 
   return xml;
+}
+
+/**
+ * Refresh sitemap: regenerate and write to static files
+ * Called by admin panel "Refresh Sitemap" button
+ */
+export async function refreshSitemapFile(): Promise<{ success: boolean; urlCount: number; writtenPaths: string[] }> {
+  // Invalidate cache to force regeneration
+  sitemapCache = null;
+  sitemapCacheExpiry = 0;
+
+  const xml = await generateSitemap();
+  const urlCount = (xml.match(/<url>/g) || []).length;
+  const writtenPaths: string[] = [];
+
+  // Write to dist/public (production) and client/public (dev)
+  const candidatePaths = [
+    path.resolve(process.cwd(), "dist", "public", "sitemap.xml"),
+    path.resolve(process.cwd(), "client", "public", "sitemap.xml"),
+  ];
+
+  for (const filePath of candidatePaths) {
+    try {
+      if (fs.existsSync(path.dirname(filePath))) {
+        fs.writeFileSync(filePath, xml, "utf-8");
+        writtenPaths.push(filePath);
+        console.log(`[Sitemap] Written to ${filePath} (${urlCount} URLs)`);
+      }
+    } catch (err) {
+      console.error(`[Sitemap] Failed to write to ${filePath}:`, err);
+    }
+  }
+
+  return { success: true, urlCount, writtenPaths };
 }
 
 router.get("/sitemap.xml", async (req: Request, res: Response) => {

@@ -132,6 +132,7 @@ const menuGroups: MenuItem[] = [
       { icon: Wrench, label: "Site Ayarları", path: "/admin/site-settings" },
       { icon: ArrowLeftRight, label: "Yönlendirmeler", path: "/admin/redirects" },
       { icon: Smartphone, label: "Uygulama Versiyonları", path: "/admin/app-versions" },
+      { icon: Globe, label: "SEO Yönetimi", path: "/admin/seo" },
     ],
   },
 ];

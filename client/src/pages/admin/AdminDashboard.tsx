@@ -26,6 +26,7 @@ import { AdminSiteSettings } from "./AdminSiteSettings";
 import { AdminRedirects } from "./AdminRedirects";
 import { AdminReferrals } from "./AdminReferrals";
 import { AdminAppVersions } from "./AdminAppVersions";
+import AdminSEO from "./AdminSEO";
 import { io, Socket } from "socket.io-client";
 import { toast } from "sonner";
 
@@ -131,6 +132,7 @@ export default function AdminDashboard() {
         <Route path="/admin/redirects" component={AdminRedirects} />
         <Route path="/admin/referrals" component={AdminReferrals} />
         <Route path="/admin/app-versions" component={AdminAppVersions} />
+        <Route path="/admin/seo" component={AdminSEO} />
       </Switch>
     </AdminDashboardLayout>
   );
