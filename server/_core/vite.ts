@@ -163,7 +163,17 @@ export function serveStatic(app: Express) {
       `Could not find the build directory: ${distPath}, make sure to build the client first`
     );
   }
-
+  // Serve sitemap.xml dynamically BEFORE express.static so Manus's static sitemap doesn't override ours
+  app.get("/sitemap.xml", async (_req, res) => {
+    try {
+      const { generateSitemap } = await import("../sitemapRouter");
+      const xml = await generateSitemap();
+      res.set("Content-Type", "application/xml").send(xml);
+    } catch (e) {
+      console.error("[sitemap] Error generating sitemap:", e);
+      res.status(500).send("Error generating sitemap");
+    }
+  });
   app.use(express.static(distPath));
 
   // fall through to index.html if the file doesn't exist
