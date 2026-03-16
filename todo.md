@@ -176,3 +176,14 @@
 - [x] Backend: referans admin endpoint'leri (listAll, getStats)
 - [x] Backend: uygulama versiyonları admin endpoint'leri (listAll, update, delete)
 - [x] AdminDashboard route ve sidebar güncellemeleri
+
+## /areas Sayfası Mobil Responsive Düzeltme (17.03.2026)
+- [x] Mobil için Liste/Harita sekme sistemi eklendi (md:hidden tab switcher)
+- [x] Masaüstü için yan yana panel düzeni iyileştirildi (w-72/w-80 sabit liste, flex-1 harita)
+- [x] Mobil liste görünümü tam ekran yüksekliğinde (60vh min-height)
+- [x] Mobil harita görünümü tam ekran yüksekliğinde (60vh min-height)
+- [x] Alan seçildiğinde mobil'de otomatik harita sekmesine geçiş
+- [x] Arama çubuğuna temizle (X) butonu eklendi
+- [x] Seçili alan kartı mobil'de daha büyük ve kullanışlı
+- [x] isMobile state kaldırıldı, Tailwind breakpoint sınıfları kullanıldı
+- [x] Masaüstü liste paneli başlığı eklendi (All Areas / alan sayısı)
