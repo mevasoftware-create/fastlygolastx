@@ -10,7 +10,6 @@ import {
 } from "../../drizzle/schema";
 import { eq, and, desc, sql, gte, lte } from "drizzle-orm";
 import { emitToUser } from "../_core/socket";
-import { refreshSitemapFile, generateSitemap } from "../sitemapRouter";
 
 export const adminRouter = router({
   /**
@@ -1506,23 +1505,4 @@ export const adminRouter = router({
       return { success: true };
     }),
 
-  // ─── SEO: Sitemap Management ───────────────────────────────────────────────
-  refreshSitemap: adminProcedure
-    .mutation(async () => {
-      const result = await refreshSitemapFile();
-      return result;
-    }),
-
-  getSitemapPreview: adminProcedure
-    .query(async () => {
-      const xml = await generateSitemap();
-      const urlCount = (xml.match(/<url>/g) || []).length;
-      const locMatches = xml.match(/<loc>(.*?)<\/loc>/g) || [];
-      const urls: string[] = [];
-      for (const match of locMatches) {
-        const url = match.replace(/<\/?loc>/g, "");
-        if (!urls.includes(url)) urls.push(url);
-      }
-      return { urlCount, urls };
-    }),
 });

@@ -177,6 +177,15 @@
 - [x] Backend: uygulama versiyonları admin endpoint'leri (listAll, update, delete)
 - [x] AdminDashboard route ve sidebar güncellemeleri
 
+## Sitemap 4 Dilli hreflang Yapısı (17.03.2026)
+- [x] Dinamik sitemapRouter.ts kaldırıldı
+- [x] server/_core/vite.ts ve index.ts'ten sitemap middleware temizlendi
+- [x] AdminSEO.tsx fiziksel dosyayı fetch ederek gösterecek şekilde güncellendi
+- [x] sitemap.xml 35 URL → 140 URL bloğuna dönüştürüldü (35 sayfa × 4 dil)
+- [x] Her URL bloğu x-default + en/tr/mk/sq çapraz hreflang referansları içeriyor
+- [x] Netlify deploy için _redirects SPA routing kuralı eklendi
+- [x] netlify.toml oluşturuldu
+
 ## /areas Sayfası Mobil Responsive Düzeltme (17.03.2026)
 - [x] Mobil için Liste/Harita sekme sistemi eklendi (md:hidden tab switcher)
 - [x] Masaüstü için yan yana panel düzeni iyileştirildi (w-72/w-80 sabit liste, flex-1 harita)

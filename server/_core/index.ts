@@ -177,10 +177,6 @@ async function startServer() {
     });
   });
 
-  // Dynamic sitemap.xml - serves all area and category URLs with hreflang
-  const { default: sitemapRouter } = await import("../sitemapRouter");
-  app.use(sitemapRouter);
-
   // OAuth routes handled separately
   
   // Apply rate limiting to tRPC endpoints

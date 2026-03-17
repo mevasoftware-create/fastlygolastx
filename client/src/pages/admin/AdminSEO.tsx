@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { trpc } from "@/lib/trpc";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -18,20 +17,36 @@ import {
   AlertCircle,
 } from "lucide-react";
 
+interface SitemapData {
+  urlCount: number;
+  urls: string[];
+}
+
 export default function AdminSEO() {
   const [copied, setCopied] = useState(false);
+  const [sitemapData, setSitemapData] = useState<SitemapData | null>(null);
+  const [sitemapLoading, setSitemapLoading] = useState(false);
 
-  const { data: sitemapData, isLoading: sitemapLoading, refetch } = trpc.admin.getSitemapPreview.useQuery();
-
-  const refreshMutation = trpc.admin.refreshSitemap.useMutation({
-    onSuccess: (data) => {
-      toast.success(`Sitemap Yenilendi — ${data.urlCount} URL güncellendi`);
-      refetch();
-    },
-    onError: (err) => {
-      toast.error(err.message);
-    },
-  });
+  const fetchSitemap = async () => {
+    setSitemapLoading(true);
+    try {
+      const res = await fetch("/sitemap.xml");
+      const xml = await res.text();
+      const urlCount = (xml.match(/<url>/g) || []).length;
+      const locMatches = xml.match(/<loc>(.*?)<\/loc>/g) || [];
+      const urls: string[] = [];
+      for (const match of locMatches) {
+        const url = match.replace(/<\/?loc>/g, "");
+        if (!urls.includes(url)) urls.push(url);
+      }
+      setSitemapData({ urlCount, urls });
+      toast.success(`Sitemap yüklendi — ${urlCount} URL`);
+    } catch {
+      toast.error("Sitemap yüklenemedi");
+    } finally {
+      setSitemapLoading(false);
+    }
+  };
 
   const handleCopySitemapUrl = () => {
     navigator.clipboard.writeText("https://fastlygo.mk/sitemap.xml");
@@ -40,9 +55,9 @@ export default function AdminSEO() {
     toast.success("Sitemap URL panoya kopyalandı");
   };
 
-  const staticUrls = sitemapData?.urls.filter((u) => !u.includes("/areas/") && !u.includes("/categories/")) || [];
-  const areaUrls = sitemapData?.urls.filter((u) => u.includes("/areas/")) || [];
-  const categoryUrls = sitemapData?.urls.filter((u) => u.includes("/categories/")) || [];
+  const staticUrls = sitemapData?.urls.filter((u: string) => !u.includes("/areas/") && !u.includes("/categories/")) || [];
+  const areaUrls = sitemapData?.urls.filter((u: string) => u.includes("/areas/")) || [];
+  const categoryUrls = sitemapData?.urls.filter((u: string) => u.includes("/categories/")) || [];
 
   return (
     <div className="p-6 space-y-6 max-w-5xl mx-auto">
@@ -55,12 +70,12 @@ export default function AdminSEO() {
           </p>
         </div>
         <Button
-          onClick={() => refreshMutation.mutate()}
-          disabled={refreshMutation.isPending}
+          onClick={fetchSitemap}
+          disabled={sitemapLoading}
           className="gap-2"
         >
-          <RefreshCw className={`h-4 w-4 ${refreshMutation.isPending ? "animate-spin" : ""}`} />
-          {refreshMutation.isPending ? "Yenileniyor..." : "Sitemap Yenile"}
+          <RefreshCw className={`h-4 w-4 ${sitemapLoading ? "animate-spin" : ""}`} />
+          {sitemapLoading ? "Yükleniyor..." : "Sitemap Görüntüle"}
         </Button>
       </div>
 
@@ -86,7 +101,7 @@ export default function AdminSEO() {
                 <Map className="h-5 w-5 text-orange-600" />
               </div>
               <div>
-                <p className="text-2xl font-bold">{areaUrls.length}</p>
+                <p className="text-2xl font-bold">{areaUrls.length || "—"}</p>
                 <p className="text-sm text-muted-foreground">Bölge Sayfası</p>
               </div>
             </div>
@@ -99,7 +114,7 @@ export default function AdminSEO() {
                 <FileText className="h-5 w-5 text-green-600" />
               </div>
               <div>
-                <p className="text-2xl font-bold">{categoryUrls.length}</p>
+                <p className="text-2xl font-bold">{categoryUrls.length || "—"}</p>
                 <p className="text-sm text-muted-foreground">Kategori Sayfası</p>
               </div>
             </div>
@@ -206,7 +221,7 @@ export default function AdminSEO() {
             )}
           </CardTitle>
           <CardDescription>
-            Sitemap'te yer alan tüm sayfalar. Yeni bölge/kategori eklenince "Sitemap Yenile" butonuna tıklayın.
+            Sitemap'te yer alan tüm sayfalar. Güncel listeyi görmek için "Sitemap Görüntüle" butonuna tıklayın.
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -214,6 +229,11 @@ export default function AdminSEO() {
             <div className="flex items-center justify-center py-8 text-muted-foreground">
               <RefreshCw className="h-5 w-5 animate-spin mr-2" />
               Yükleniyor...
+            </div>
+          ) : !sitemapData ? (
+            <div className="flex items-center gap-2 text-muted-foreground py-4">
+              <AlertCircle className="h-4 w-4" />
+              <span className="text-sm">Sitemap'i görüntülemek için yukarıdaki "Sitemap Görüntüle" butonuna tıklayın.</span>
             </div>
           ) : (
             <div className="space-y-4">
@@ -225,15 +245,11 @@ export default function AdminSEO() {
                   </p>
                   <ScrollArea className="h-32">
                     <div className="space-y-1">
-                      {staticUrls.map((url) => (
+                      {staticUrls.map((url: string) => (
                         <div key={url} className="flex items-center gap-2 text-sm py-1">
                           <CheckCircle2 className="h-3 w-3 text-green-500 shrink-0" />
-                          <a
-                            href={url}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-muted-foreground hover:text-foreground hover:underline truncate"
-                          >
+                          <a href={url} target="_blank" rel="noopener noreferrer"
+                            className="text-muted-foreground hover:text-foreground hover:underline truncate">
                             {url}
                           </a>
                         </div>
@@ -253,15 +269,11 @@ export default function AdminSEO() {
                   </p>
                   <ScrollArea className="h-40">
                     <div className="space-y-1">
-                      {areaUrls.map((url) => (
+                      {areaUrls.map((url: string) => (
                         <div key={url} className="flex items-center gap-2 text-sm py-1">
                           <Map className="h-3 w-3 text-orange-500 shrink-0" />
-                          <a
-                            href={url}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-muted-foreground hover:text-foreground hover:underline truncate"
-                          >
+                          <a href={url} target="_blank" rel="noopener noreferrer"
+                            className="text-muted-foreground hover:text-foreground hover:underline truncate">
                             {url}
                           </a>
                         </div>
@@ -281,28 +293,17 @@ export default function AdminSEO() {
                   </p>
                   <ScrollArea className="h-32">
                     <div className="space-y-1">
-                      {categoryUrls.map((url) => (
+                      {categoryUrls.map((url: string) => (
                         <div key={url} className="flex items-center gap-2 text-sm py-1">
                           <FileText className="h-3 w-3 text-blue-500 shrink-0" />
-                          <a
-                            href={url}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-muted-foreground hover:text-foreground hover:underline truncate"
-                          >
+                          <a href={url} target="_blank" rel="noopener noreferrer"
+                            className="text-muted-foreground hover:text-foreground hover:underline truncate">
                             {url}
                           </a>
                         </div>
                       ))}
                     </div>
                   </ScrollArea>
-                </div>
-              )}
-
-              {!sitemapData?.urlCount && (
-                <div className="flex items-center gap-2 text-muted-foreground py-4">
-                  <AlertCircle className="h-4 w-4" />
-                  <span className="text-sm">Sitemap verisi yüklenemedi. "Sitemap Yenile" butonuna tıklayın.</span>
                 </div>
               )}
             </div>

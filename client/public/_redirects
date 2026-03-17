@@ -7,3 +7,6 @@ https://www.fastlygo.mk/*  https://fastlygo.mk/:splat  301!
 # HTTP → HTTPS redirect
 http://fastlygo.mk/*  https://fastlygo.mk/:splat  301!
 http://www.fastlygo.mk/*  https://fastlygo.mk/:splat  301!
+
+# SPA routing - tüm route'ları index.html'e yönlendir
+/*  /index.html  200
