@@ -340,3 +340,7 @@
 - [x] Tutarlı design system: rounded-2xl, soft gölgeler, turuncu accent, modern tipografi
 - [x] Tüm TS hataları 0'a düşürüldü
 - [x] Tüm 63 test geçiyor
+
+## Home Sayfa Hatası - useLanguage LanguageProvider (08.04.2026)
+- [x] useSeoFromDatabase hook'u useLanguage yerine useTranslation kullanıyor — LanguageProvider dışında da çalışır
+- [x] HMR/error recovery sırasında provider sıralama sorunu artık oluşmaz
