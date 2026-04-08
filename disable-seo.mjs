@@ -3,66 +3,43 @@ import fs from 'fs';
 import path from 'path';
 
 /**
- * This script completely disables Manus auto-generated SEO features
- * Run after build to ensure no SEO files are included in production
+ * Post-build script: Ensure our custom sitemap.xml and robots.txt
+ * are preserved in the dist/public folder for production serving.
+ * 
+ * Previously this script was DELETING these files, which caused
+ * Manus platform to generate its own minimal versions.
+ * Now it COPIES our custom files from server/static/ to dist/public/.
  */
 
 const distPublicPath = path.resolve('./dist/public');
-const distPath = path.resolve('./dist');
+const serverStaticPath = path.resolve('./server/static');
 
-console.log('\n🚫 Disabling Manus SEO features...\n');
+console.log('\n📋 Ensuring custom SEO files are in production build...\n');
 
-// 1. Remove all SEO-related files
-const seoFiles = [
-  path.join(distPublicPath, 'sitemap.xml'),
-  path.join(distPublicPath, 'robots.txt'),
-  path.join(distPath, 'sitemap.xml'),
-  path.join(distPath, 'robots.txt'),
-];
+// Ensure dist/public exists
+if (!fs.existsSync(distPublicPath)) {
+  fs.mkdirSync(distPublicPath, { recursive: true });
+}
 
-let removedCount = 0;
-seoFiles.forEach(filePath => {
-  if (fs.existsSync(filePath)) {
-    fs.unlinkSync(filePath);
-    console.log(`✓ Removed: ${path.relative('.', filePath)}`);
-    removedCount++;
-  }
-});
+// Copy our custom sitemap.xml and robots.txt to dist/public
+const seoFiles = ['sitemap.xml', 'robots.txt'];
+let copiedCount = 0;
 
-// 2. Scan for any remaining SEO files in dist
-function scanDirectory(dir, pattern) {
-  const found = [];
-  if (!fs.existsSync(dir)) return found;
+seoFiles.forEach(fileName => {
+  const sourcePath = path.join(serverStaticPath, fileName);
+  const destPath = path.join(distPublicPath, fileName);
   
-  const files = fs.readdirSync(dir, { withFileTypes: true });
-  for (const file of files) {
-    const fullPath = path.join(dir, file.name);
-    if (file.isDirectory()) {
-      found.push(...scanDirectory(fullPath, pattern));
-    } else if (pattern.test(file.name)) {
-      found.push(fullPath);
-    }
-  }
-  return found;
-}
-
-const seoPattern = /^(sitemap.*\.xml|robots\.txt)$/i;
-const foundFiles = scanDirectory(distPath, seoPattern);
-
-foundFiles.forEach(filePath => {
-  if (fs.existsSync(filePath)) {
-    fs.unlinkSync(filePath);
-    console.log(`✓ Removed (scan): ${path.relative('.', filePath)}`);
-    removedCount++;
+  if (fs.existsSync(sourcePath)) {
+    fs.copyFileSync(sourcePath, destPath);
+    const stats = fs.statSync(destPath);
+    console.log(`✓ Copied: server/static/${fileName} → dist/public/${fileName} (${stats.size} bytes)`);
+    copiedCount++;
+  } else {
+    console.log(`⚠ Source not found: server/static/${fileName}`);
   }
 });
 
-// 3. Summary
 console.log('\n' + '='.repeat(50));
-if (removedCount === 0) {
-  console.log('✅ No SEO files found - Build is clean!');
-} else {
-  console.log(`✅ Successfully removed ${removedCount} SEO file(s)`);
-}
-console.log('✅ Manus SEO features are now disabled');
+console.log(`✅ ${copiedCount} custom SEO file(s) copied to production build`);
+console.log('✅ Custom sitemap.xml and robots.txt will be served in production');
 console.log('='.repeat(50) + '\n');

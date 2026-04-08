@@ -228,3 +228,8 @@
 - [x] Header menüsünü güncelle (Services dropdown ile birleştirildi)
 - [x] SEO: sitemap.xml güncellendi (/categories → /services)
 - [x] Eski /categories linklerini /services'e redirect et (App.tsx)
+
+## Sitemap ve Robots.txt Production Sorunu (08.04.2026)
+- [x] Production'da sitemap.xml sadece 1 URL gösteriyor - disable-seo.mjs dosyaları siliyordu, kopyalamaya çevrildi
+- [x] robots.txt production'da doğru serve edilecek (disable-seo.mjs düzeltildi)
+- [x] Server route'ları doğru - sorun build script'inin dosyaları silmesiydi
