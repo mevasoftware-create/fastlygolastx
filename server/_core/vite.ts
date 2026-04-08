@@ -271,7 +271,7 @@ export function serveStatic(app: Express) {
       const _pathname = url.split("?")[0];
       const _language = detectLanguageFromUrl(url, acceptLang);
       html = injectSeoIntoHtml(html, seoData?.title || "", seoData?.description || "", _pathname, _language);
-      res.status(200).set({ "Content-Type": "text/html" }).end(html);
+      res.status(200).set({ "Content-Type": "text/html", "X-SEO-Injected": "true" }).end(html);
     });
   });
 }

@@ -262,3 +262,8 @@
 
 ## Manus Fazladan Canonical Tag Kaldır (08.04.2026)
 - [x] Manus'un </head> öncesine eklediği fazladan canonical tag'ı engelle - index.html'den statik canonical kaldırıldı, client-side pageSeo.ts tüm canonical'ları temizleyip doğrusunu ekliyor
+
+## Production'da Sayfa Bazlı Dinamik SEO (08.04.2026)
+- [x] Production'da tüm sayfalar aynı title/description/OG tag alıyor - prerender-seo.mjs ile çözüldü
+- [x] Manus proxy statik index.html serve ediyor - her sayfa için ayrı HTML dosyası oluşturuldu
+- [x] prerender-seo.mjs: Build sırasında 16 sayfa için ayrı HTML dosyaları oluşturuluyor
