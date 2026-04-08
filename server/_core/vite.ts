@@ -259,6 +259,39 @@ export function serveStatic(app: Express) {
 
   app.use(express.static(distPath));
 
+  // Explicit page routes for SEO injection
+  // Manus proxy forwards explicit routes to Express but bypasses wildcard SPA fallback
+  const seoPages = [
+    "/", "/how-it-works", "/about-us", "/services", "/areas",
+    "/new-order", "/login", "/register", "/courier-register",
+    "/business/register", "/my-orders", "/profile",
+    "/privacy-policy", "/terms-of-service", "/forgot-password",
+    "/notifications", "/notification-settings", "/settings/notifications",
+    "/courier", "/courier/register", "/courier/payments",
+    "/business", "/admin", "/admin/login",
+    "/verify-email", "/reset-password", "/pending-approval",
+    "/track-order/:orderNumber", "/categories/:slug", "/areas/:slug",
+    "/api-docs", "/404"
+  ];
+
+  const serveSeoHtml = async (req: any, res: any) => {
+    const indexPath = path.resolve(distPath, "index.html");
+    const url = req.originalUrl || req.url;
+    fs.readFile(indexPath, "utf-8", async (err, html) => {
+      if (err) { res.sendFile(indexPath); return; }
+      const acceptLang = req.headers?.["accept-language"] as string | undefined;
+      const seoData = await getSeoForUrl(url, acceptLang).catch(() => null);
+      const _pathname = url.split("?")[0];
+      const _language = detectLanguageFromUrl(url, acceptLang);
+      html = injectSeoIntoHtml(html, seoData?.title || "", seoData?.description || "", _pathname, _language);
+      res.status(200).set({ "Content-Type": "text/html", "X-SEO-Injected": "true" }).end(html);
+    });
+  };
+
+  for (const pagePath of seoPages) {
+    app.get(pagePath, serveSeoHtml);
+  }
+
   // fall through to index.html if the file doesn't exist
   app.use("*", (req, res) => {
     const indexPath = path.resolve(distPath, "index.html");

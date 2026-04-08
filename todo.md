@@ -267,3 +267,17 @@
 - [x] Production'da tüm sayfalar aynı title/description/OG tag alıyor - prerender-seo.mjs ile çözüldü
 - [x] Manus proxy statik index.html serve ediyor - her sayfa için ayrı HTML dosyası oluşturuldu
 - [x] prerender-seo.mjs: Build sırasında 16 sayfa için ayrı HTML dosyaları oluşturuluyor
+
+## Sitemap Duplicate Lang URL'leri Kaldır (08.04.2026)
+- [ ] Sitemap'te ?lang=tr, ?lang=mk, ?lang=sq ayrı <url> entry'leri var - bunlar gereksiz, hreflang alternate yeterli
+- [ ] Sadece ana URL'ler <loc>'ta olsun, dil varyantları sadece xhtml:link alternate olarak kalsın
+
+## registerPushToken 500 Hatası (08.04.2026)
+- [ ] push_tokens INSERT sorgusu 500 veriyor - auth kolonu null/geçersiz değer alıyor olabilir
+- [ ] Anonim kullanıcılar için auth kolonunun doğru değer aldığını kontrol et
+
+## Pre-render SEO Production'da Çalışmıyor (08.04.2026)
+- [ ] Manus proxy /how-it-works için dist/public/how-it-works/index.html'i değil root index.html'i serve ediyor
+- [ ] Manus hala title'ı "FastlyGo"ya override ediyor
+- [ ] Manus hala </head> öncesine canonical ekliyor
+- [ ] Farklı yaklaşım gerekiyor - pre-render alt dizin stratejisi çalışmıyor
