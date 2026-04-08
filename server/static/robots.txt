@@ -1,16 +1,15 @@
 User-agent: *
 Allow: /
 Allow: /areas
+Allow: /areas/
 Allow: /services
 Allow: /how-it-works
 Allow: /about-us
-Allow: /contact
+Allow: /new-order
 Allow: /courier/register
 Allow: /business/register
 Allow: /terms-of-service
 Allow: /privacy-policy
-Allow: /categories/
-Allow: /areas/
 
 # Private / auth pages - do not index
 Disallow: /admin
@@ -25,7 +24,6 @@ Disallow: /pending-approval
 Disallow: /profile
 Disallow: /my-orders
 Disallow: /order-history
-Disallow: /new-order
 Disallow: /notifications
 Disallow: /notification-settings
 Disallow: /settings
@@ -36,6 +34,8 @@ Disallow: /courier/payments
 Disallow: /courier/map
 Disallow: /business/dashboard
 Disallow: /business-dashboard
+Disallow: /categories
+Disallow: /categories/
 
 # API endpoints
 Disallow: /api/

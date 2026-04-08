@@ -66,7 +66,7 @@ const pages = {
     description: 'Create your FastlyGo account. Join thousands of users enjoying fast delivery. Quick registration for customers, couriers, and businesses.',
     keywords: 'register, sign up, create account, FastlyGo join'
   },
-  '/courier-register': {
+  '/courier/register': {
     title: 'Become a Courier - FastlyGo Driver Registration',
     description: 'Join FastlyGo as a courier driver. Flexible hours, competitive pay, instant payouts. Register now and start earning in Skopje.',
     keywords: 'courier registration, driver signup, delivery driver, earn money, Skopje'

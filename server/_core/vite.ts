@@ -66,6 +66,9 @@ async function getSeoForUrl(url: string, acceptLanguage?: string): Promise<{ tit
       "/about-us": "about-us", "/how-it-works": "how-it-works",
       "/services": "services", "/privacy-policy": "privacy-policy",
       "/terms-of-service": "terms-of-service",
+      "/new-order": "new-order",
+      "/courier/register": "courier-register",
+      "/business/register": "business-register",
     };
     if (staticPageSlugs[pathname]) {
       const rows = await db.select({ seoMeta: pages.seoMeta }).from(pages).where(eq(pages.slug, staticPageSlugs[pathname])).limit(1);
@@ -95,8 +98,24 @@ function injectSeoIntoHtml(
   language: string
 ): string {
   const esc = (s: string) => s.replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-  const safeTitle = title ? esc(title) : "FastlyGo";
-  const safeDesc = esc(description || "");
+  // Fallback SEO data for pages not in DB (new-order, privacy-policy, etc.)
+  const fallbackSeo: Record<string, { title: string; description: string }> = {
+    "/": { title: "FastlyGo - Food Delivery, Courier and Cargo Services in Skopje", description: "Fast courier & delivery service in Skopje. Food, cargo, package delivery in 15 minutes. Real-time tracking, affordable prices. Order now with FastlyGo!" },
+    "/how-it-works": { title: "How It Works - FastlyGo Delivery Process | Skopje", description: "Learn how FastlyGo delivery works. Simple 4-step process: Order online, courier accepts, real-time tracking, delivery in 15 minutes. Fast & reliable." },
+    "/about-us": { title: "About FastlyGo - Courier & Delivery Service in Skopje", description: "FastlyGo is a professional courier and delivery service in Skopje, Macedonia. 53+ active couriers, 15-minute delivery, real-time tracking." },
+    "/services": { title: "Our Services - FastlyGo Delivery Categories | Skopje", description: "Explore FastlyGo delivery services: food delivery, grocery shopping, pharmacy delivery, cargo transport, document delivery and more in Skopje." },
+    "/areas": { title: "Delivery Areas - FastlyGo Coverage in Skopje", description: "Check FastlyGo delivery coverage areas in Skopje and surrounding regions. Fast delivery to 38+ neighborhoods and districts." },
+    "/new-order": { title: "Order Now - FastlyGo Quick Courier | Skopje", description: "Place your delivery order with FastlyGo. Fast courier service in Skopje. Enter pickup and delivery addresses, choose package size, and get instant delivery." },
+    "/privacy-policy": { title: "Privacy Policy - FastlyGo", description: "FastlyGo privacy policy. Learn how we collect, use, and protect your personal data." },
+    "/terms-of-service": { title: "Terms of Service - FastlyGo", description: "FastlyGo terms of service. Read our terms and conditions for using the delivery platform." },
+    "/courier/register": { title: "Become a Courier - FastlyGo Driver Registration", description: "Join FastlyGo as a courier driver. Flexible hours, competitive pay, instant payouts. Register now and start earning in Skopje." },
+    "/business/register": { title: "Business Registration - FastlyGo Partner Program", description: "Partner with FastlyGo for your business deliveries. Restaurant, market, pharmacy integration. Grow your business with fast delivery." },
+    "/login": { title: "Login - FastlyGo Account", description: "Log in to your FastlyGo account. Track orders, manage deliveries, and access your courier dashboard." },
+    "/register": { title: "Register - Create FastlyGo Account", description: "Create your FastlyGo account. Join thousands of users enjoying fast delivery." },
+  };
+  const fb = fallbackSeo[pathname];
+  const safeTitle = title ? esc(title) : (fb ? esc(fb.title) : "FastlyGo");
+  const safeDesc = esc(description || fb?.description || "");
 
   // Canonical URL: always BASE_URL, clean path (no ?lang= in canonical)
   const canonicalUrl = `${BASE_URL}${pathname}`;

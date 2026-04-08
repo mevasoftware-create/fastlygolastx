@@ -200,6 +200,98 @@ export const pageSeoData: Record<string, MultiLangPageSEO> = {
       description: `Krijo llogarinë tënde ${APP_TITLE}. Bashkohu me mijëra përdorues që gëzojnë dërgim të shpejtë. Regjistrim i shpejtë për klientë, korrier dhe biznese.`,
       keywords: "regjistrim, kyçje, krijo llogari, llogari e re, bashkohu fastlygo, regjistrim korrier"
     }
+  },
+  services: {
+    en: {
+      title: `Our Services - ${APP_TITLE} Delivery Categories | Skopje`,
+      description: `Explore ${APP_TITLE} delivery services: food delivery, grocery shopping, pharmacy delivery, cargo transport, document delivery and more in Skopje.`,
+      keywords: "delivery services, food delivery, grocery delivery, pharmacy delivery, cargo, Skopje",
+      url: "https://fastlygo.mk/services"
+    },
+    tr: {
+      title: `Hizmetlerimiz - ${APP_TITLE} Teslimat Kategorileri | Üsküp`,
+      description: `${APP_TITLE} teslimat hizmetlerini keşfedin: yemek teslimatı, market alışverişi, eczane teslimatı, kargo taşıma, evrak teslimatı ve daha fazlası.`,
+      keywords: "teslimat hizmetleri, yemek teslimatı, market teslimatı, eczane teslimatı, kargo, Üsküp"
+    },
+    mk: {
+      title: `Наши Услуги - ${APP_TITLE} Категории за Достава | Скопје`,
+      description: `Истражете ги услугите за достава на ${APP_TITLE}: достава на храна, купување намирници, достава од аптека, карго транспорт, достава на документи и повеќе.`,
+      keywords: "услуги за достава, достава храна, достава намирници, достава аптека, карго, Скопје"
+    },
+    sq: {
+      title: `Shërbimet Tona - ${APP_TITLE} Kategoritë e Dërgimit | Shkup`,
+      description: `Eksploroni shërbimet e dërgimit të ${APP_TITLE}: dërgim ushqimi, blerje ushqimore, dërgim farmaci, transport kargo, dërgim dokumentesh dhe më shumë.`,
+      keywords: "shërbime dërgimi, dërgim ushqimi, dërgim ushqimore, dërgim farmaci, kargo, Shkup"
+    }
+  },
+  areas: {
+    en: {
+      title: `Delivery Areas - ${APP_TITLE} Coverage in Skopje`,
+      description: `Check ${APP_TITLE} delivery coverage areas in Skopje and surrounding regions. Fast delivery to 38+ neighborhoods and districts.`,
+      keywords: "delivery areas, coverage, Skopje neighborhoods, delivery zones, service areas",
+      url: "https://fastlygo.mk/areas"
+    },
+    tr: {
+      title: `Teslimat Bölgeleri - ${APP_TITLE} Üsküp Kapsama Alanı`,
+      description: `${APP_TITLE} teslimat kapsama alanlarını Üsküp ve çevresinde kontrol edin. 38+ mahalle ve bölgeye hızlı teslimat.`,
+      keywords: "teslimat bölgeleri, kapsama alanı, Üsküp mahalleler, teslimat bölgeleri, hizmet alanları"
+    },
+    mk: {
+      title: `Области за Достава - ${APP_TITLE} Покриеност во Скопје`,
+      description: `Проверете ги областите за достава на ${APP_TITLE} во Скопје и околните региони. Брза достава до 38+ населби и општини.`,
+      keywords: "области за достава, покриеност, населби Скопје, зони за достава, сервисни области"
+    },
+    sq: {
+      title: `Zonat e Dërgimit - ${APP_TITLE} Mbulimi në Shkup`,
+      description: `Kontrolloni zonat e mbulimit të dërgimit të ${APP_TITLE} në Shkup dhe rajonet përreth. Dërgim i shpejtë në 38+ lagje dhe komuna.`,
+      keywords: "zona dërgimi, mbulim, lagje Shkup, zona dërgimi, zona shërbimi"
+    }
+  },
+  privacyPolicy: {
+    en: {
+      title: `Privacy Policy - ${APP_TITLE}`,
+      description: `${APP_TITLE} privacy policy. Learn how we collect, use, and protect your personal data.`,
+      keywords: "privacy policy, data protection, personal data, FastlyGo privacy",
+      url: "https://fastlygo.mk/privacy-policy"
+    },
+    tr: {
+      title: `Gizlilik Politikası - ${APP_TITLE}`,
+      description: `${APP_TITLE} gizlilik politikası. Kişisel verilerinizi nasıl topladığımızı, kullandığımızı ve koruduğumuzu öğrenin.`,
+      keywords: "gizlilik politikası, veri koruma, kişisel veri, FastlyGo gizlilik"
+    },
+    mk: {
+      title: `Политика за Приватност - ${APP_TITLE}`,
+      description: `Политика за приватност на ${APP_TITLE}. Дознајте како ги собираме, користиме и заштитуваме вашите лични податоци.`,
+      keywords: "политика за приватност, заштита на податоци, лични податоци, FastlyGo приватност"
+    },
+    sq: {
+      title: `Politika e Privatësisë - ${APP_TITLE}`,
+      description: `Politika e privatësisë e ${APP_TITLE}. Mëso si i mbledhim, përdorim dhe mbrojmë të dhënat tuaja personale.`,
+      keywords: "politika e privatësisë, mbrojtja e të dhënave, të dhëna personale, FastlyGo privatësi"
+    }
+  },
+  termsOfService: {
+    en: {
+      title: `Terms of Service - ${APP_TITLE}`,
+      description: `${APP_TITLE} terms of service. Read our terms and conditions for using the delivery platform.`,
+      keywords: "terms of service, terms and conditions, user agreement, FastlyGo terms",
+      url: "https://fastlygo.mk/terms-of-service"
+    },
+    tr: {
+      title: `Kullanım Koşulları - ${APP_TITLE}`,
+      description: `${APP_TITLE} kullanım koşulları. Teslimat platformunu kullanma şartlarımızı ve koşullarımızı okuyun.`,
+      keywords: "kullanım koşulları, şartlar ve koşullar, kullanıcı sözleşmesi, FastlyGo koşullar"
+    },
+    mk: {
+      title: `Услови за Користење - ${APP_TITLE}`,
+      description: `Услови за користење на ${APP_TITLE}. Прочитајте ги нашите услови и правила за користење на платформата за достава.`,
+      keywords: "услови за користење, правила и услови, кориснички договор, FastlyGo услови"
+    },
+    sq: {
+      title: `Kushtet e Shërbimit - ${APP_TITLE}`,
+      description: `Kushtet e shërbimit të ${APP_TITLE}. Lexoni kushtet dhe rregullat tona për përdorimin e platformës së dërgimit.`,
+      keywords: "kushtet e shërbimit, kushte dhe rregulla, marrëveshje përdoruesi, FastlyGo kushte"
+    }
   }
 };
 
@@ -368,11 +460,15 @@ function updateHreflangTags(page: keyof typeof pageSeoData, currentLanguage: Lan
     home: '/',
     howItWorks: '/how-it-works',
     aboutUs: '/about-us',
-    order: '/order',
-    courierRegister: '/courier-register',
+    order: '/new-order',
+    services: '/services',
+    areas: '/areas',
+    courierRegister: '/courier/register',
     businessRegister: '/business/register',
     login: '/login',
-    register: '/register'
+    register: '/register',
+    privacyPolicy: '/privacy-policy',
+    termsOfService: '/terms-of-service',
   };
 
   const pagePath = pagePaths[page] || '/';
@@ -415,11 +511,15 @@ function updateCanonicalURL(page: keyof typeof pageSeoData) {
     home: '/',
     howItWorks: '/how-it-works',
     aboutUs: '/about-us',
-    order: '/order',
-    courierRegister: '/courier-register',
+    order: '/new-order',
+    services: '/services',
+    areas: '/areas',
+    courierRegister: '/courier/register',
     businessRegister: '/business/register',
     login: '/login',
-    register: '/register'
+    register: '/register',
+    privacyPolicy: '/privacy-policy',
+    termsOfService: '/terms-of-service',
   };
 
   const pagePath = pagePaths[page] || '/';

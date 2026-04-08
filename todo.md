@@ -284,3 +284,15 @@
 - [ ] Manus hala title'ı "FastlyGo"ya override ediyor
 - [ ] Manus hala </head> öncesine canonical ekliyor
 - [ ] Farklı yaklaşım gerekiyor - pre-render alt dizin stratejisi çalışmıyor
+
+## Kapsamlı SEO Audit ve Düzeltme (08.04.2026)
+- [x] SORUN-1: Production'da tüm sayfalar aynı title/description/OG gösteriyor — index.html'den statik tag'ler kaldırıldı, server-side fallback eklendi
+- [x] SORUN-2: Her sayfada 2 adet canonical tag var — index.html'den statik canonical kaldırıldı, artık sadece 1 doğru canonical var
+- [x] SORUN-3: og:url tüm sayfalarda https://fastlygo.mk/ — server-side injection sayfa bazlı og:url enjekte ediyor
+- [x] SORUN-4: Title sadece "FastlyGo" — fallback SEO data eklendi, DB'de data yoksa bile doğru title enjekte ediliyor
+- [x] SORUN-5: robots.txt'te /categories/ Disallow'a taşındı, /new-order Allow'a eklendi, /contact kaldırıldı
+- [x] SORUN-6: pageSeo.ts pagePaths'e services, areas, privacyPolicy, termsOfService eklendi, /order→/new-order düzeltildi
+- [x] SORUN-7: pageSeo.ts'deki updatePageSEO dead code — SEOHead bileşeni zaten tüm sayfalarda kullanılıyor (React 19 head hoisting)
+- [x] SORUN-8: prerender-seo.mjs hala build'de çalışıyor (yedek), asıl çözüm server-side vite.ts injection + fallback data
+- [x] SORUN-9: index.html template'inden tüm statik SEO tag'ler kaldırıldı — artık duplicate yok
+- [x] ÇÖZÜM: vite.ts fallback SEO data eklendi, staticPageSlugs genişletildi, pageSeo.ts pagePaths güncellendi
