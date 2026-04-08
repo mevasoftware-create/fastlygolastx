@@ -78,21 +78,81 @@ async function getSeoForUrl(url: string, acceptLanguage?: string): Promise<{ tit
   }
 }
 
-// Server-side SEO injection: only injects title + description into static HTML
-// so Google bot sees correct content before JS executes.
-// hreflang tags are handled by SEOHead component (React 19 head hoisting) - no duplication needed.
-function injectSeoIntoHtml(html: string, title: string, description: string): string {
-  if (!title) return html;
+const BASE_URL = "https://fastlygo.mk";
+const OG_IMAGE = "https://fastlygo.mk/og-image.e6740bbc.jpg";
+
+/**
+ * Server-side SEO injection:
+ * Injects correct title, description, canonical, hreflang, og:*, twitter:* tags
+ * into static HTML so Google bot sees correct content before JS executes.
+ * Overwrites any Manus-generated placeholder tags with correct values.
+ */
+function injectSeoIntoHtml(
+  html: string,
+  title: string,
+  description: string,
+  pathname: string,
+  language: string
+): string {
   const esc = (s: string) => s.replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-  const safeTitle = esc(title);
+  const safeTitle = title ? esc(title) : "FastlyGo";
   const safeDesc = esc(description || "");
-  html = html.replace(/<title>[^<]*<\/title>/, `<title>${safeTitle}</title>`);
-  if (html.includes('property="og:title"')) html = html.replace(/<meta property="og:title"[^>]*\/?>/, `<meta property="og:title" content="${safeTitle}"/>`);
-  if (safeDesc) {
-    if (html.includes('name="description"')) html = html.replace(/<meta name="description"[^>]*\/?>/, `<meta name="description" content="${safeDesc}"/>`);
-    else html = html.replace("</head>", `  <meta name="description" content="${safeDesc}"/>\n</head>`);
-    if (html.includes('property="og:description"')) html = html.replace(/<meta property="og:description"[^>]*\/?>/, `<meta property="og:description" content="${safeDesc}"/>`);
-  }
+
+  // Canonical URL: always BASE_URL, clean path (no ?lang= in canonical)
+  const canonicalUrl = `${BASE_URL}${pathname}`;
+
+  // hreflang URLs
+  const hrefEn = `${BASE_URL}${pathname}`;
+  const hrefTr = `${BASE_URL}${pathname}?lang=tr`;
+  const hrefMk = `${BASE_URL}${pathname}?lang=mk`;
+  const hrefSq = `${BASE_URL}${pathname}?lang=sq`;
+
+  // OG locale map
+  const ogLocale: Record<string, string> = { en: "en_US", tr: "tr_TR", mk: "mk_MK", sq: "sq_AL" };
+  const locale = ogLocale[language] || "en_US";
+
+  // Current page URL (with lang param if non-English)
+  const currentUrl = language !== "en" ? `${BASE_URL}${pathname}?lang=${language}` : canonicalUrl;
+
+  // Build the full SEO block to inject before </head>
+  const seoBlock = `
+  <!-- Server-side SEO injection -->
+  <title>${safeTitle}</title>
+  <meta name="description" content="${safeDesc}" />
+  <link rel="canonical" href="${canonicalUrl}" />
+  <link rel="alternate" hreflang="x-default" href="${hrefEn}" />
+  <link rel="alternate" hreflang="en" href="${hrefEn}" />
+  <link rel="alternate" hreflang="tr" href="${hrefTr}" />
+  <link rel="alternate" hreflang="mk" href="${hrefMk}" />
+  <link rel="alternate" hreflang="sq" href="${hrefSq}" />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="${currentUrl}" />
+  <meta property="og:title" content="${safeTitle}" />
+  <meta property="og:description" content="${safeDesc}" />
+  <meta property="og:site_name" content="FastlyGo" />
+  <meta property="og:locale" content="${locale}" />
+  <meta property="og:image" content="${OG_IMAGE}" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="${safeTitle}" />
+  <meta name="twitter:description" content="${safeDesc}" />
+  <meta name="twitter:image" content="${OG_IMAGE}" />`;
+
+  // Remove any existing Manus-injected or duplicate og/twitter/canonical/hreflang tags
+  html = html
+    .replace(/<title>[^<]*<\/title>/g, "")
+    .replace(/<meta name="description"[^>]*\/?>/g, "")
+    .replace(/<link rel="canonical"[^>]*\/?>/g, "")
+    .replace(/<link rel="alternate" hreflang[^>]*\/?>/g, "")
+    .replace(/<link rel="alternate" hrefLang[^>]*\/?>/g, "")
+    .replace(/<meta property="og:[^>]*\/?>/g, "")
+    .replace(/<meta name="twitter:[^>]*\/?>/g, "");
+
+  // Inject our clean SEO block before </head>
+  html = html.replace("</head>", `${seoBlock}
+</head>`);
+
   return html;
 }
 
@@ -160,7 +220,9 @@ export async function setupVite(app: Express, server: Server) {
       // Language detection: ?lang= param → Accept-Language header → default EN
       const acceptLang = req.headers["accept-language"] as string | undefined;
       const seoData = await getSeoForUrl(url, acceptLang);
-      if (seoData?.title) page = injectSeoIntoHtml(page, seoData.title, seoData.description);
+      const _pathname = url.split("?")[0];
+      const _language = detectLanguageFromUrl(url, acceptLang);
+      page = injectSeoIntoHtml(page, seoData?.title || "", seoData?.description || "", _pathname, _language);
       res.status(200).set({ "Content-Type": "text/html" }).end(page);
     } catch (e) {
       vite.ssrFixStacktrace(e as Error);
@@ -207,7 +269,9 @@ export function serveStatic(app: Express) {
       // Server-side SEO injection
       const acceptLang = (req as any).headers?.["accept-language"] as string | undefined;
       const seoData = await getSeoForUrl(url, acceptLang).catch(() => null);
-      if (seoData?.title) html = injectSeoIntoHtml(html, seoData.title, seoData.description);
+      const _pathname = url.split("?")[0];
+      const _language = detectLanguageFromUrl(url, acceptLang);
+      html = injectSeoIntoHtml(html, seoData?.title || "", seoData?.description || "", _pathname, _language);
       res.status(200).set({ "Content-Type": "text/html" }).end(html);
     });
   });

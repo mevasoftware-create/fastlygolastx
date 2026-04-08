@@ -204,3 +204,13 @@
 - [x] client/public/robots.txt → fiziksel dosya, doğrudan sendFile ile sunuluyor
 - [x] React router'ın sitemap.xml/robots.txt'i yakalaması engellendi
 - [x] sitemap.xml 140 URL bloğu (35 sayfa × 4 dil: en/tr/mk/sq + x-default hreflang)
+
+## Meta Tag Temiz Sistem (08.04.2026)
+- [x] injectSeoIntoHtml fonksiyonu genişletildi: canonical, hreflang, og:*, twitter:* server-side enjekte ediliyor
+- [x] Manus'un otomatik eklediği yanlış og:url (manus.space), og:image (screenshot), twitter:* tagları temizlendi
+- [x] og:url her zaman fastlygo.mk domain'i ile doğru URL'yi gösteriyor
+- [x] og:image sabit doğru OG image URL'sine bağlandı (fastlygo.mk/og-image.e6740bbc.jpg)
+- [x] canonical her zaman ?lang= parametresiz temiz URL (Google standardı)
+- [x] hreflang: x-default + en/tr/mk/sq server-side enjekte ediliyor
+- [x] Türkçe/Makedonca/Arnavutça sayfada og:url doğru ?lang= parametresiyle gösteriyor
+- [x] Test edildi: dev server'da tüm taglar doğru çalışıyor
