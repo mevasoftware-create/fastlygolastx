@@ -1,16 +1,12 @@
 import { useState, useMemo } from "react";
 import { trpc } from "@/lib/trpc";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from "@/components/ui/sheet";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Switch } from "@/components/ui/switch";
-import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Plus, Edit, Trash2, Ticket, Search, Copy, RefreshCw, Percent, DollarSign, Calendar, Users, BarChart3, Clock } from "lucide-react";
+import { Plus, Edit, Trash2, Ticket, Search, Copy, RefreshCw, Percent, DollarSign, Calendar, Users, BarChart3, Clock, Loader2, X } from "lucide-react";
 import { toast } from "sonner";
 import { formatEUR } from "@/lib/formatEUR";
 
@@ -41,7 +37,7 @@ const emptyForm: CouponForm = {
 };
 
 export function AdminCoupons() {
-  const [dialogOpen, setDialogOpen] = useState(false);
+  const [sheetOpen, setSheetOpen] = useState(false);
   const [editingId, setEditingId] = useState<number | null>(null);
   const [form, setForm] = useState<CouponForm>(emptyForm);
   const [search, setSearch] = useState("");
@@ -51,11 +47,11 @@ export function AdminCoupons() {
   const { data: couponsList, isLoading } = trpc.coupons.list.useQuery();
 
   const createMut = trpc.coupons.create.useMutation({
-    onSuccess: () => { toast.success("Kupon oluşturuldu"); utils.coupons.list.invalidate(); setDialogOpen(false); },
+    onSuccess: () => { toast.success("Kupon oluşturuldu"); utils.coupons.list.invalidate(); setSheetOpen(false); },
     onError: (e) => toast.error(e.message),
   });
   const updateMut = trpc.coupons.update.useMutation({
-    onSuccess: () => { toast.success("Kupon güncellendi"); utils.coupons.list.invalidate(); setDialogOpen(false); },
+    onSuccess: () => { toast.success("Kupon güncellendi"); utils.coupons.list.invalidate(); setSheetOpen(false); },
     onError: (e) => toast.error(e.message),
   });
   const deleteMut = trpc.coupons.delete.useMutation({
@@ -89,7 +85,7 @@ export function AdminCoupons() {
       validUntil: new Date(c.validUntil).toISOString().slice(0, 16),
       description: c.description || "",
     });
-    setDialogOpen(true);
+    setSheetOpen(true);
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -119,163 +115,138 @@ export function AdminCoupons() {
   const isExpired = (c: any) => new Date(c.validUntil) <= new Date();
   const isLimitReached = (c: any) => c.usageLimit && c.usageCount >= c.usageLimit;
 
+  const StatCard = ({ icon: Icon, label, value, color }: { icon: any, label: string, value: number | string, color: string }) => (
+    <div className={`bg-${color}-50 rounded-2xl p-3.5 flex items-center gap-3 ring-1 ring-${color}-100`}>
+      <div className="w-9 h-9 rounded-xl bg-white flex items-center justify-center shadow-sm">
+        <Icon className={`w-5 h-5 text-${color}-500`} />
+      </div>
+      <div>
+        <div className={`text-sm font-medium text-${color}-600`}>{label}</div>
+        <div className={`text-2xl font-bold text-${color}-800`}>{value}</div>
+      </div>
+    </div>
+  );
+
+  const StatusBadge = ({ coupon }: { coupon: any }) => {
+    if (isExpired(coupon)) return <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] font-semibold border bg-gray-50 text-gray-600 border-gray-200">Süresi Dolmuş</span>;
+    if (isLimitReached(coupon)) return <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] font-semibold border bg-amber-50 text-amber-700 border-amber-200">Limit Doldu</span>;
+    if (coupon.isActive) return <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] font-semibold border bg-emerald-50 text-emerald-700 border-emerald-200">Aktif</span>;
+    return <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] font-semibold border bg-gray-100 text-gray-500 border-gray-200">Pasif</span>;
+  };
+
   return (
-    <div className="p-6 space-y-6">
+    <div className="p-4 lg:p-6 space-y-5 max-w-[1400px] mx-auto">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
-            <Ticket className="w-7 h-7 text-orange-500" /> Kupon Yönetimi
-          </h1>
-          <p className="text-gray-500 text-sm mt-0.5">İndirim kuponlarını oluşturun ve yönetin</p>
+          <h1 className="text-2xl font-bold text-gray-900 tracking-tight">Kupon Yönetimi</h1>
+          <p className="text-sm text-gray-500 mt-0.5">İndirim kuponlarını oluşturun ve yönetin.</p>
         </div>
-        <Button onClick={() => { resetForm(); setDialogOpen(true); }} className="bg-orange-500 hover:bg-orange-600 gap-2">
+        <Button onClick={() => { resetForm(); setSheetOpen(true); }} className="rounded-xl bg-orange-500 hover:bg-orange-600 gap-2">
           <Plus className="w-4 h-4" /> Yeni Kupon
         </Button>
       </div>
 
-      <div className="grid grid-cols-4 gap-4">
-        <Card className="border-0 shadow-sm bg-gradient-to-br from-orange-50 to-orange-100">
-          <CardContent className="p-4"><div className="flex items-center gap-2 mb-1"><Ticket className="w-4 h-4 text-orange-600" /><span className="text-xs text-orange-600">Toplam</span></div><div className="text-2xl font-bold text-orange-700">{stats.total}</div></CardContent>
-        </Card>
-        <Card className="border-0 shadow-sm bg-gradient-to-br from-green-50 to-green-100">
-          <CardContent className="p-4"><div className="flex items-center gap-2 mb-1"><div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" /><span className="text-xs text-green-600">Aktif</span></div><div className="text-2xl font-bold text-green-700">{stats.active}</div></CardContent>
-        </Card>
-        <Card className="border-0 shadow-sm bg-gradient-to-br from-red-50 to-red-100">
-          <CardContent className="p-4"><div className="flex items-center gap-2 mb-1"><Clock className="w-4 h-4 text-red-600" /><span className="text-xs text-red-600">Süresi Dolmuş</span></div><div className="text-2xl font-bold text-red-700">{stats.expired}</div></CardContent>
-        </Card>
-        <Card className="border-0 shadow-sm bg-gradient-to-br from-purple-50 to-purple-100">
-          <CardContent className="p-4"><div className="flex items-center gap-2 mb-1"><BarChart3 className="w-4 h-4 text-purple-600" /><span className="text-xs text-purple-600">Toplam Kullanım</span></div><div className="text-2xl font-bold text-purple-700">{stats.totalUsage}</div></CardContent>
-        </Card>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <StatCard icon={Ticket} label="Toplam Kupon" value={stats.total} color="orange" />
+        <StatCard icon={Clock} label="Aktif Kupon" value={stats.active} color="emerald" />
+        <StatCard icon={Users} label="Süresi Dolmuş" value={stats.expired} color="red" />
+        <StatCard icon={BarChart3} label="Toplam Kullanım" value={stats.totalUsage} color="blue" />
       </div>
 
-      <Card className="shadow-sm">
-        <CardHeader className="pb-3">
-          <div className="flex items-center justify-between">
-            <CardTitle className="text-base">Kuponlar</CardTitle>
+      <div className="bg-white rounded-2xl border border-gray-100">
+        <div className="p-4 flex items-center justify-between border-b border-gray-100">
+            <h2 className="font-semibold text-gray-800">Tüm Kuponlar</h2>
             <div className="flex items-center gap-2">
               <div className="relative">
-                <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-400" />
-                <Input placeholder="Kupon kodu ara..." value={search} onChange={e => setSearch(e.target.value)} className="pl-8 h-9 w-48 text-sm" />
+                <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                <Input placeholder="Kupon kodu ara..." value={search} onChange={e => setSearch(e.target.value)} className="pl-9 h-10 w-56 text-sm rounded-xl" />
               </div>
-              <Button variant="outline" size="sm" onClick={() => utils.coupons.list.invalidate()} className="gap-1.5 h-9">
-                <RefreshCw className="h-3.5 w-3.5" />
-              </Button>
             </div>
-          </div>
-        </CardHeader>
-        <CardContent className="p-0">
-          {isLoading ? (
-            <div className="text-center py-12 text-gray-400">Yükleniyor...</div>
-          ) : filtered.length === 0 ? (
-            <div className="text-center py-12 text-gray-400">
-              <Ticket className="w-12 h-12 mx-auto mb-3 opacity-30" />
-              <p>Kupon bulunamadı</p>
-            </div>
-          ) : (
-            <Table>
-              <TableHeader>
-                <TableRow className="bg-gray-50/60">
-                  <TableHead>Kupon Kodu</TableHead>
-                  <TableHead>Tip</TableHead>
-                  <TableHead>Değer</TableHead>
-                  <TableHead>Min. Sipariş</TableHead>
-                  <TableHead>Kullanım</TableHead>
-                  <TableHead>Geçerlilik</TableHead>
-                  <TableHead>Durum</TableHead>
-                  <TableHead className="text-right">İşlemler</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {filtered.map(c => (
-                  <TableRow key={c.id} className={`hover:bg-gray-50/50 ${isExpired(c) ? "opacity-50" : ""}`}>
-                    <TableCell>
-                      <div className="flex items-center gap-2">
-                        <span className="font-mono font-bold text-sm bg-orange-50 text-orange-700 px-2 py-0.5 rounded">{c.code}</span>
-                        <button onClick={() => { navigator.clipboard.writeText(c.code); toast.success("Kopyalandı"); }} className="text-gray-300 hover:text-gray-500">
-                          <Copy className="w-3.5 h-3.5" />
-                        </button>
-                      </div>
-                      {c.description && <p className="text-xs text-gray-400 mt-0.5 max-w-[150px] truncate">{c.description}</p>}
-                    </TableCell>
-                    <TableCell>
-                      <Badge variant="outline" className="gap-1 text-xs">
-                        {c.type === "percentage" ? <Percent className="w-3 h-3" /> : <DollarSign className="w-3 h-3" />}
-                        {c.type === "percentage" ? "Yüzde" : "Sabit"}
-                      </Badge>
-                    </TableCell>
-                    <TableCell className="font-semibold">
-                      {c.type === "percentage" ? `%${c.value}` : formatEUR(c.value)}
-                      {c.maxDiscount ? <span className="text-xs text-gray-400 block">Maks: {formatEUR(c.maxDiscount)}</span> : null}
-                    </TableCell>
-                    <TableCell className="text-sm text-gray-600">
-                      {c.minOrderAmount ? formatEUR(c.minOrderAmount) : "—"}
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex items-center gap-1.5">
-                        <span className="font-semibold text-sm">{c.usageCount}</span>
-                        <span className="text-gray-400 text-xs">/ {c.usageLimit || "∞"}</span>
-                      </div>
-                      <div className="w-16 h-1.5 bg-gray-100 rounded-full mt-1">
-                        <div className="h-full bg-orange-500 rounded-full" style={{ width: `${c.usageLimit ? Math.min(100, (c.usageCount / c.usageLimit) * 100) : 10}%` }} />
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <div className="text-xs space-y-0.5">
-                        <div className="flex items-center gap-1 text-gray-500">
-                          <Calendar className="w-3 h-3" />
-                          {new Date(c.validFrom).toLocaleDateString("tr-TR", { day: "2-digit", month: "short" })}
-                        </div>
-                        <div className="flex items-center gap-1 text-gray-500">
-                          <span className="text-gray-300">→</span>
-                          {new Date(c.validUntil).toLocaleDateString("tr-TR", { day: "2-digit", month: "short", year: "numeric" })}
-                        </div>
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      {isExpired(c) ? (
-                        <Badge variant="secondary" className="text-xs">Süresi Dolmuş</Badge>
-                      ) : isLimitReached(c) ? (
-                        <Badge variant="secondary" className="text-xs bg-yellow-50 text-yellow-700">Limit Doldu</Badge>
-                      ) : c.isActive ? (
-                        <Badge className="text-xs bg-green-100 text-green-700 border-green-200">Aktif</Badge>
-                      ) : (
-                        <Badge variant="secondary" className="text-xs">Pasif</Badge>
-                      )}
-                    </TableCell>
-                    <TableCell className="text-right">
-                      <div className="flex justify-end gap-1.5">
-                        <Button variant="outline" size="sm" onClick={() => handleEdit(c)} className="h-7 px-2"><Edit className="w-3.5 h-3.5" /></Button>
-                        <Button variant="destructive" size="sm" onClick={() => setDeleteId(c.id)} className="h-7 px-2"><Trash2 className="w-3.5 h-3.5" /></Button>
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          )}
-        </CardContent>
-      </Card>
+        </div>
 
-      {/* Create/Edit Dialog */}
-      <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-        <DialogContent className="max-w-lg">
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2"><Ticket className="w-5 h-5 text-orange-500" />{editingId ? "Kupon Düzenle" : "Yeni Kupon"}</DialogTitle>
-            <DialogDescription>Kupon detaylarını girin</DialogDescription>
-          </DialogHeader>
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="grid grid-cols-2 gap-3">
+        {isLoading ? (
+          <div className="h-64 flex items-center justify-center">
+            <Loader2 className="h-8 w-8 animate-spin text-orange-500" />
+          </div>
+        ) : filtered.length === 0 ? (
+          <div className="text-center py-16">
+            <div className="w-16 h-16 rounded-2xl bg-gray-50 flex items-center justify-center mb-4 mx-auto">
+                <Ticket className="w-8 h-8 text-gray-400" />
+            </div>
+            <p className="text-sm font-medium text-gray-600">Aramanızla eşleşen kupon bulunamadı.</p>
+            <p className="text-xs text-gray-400 mt-1">Farklı bir anahtar kelime deneyin.</p>
+          </div>
+        ) : (
+          <div className="divide-y divide-gray-50">
+            {filtered.map(c => (
+              <div key={c.id} className={`px-5 py-3.5 hover:bg-gray-50/50 transition-colors group ${isExpired(c) ? "opacity-60" : ""}`}>
+                <div className="grid grid-cols-12 items-center gap-4">
+                    <div className="col-span-3">
+                        <div className="flex items-center gap-2">
+                            <span className="font-mono font-bold text-sm bg-orange-50 text-orange-700 px-2.5 py-1 rounded-md">{c.code}</span>
+                            <button onClick={() => { navigator.clipboard.writeText(c.code); toast.success("Kopyalandı"); }} className="text-gray-400 hover:text-gray-600 opacity-0 group-hover:opacity-100 transition-opacity">
+                                <Copy className="w-3.5 h-3.5" />
+                            </button>
+                        </div>
+                        {c.description && <p className="text-xs text-gray-500 mt-1 max-w-[200px] truncate">{c.description}</p>}
+                    </div>
+                    <div className="col-span-2">
+                        <div className="flex items-center gap-2 text-sm text-gray-700">
+                            {c.type === "percentage" ? <Percent className="w-4 h-4 text-gray-400" /> : <DollarSign className="w-4 h-4 text-gray-400" />}
+                            <span className="font-medium">{c.type === "percentage" ? `%${c.value}` : formatEUR(c.value)}</span>
+                            {(c.maxDiscount ?? 0) > 0 && <span className="text-xs text-gray-400">(Maks: {formatEUR(c.maxDiscount ?? 0)})</span>}
+                        </div>
+                    </div>
+                    <div className="col-span-2 text-sm text-gray-600">
+                        <span className="text-gray-400">Min: </span> {(c.minOrderAmount ?? 0) > 0 ? formatEUR(c.minOrderAmount ?? 0) : "—"}
+                    </div>
+                    <div className="col-span-2">
+                        <div className="flex items-center gap-2">
+                            <span className="font-semibold text-sm">{c.usageCount} / {c.usageLimit || "∞"}</span>
+                            <div className="w-full h-1.5 bg-gray-100 rounded-full">
+                                <div className="h-full bg-orange-400 rounded-full" style={{ width: `${c.usageLimit ? Math.min(100, (c.usageCount / c.usageLimit) * 100) : 0}%` }} />
+                            </div>
+                        </div>
+                    </div>
+                    <div className="col-span-1">
+                        <StatusBadge coupon={c} />
+                    </div>
+                    <div className="col-span-2 flex justify-end items-center gap-2">
+                        <div className="text-xs text-gray-500 text-right">
+                            <div>{new Date(c.validFrom).toLocaleDateString("tr-TR")}</div>
+                            <div>{new Date(c.validUntil).toLocaleDateString("tr-TR")}</div>
+                        </div>
+                        <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                            <Button variant="outline" size="icon" onClick={() => handleEdit(c)} className="h-8 w-8 rounded-lg"><Edit className="w-4 h-4" /></Button>
+                            <Button variant="outline" size="icon" onClick={() => setDeleteId(c.id)} className="h-8 w-8 rounded-lg border-red-100 text-red-500 hover:bg-red-50 hover:text-red-600"><Trash2 className="w-4 h-4" /></Button>
+                        </div>
+                    </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
+      <Sheet open={sheetOpen} onOpenChange={setSheetOpen}>
+        <SheetContent className="sm:max-w-lg overflow-y-auto">
+          <SheetHeader>
+            <SheetTitle className="flex items-center gap-2">{editingId ? "Kupon Düzenle" : "Yeni Kupon Oluştur"}</SheetTitle>
+            <SheetDescription>Kuponun özelliklerini, limitlerini ve geçerlilik tarihlerini belirleyin.</SheetDescription>
+          </SheetHeader>
+          <form onSubmit={handleSubmit} className="space-y-5 pt-6">
+            <div className="grid grid-cols-2 gap-4">
               <div>
-                <Label className="text-xs">Kupon Kodu *</Label>
-                <div className="flex gap-1 mt-1">
-                  <Input value={form.code} onChange={e => setForm({ ...form, code: e.target.value.toUpperCase() })} placeholder="FG-XXXX" required disabled={!!editingId} />
-                  {!editingId && <Button type="button" variant="outline" size="sm" onClick={() => setForm({ ...form, code: generateCode() })} className="px-2 shrink-0"><RefreshCw className="w-3.5 h-3.5" /></Button>}
+                <Label className="text-[11px] text-gray-500 uppercase tracking-wider font-semibold">Kupon Kodu *</Label>
+                <div className="flex gap-2 mt-1.5">
+                  <Input value={form.code} onChange={e => setForm({ ...form, code: e.target.value.toUpperCase() })} placeholder="FG-XXXX" required disabled={!!editingId} className="rounded-xl" />
+                  {!editingId && <Button type="button" variant="outline" size="icon" onClick={() => setForm({ ...form, code: generateCode() })} className="rounded-xl shrink-0"><RefreshCw className="w-4 h-4" /></Button>}
                 </div>
               </div>
               <div>
-                <Label className="text-xs">Tip *</Label>
+                <Label className="text-[11px] text-gray-500 uppercase tracking-wider font-semibold">Tip *</Label>
                 <Select value={form.type} onValueChange={(v: "percentage" | "fixed") => setForm({ ...form, type: v })} disabled={!!editingId}>
-                  <SelectTrigger className="mt-1"><SelectValue /></SelectTrigger>
+                  <SelectTrigger className="mt-1.5 rounded-xl"><SelectValue /></SelectTrigger>
                   <SelectContent>
                     <SelectItem value="percentage">Yüzde (%)</SelectItem>
                     <SelectItem value="fixed">Sabit Tutar (€)</SelectItem>
@@ -283,70 +254,68 @@ export function AdminCoupons() {
                 </Select>
               </div>
             </div>
-            <div className="grid grid-cols-3 gap-3">
+            <div className="grid grid-cols-3 gap-4">
               <div>
-                <Label className="text-xs">Değer *</Label>
-                <Input type="number" value={form.value} onChange={e => setForm({ ...form, value: Number(e.target.value) })} className="mt-1" required disabled={!!editingId} />
-                <span className="text-xs text-gray-400">{form.type === "percentage" ? "%" : "cent"}</span>
+                <Label className="text-[11px] text-gray-500 uppercase tracking-wider font-semibold">Değer *</Label>
+                <Input type="number" value={form.value} onChange={e => setForm({ ...form, value: Number(e.target.value) })} className="mt-1.5 rounded-xl" required disabled={!!editingId} />
               </div>
               <div>
-                <Label className="text-xs">Min. Sipariş (cent)</Label>
-                <Input type="number" value={form.minOrderAmount} onChange={e => setForm({ ...form, minOrderAmount: Number(e.target.value) })} className="mt-1" disabled={!!editingId} />
+                <Label className="text-[11px] text-gray-500 uppercase tracking-wider font-semibold">Min. Sipariş (cent)</Label>
+                <Input type="number" value={form.minOrderAmount} onChange={e => setForm({ ...form, minOrderAmount: Number(e.target.value) })} className="mt-1.5 rounded-xl" disabled={!!editingId} />
               </div>
               <div>
-                <Label className="text-xs">Maks. İndirim (cent)</Label>
-                <Input type="number" value={form.maxDiscount} onChange={e => setForm({ ...form, maxDiscount: Number(e.target.value) })} className="mt-1" disabled={!!editingId} />
-              </div>
-            </div>
-            <div className="grid grid-cols-2 gap-3">
-              <div>
-                <Label className="text-xs">Toplam Kullanım Limiti</Label>
-                <Input type="number" value={form.usageLimit} onChange={e => setForm({ ...form, usageLimit: Number(e.target.value) })} className="mt-1" placeholder="0 = sınırsız" />
-              </div>
-              <div>
-                <Label className="text-xs">Kişi Başı Limit</Label>
-                <Input type="number" value={form.perUserLimit} onChange={e => setForm({ ...form, perUserLimit: Number(e.target.value) })} className="mt-1" disabled={!!editingId} />
+                <Label className="text-[11px] text-gray-500 uppercase tracking-wider font-semibold">Maks. İndirim (cent)</Label>
+                <Input type="number" value={form.maxDiscount} onChange={e => setForm({ ...form, maxDiscount: Number(e.target.value) })} className="mt-1.5 rounded-xl" disabled={!!editingId} />
               </div>
             </div>
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-2 gap-4">
               <div>
-                <Label className="text-xs">Başlangıç *</Label>
-                <Input type="datetime-local" value={form.validFrom} onChange={e => setForm({ ...form, validFrom: e.target.value })} className="mt-1" required disabled={!!editingId} />
+                <Label className="text-[11px] text-gray-500 uppercase tracking-wider font-semibold">Toplam Kullanım Limiti</Label>
+                <Input type="number" value={form.usageLimit} onChange={e => setForm({ ...form, usageLimit: Number(e.target.value) })} className="mt-1.5 rounded-xl" placeholder="0 = sınırsız" />
               </div>
               <div>
-                <Label className="text-xs">Bitiş *</Label>
-                <Input type="datetime-local" value={form.validUntil} onChange={e => setForm({ ...form, validUntil: e.target.value })} className="mt-1" required />
+                <Label className="text-[11px] text-gray-500 uppercase tracking-wider font-semibold">Kişi Başı Limit</Label>
+                <Input type="number" value={form.perUserLimit} onChange={e => setForm({ ...form, perUserLimit: Number(e.target.value) })} className="mt-1.5 rounded-xl" disabled={!!editingId} />
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <Label className="text-[11px] text-gray-500 uppercase tracking-wider font-semibold">Başlangıç *</Label>
+                <Input type="datetime-local" value={form.validFrom} onChange={e => setForm({ ...form, validFrom: e.target.value })} className="mt-1.5 rounded-xl" required disabled={!!editingId} />
+              </div>
+              <div>
+                <Label className="text-[11px] text-gray-500 uppercase tracking-wider font-semibold">Bitiş *</Label>
+                <Input type="datetime-local" value={form.validUntil} onChange={e => setForm({ ...form, validUntil: e.target.value })} className="mt-1.5 rounded-xl" required />
               </div>
             </div>
             <div>
-              <Label className="text-xs">Açıklama</Label>
-              <Textarea value={form.description} onChange={e => setForm({ ...form, description: e.target.value })} className="mt-1 resize-none" rows={2} placeholder="Kupon açıklaması..." disabled={!!editingId} />
+              <Label className="text-[11px] text-gray-500 uppercase tracking-wider font-semibold">Açıklama</Label>
+              <Textarea value={form.description} onChange={e => setForm({ ...form, description: e.target.value })} className="mt-1.5 resize-none rounded-xl" rows={3} placeholder="Kupon açıklaması..." disabled={!!editingId} />
             </div>
-            <div className="flex justify-end gap-2 pt-2">
-              <Button type="button" variant="outline" onClick={() => setDialogOpen(false)}>İptal</Button>
-              <Button type="submit" className="bg-orange-500 hover:bg-orange-600" disabled={createMut.isPending || updateMut.isPending}>
-                {createMut.isPending || updateMut.isPending ? "Kaydediliyor..." : editingId ? "Güncelle" : "Oluştur"}
+            <div className="flex justify-end gap-3 pt-4">
+              <Button type="button" variant="outline" onClick={() => setSheetOpen(false)} className="rounded-xl">İptal</Button>
+              <Button type="submit" className="rounded-xl bg-orange-500 hover:bg-orange-600" disabled={createMut.isPending || updateMut.isPending}>
+                {createMut.isPending || updateMut.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : editingId ? "Değişiklikleri Kaydet" : "Kupon Oluştur"}
               </Button>
             </div>
           </form>
-        </DialogContent>
-      </Dialog>
+        </SheetContent>
+      </Sheet>
 
-      {/* Delete Confirm */}
-      <Dialog open={deleteId !== null} onOpenChange={() => setDeleteId(null)}>
-        <DialogContent className="max-w-sm">
-          <DialogHeader>
-            <DialogTitle>Kuponu Sil</DialogTitle>
-            <DialogDescription>Bu kupon kalıcı olarak silinecek. Emin misiniz?</DialogDescription>
-          </DialogHeader>
-          <div className="flex justify-end gap-2 mt-4">
-            <Button variant="outline" onClick={() => setDeleteId(null)}>İptal</Button>
-            <Button variant="destructive" disabled={deleteMut.isPending} onClick={() => deleteId && deleteMut.mutate({ id: deleteId })}>
-              {deleteMut.isPending ? "Siliniyor..." : "Sil"}
-            </Button>
-          </div>
-        </DialogContent>
-      </Dialog>
+      {deleteId !== null && (
+        <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm flex items-center justify-center">
+            <div className="bg-white rounded-2xl p-6 max-w-sm shadow-2xl w-full mx-4">
+                <h3 className="text-lg font-semibold text-gray-900">Kuponu Sil</h3>
+                <p className="text-sm text-gray-500 mt-1">Bu kupon kalıcı olarak silinecek. Bu işlem geri alınamaz. Emin misiniz?</p>
+                <div className="flex justify-end gap-3 mt-6">
+                    <Button variant="outline" onClick={() => setDeleteId(null)} className="rounded-xl">İptal</Button>
+                    <Button variant="destructive" disabled={deleteMut.isPending} onClick={() => deleteId && deleteMut.mutate({ id: deleteId })} className="rounded-xl bg-red-500 hover:bg-red-600">
+                        {deleteMut.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : "Evet, Sil"}
+                    </Button>
+                </div>
+            </div>
+        </div>
+      )}
     </div>
   );
 }

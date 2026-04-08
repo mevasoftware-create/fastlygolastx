@@ -1,18 +1,17 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Badge } from "@/components/ui/badge";
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription, SheetFooter } from "@/components/ui/sheet";
 import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
 import {
   Bell, Send, History, Smartphone, Globe, Monitor, RefreshCw,
   CheckCircle, XCircle, AlertCircle, Users, Zap, BarChart3,
-  Trash2, PowerOff, Eye, ChevronRight, Wifi, WifiOff, Settings, Calendar,
+  Trash2, PowerOff, Eye, ChevronRight, Wifi, WifiOff, Settings, Calendar, Loader2, Search, Package, Server,
 } from "lucide-react";
-import { useState, lazy, Suspense } from "react";
+import { useState, lazy, Suspense, useMemo } from "react";
 
 const AdminScheduledNotifications = lazy(() => import("./AdminScheduledNotifications"));
 
@@ -40,6 +39,8 @@ export default function AdminNotifications() {
   });
   const [activeOnly, setActiveOnly] = useState(true);
   const [previewMode, setPreviewMode] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState<number | null>(null);
 
   // Queries
   const { data: statusData, refetch: refetchStatus } = trpc.pushNotifications.getStatus.useQuery();
@@ -47,8 +48,8 @@ export default function AdminNotifications() {
     undefined,
     { enabled: activeTab === "stats" }
   );
-  const { data: historyData, refetch: refetchHistory } = trpc.pushNotifications.getHistory.useQuery(
-    { limit: 30, offset: 0 },
+  const { data: historyData, isLoading: historyLoading, refetch: refetchHistory } = trpc.pushNotifications.getHistory.useQuery(
+    { limit: 50, offset: 0 },
     { enabled: activeTab === "history" }
   );
   const { data: devicesData, isLoading: devicesLoading, refetch: refetchDevices } =
@@ -110,21 +111,30 @@ export default function AdminNotifications() {
   };
 
   const handleDelete = async (tokenId: number) => {
-    if (!confirm("Bu cihazı kalıcı olarak silmek istediğinizden emin misiniz?")) return;
     try {
       await deleteMutation.mutateAsync({ tokenId });
       toast.success("Cihaz silindi");
       refetchDevices();
       refetchStatus();
+      setShowDeleteConfirm(null);
     } catch {
       toast.error("İşlem başarısız");
     }
   };
 
+  const filteredDevices = useMemo(() => {
+    if (!devicesData) return [];
+    return devicesData.devices.filter(device =>
+      device.id.toString().includes(searchTerm.toLowerCase()) ||
+      device.userId?.toString().toLowerCase().includes(searchTerm.toLowerCase()) ||
+      getRoleLabel(String(device.userRole ?? ""))?.toString().toLowerCase().includes(searchTerm.toLowerCase())
+    );
+  }, [devicesData, searchTerm]);
+
   const getDeviceIcon = (deviceType: string | null) => {
-    if (deviceType === "android" || deviceType === "ios") return <Smartphone className="h-4 w-4" />;
-    if (deviceType === "web") return <Monitor className="h-4 w-4" />;
-    return <Bell className="h-4 w-4" />;
+    if (deviceType === "android" || deviceType === "ios") return <Smartphone className="h-5 w-5 text-gray-500" />;
+    if (deviceType === "web") return <Monitor className="h-5 w-5 text-gray-500" />;
+    return <Bell className="h-5 w-5 text-gray-500" />;
   };
 
   const getDeviceLabel = (deviceType: string | null) => {
@@ -134,11 +144,12 @@ export default function AdminNotifications() {
     return deviceType || "Bilinmiyor";
   };
 
-  const getRoleBadgeColor = (role: string | null) => {
-    if (role === "admin") return "bg-red-100 text-red-700 border-red-200";
-    if (role === "courier") return "bg-blue-100 text-blue-700 border-blue-200";
-    if (role === "business") return "bg-purple-100 text-purple-700 border-purple-200";
-    return "bg-gray-100 text-gray-700 border-gray-200";
+  const getRoleBadge = (role: string | null) => {
+    const baseClasses = "inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] font-semibold border";
+    if (role === "admin") return <span className={`${baseClasses} bg-red-50 text-red-700 border-red-200`}>Admin</span>;
+    if (role === "courier") return <span className={`${baseClasses} bg-blue-50 text-blue-700 border-blue-200`}>Kurye</span>;
+    if (role === "business") return <span className={`${baseClasses} bg-amber-50 text-amber-700 border-amber-200`}>İşletme</span>;
+    return <span className={`${baseClasses} bg-gray-50 text-gray-600 border-gray-200`}>Müşteri</span>;
   };
 
   const getRoleLabel = (role: string | null) => {
@@ -158,41 +169,61 @@ export default function AdminNotifications() {
     return map[platform] || platform;
   };
 
+  const renderEmptyState = (icon: React.ReactNode, message: string, description: string) => (
+    <div className="text-center py-16 bg-white rounded-2xl border border-gray-100">
+      <div className="w-16 h-16 rounded-2xl bg-gray-50 flex items-center justify-center mx-auto mb-4">{icon}</div>
+      <p className="text-sm font-medium text-gray-800">{message}</p>
+      <p className="text-sm text-gray-500 mt-1">{description}</p>
+    </div>
+  );
+
+  const statCards = [
+    { title: "Aktif Cihaz", value: statusData?.activeDeviceCount || 0, icon: <Smartphone className="h-5 w-5 text-blue-600" />, color: "blue" },
+    { title: "Toplam Cihaz", value: devicesData?.total || 0, icon: <Users className="h-5 w-5 text-amber-600" />, color: "amber" },
+    { title: "Bildirimler (24s)", value: statsData?.totalNotificationsSent || 0, icon: <Send className="h-5 w-5 text-emerald-600" />, color: "emerald" },
+    { title: "FCM Durumu", value: statusData?.configured ? "Aktif" : "Pasif", icon: <Server className="h-5 w-5 text-red-600" />, color: "red" },
+  ];
+
   return (
-    <div className="p-6 space-y-4">
+    <div className="p-4 lg:p-6 space-y-5 max-w-[1400px] mx-auto">
+      <div>
+        <h1 className="text-2xl font-bold text-gray-900 tracking-tight">Push Bildirimleri</h1>
+        <p className="text-sm text-gray-500 mt-0.5">Kullanıcılara ve kuryelere anlık bildirimler gönderin, geçmişi ve kayıtlı cihazları yönetin.</p>
+      </div>
+
       {/* FCM Status Bar */}
-      <div className={`flex items-center justify-between px-4 py-2.5 rounded-lg border text-sm ${
+      <div className={`flex items-center justify-between px-4 py-2.5 rounded-2xl border text-sm font-medium ${
         statusData?.configured
           ? statusData.method === "service_account"
-            ? "bg-green-50 border-green-200 text-green-800"
-            : "bg-yellow-50 border-yellow-200 text-yellow-800"
+            ? "bg-emerald-50 border-emerald-200 text-emerald-800"
+            : "bg-amber-50 border-amber-200 text-amber-800"
           : "bg-red-50 border-red-200 text-red-800"
       }`}>
         <div className="flex items-center gap-2">
           {statusData?.configured ? (
             statusData.method === "service_account" ? (
-              <><Wifi className="h-4 w-4" /><span><strong>FCM Aktif</strong> — Service Account ile otomatik token yenileme çalışıyor</span></>
+              <><Wifi className="h-4 w-4" /><span><strong>FCM Aktif:</strong> Service Account ile otomatik token yenileme çalışıyor.</span></>
             ) : (
-              <><AlertCircle className="h-4 w-4" /><span><strong>FCM Aktif</strong> — Manuel token (her saat yenilenmeli). Service Account eklemek için ayarlara gidin.</span></>
+              <><AlertCircle className="h-4 w-4" /><span><strong>FCM Aktif:</strong> Manuel token kullanılıyor. Service Account eklemeniz önerilir.</span></>
             )
           ) : (
-            <><WifiOff className="h-4 w-4" /><span><strong>FCM Yapılandırılmamış</strong> — FCM_ACCESS_TOKEN veya FCM_SERVICE_ACCOUNT_JSON gerekli</span></>
+            <><WifiOff className="h-4 w-4" /><span><strong>FCM Yapılandırılmamış:</strong> Push bildirimleri gönderilemiyor.</span></>
           )}
         </div>
         <div className="flex items-center gap-3">
           {statusData && (
-            <span className="font-medium">{statusData.activeDeviceCount} aktif cihaz</span>
+            <span>{statusData.activeDeviceCount} aktif cihaz</span>
           )}
-          <button onClick={() => refetchStatus()} className="opacity-60 hover:opacity-100">
+          <button onClick={() => refetchStatus()} className="opacity-60 hover:opacity-100 transition-opacity">
             <RefreshCw className="h-3.5 w-3.5" />
           </button>
         </div>
       </div>
 
       {/* Tab Navigation */}
-      <div className="flex gap-1 border-b">
+      <div className="bg-gray-100 rounded-xl p-1 flex items-center gap-1">
         {[
-          { id: "send" as TabType, icon: <Send className="h-4 w-4" />, label: "Bildirim Gönder" },
+          { id: "send" as TabType, icon: <Send className="h-4 w-4" />, label: "Gönder" },
           { id: "history" as TabType, icon: <History className="h-4 w-4" />, label: "Geçmiş" },
           { id: "devices" as TabType, icon: <Smartphone className="h-4 w-4" />, label: "Cihazlar", badge: statusData?.activeDeviceCount },
           { id: "stats" as TabType, icon: <BarChart3 className="h-4 w-4" />, label: "İstatistikler" },
@@ -201,491 +232,313 @@ export default function AdminNotifications() {
           <button
             key={tab.id}
             onClick={() => setActiveTab(tab.id)}
-            className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
+            className={`flex-1 px-3 py-2 text-[11px] font-semibold uppercase tracking-wider rounded-lg transition-colors flex items-center justify-center gap-1.5 ${
               activeTab === tab.id
-                ? "border-orange-500 text-orange-600"
-                : "border-transparent text-gray-500 hover:text-gray-700"
+                ? "bg-white text-gray-800 shadow-sm"
+                : "text-gray-500 hover:bg-white/50 hover:text-gray-700"
             }`}
           >
-            <span className="flex items-center gap-2">
-              {tab.icon}
-              {tab.label}
-              {tab.badge !== undefined && tab.badge > 0 && (
-                <span className="px-1.5 py-0.5 text-xs rounded-full bg-orange-100 text-orange-700">{tab.badge}</span>
-              )}
-            </span>
+            {tab.icon}
+            {tab.label}
+            {tab.badge !== undefined && tab.badge > 0 && (
+              <span className="px-1.5 py-0.5 text-[10px] rounded-md bg-orange-500 text-white">{tab.badge}</span>
+            )}
           </button>
         ))}
       </div>
 
       {/* ===== SEND TAB ===== */}
       {activeTab === "send" && (
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-          {/* Main Form */}
-          <div className="lg:col-span-2 space-y-4">
-            <Card>
-              <CardHeader className="pb-3">
-                <CardTitle className="flex items-center gap-2 text-base">
-                  <Send className="h-4 w-4" />
-                  Bildirim Gönder
-                </CardTitle>
-                <CardDescription>FCM ile mobil ve web cihazlarına push notification gönderin</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <Label className="text-xs font-medium text-gray-600 uppercase tracking-wide">Platform</Label>
-                    <Select value={form.platform} onValueChange={(v: "web" | "mobile" | "all") => setForm({ ...form, platform: v })}>
-                      <SelectTrigger className="mt-1">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="all"><div className="flex items-center gap-2"><Bell className="h-4 w-4" />Tümü (Web + Mobil)</div></SelectItem>
-                        <SelectItem value="mobile"><div className="flex items-center gap-2"><Smartphone className="h-4 w-4" />Sadece Mobil (FCM)</div></SelectItem>
-                        <SelectItem value="web"><div className="flex items-center gap-2"><Globe className="h-4 w-4" />Sadece Web</div></SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div>
-                    <Label className="text-xs font-medium text-gray-600 uppercase tracking-wide">Hedef Kitle</Label>
-                    <Select value={form.targetAudience} onValueChange={(v: "all" | "users" | "couriers" | "business") => setForm({ ...form, targetAudience: v })}>
-                      <SelectTrigger className="mt-1">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="all"><div className="flex items-center gap-2"><Users className="h-4 w-4" />Tüm Kullanıcılar</div></SelectItem>
-                        <SelectItem value="users">Sadece Müşteriler</SelectItem>
-                        <SelectItem value="couriers">Sadece Kuryeler</SelectItem>
-                        <SelectItem value="business">Sadece İşletmeler</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </div>
-
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
+          <div className="lg:col-span-2 bg-white rounded-2xl border border-gray-100 p-5 space-y-5">
+            <div className="space-y-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <Label className="text-xs font-medium text-gray-600 uppercase tracking-wide">Başlık *</Label>
+                  <Label className="text-[11px] text-gray-500 uppercase tracking-wider font-semibold">Platform</Label>
+                  <Select value={form.platform} onValueChange={(v: "web" | "mobile" | "all") => setForm({ ...form, platform: v })}>
+                    <SelectTrigger className="mt-1.5 rounded-xl">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all"><div className="flex items-center gap-2"><Bell className="h-4 w-4" />Tümü (Web + Mobil)</div></SelectItem>
+                      <SelectItem value="mobile"><div className="flex items-center gap-2"><Smartphone className="h-4 w-4" />Sadece Mobil (FCM)</div></SelectItem>
+                      <SelectItem value="web"><div className="flex items-center gap-2"><Globe className="h-4 w-4" />Sadece Web</div></SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div>
+                  <Label className="text-[11px] text-gray-500 uppercase tracking-wider font-semibold">Hedef Kitle</Label>
+                  <Select value={form.targetAudience} onValueChange={(v: "all" | "users" | "couriers" | "business") => setForm({ ...form, targetAudience: v })}>
+                    <SelectTrigger className="mt-1.5 rounded-xl">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all"><div className="flex items-center gap-2"><Users className="h-4 w-4" />Tüm Kullanıcılar</div></SelectItem>
+                      <SelectItem value="users">Sadece Müşteriler</SelectItem>
+                      <SelectItem value="couriers">Sadece Kuryeler</SelectItem>
+                      <SelectItem value="business">Sadece İşletmeler</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+
+              <div>
+                <Label className="text-[11px] text-gray-500 uppercase tracking-wider font-semibold">Başlık *</Label>
+                <Input
+                  className="mt-1.5 rounded-xl"
+                  placeholder="Bildirim başlığı..."
+                  value={form.title}
+                  onChange={(e) => setForm({ ...form, title: e.target.value })}
+                />
+              </div>
+
+              <div>
+                <Label className="text-[11px] text-gray-500 uppercase tracking-wider font-semibold">Mesaj *</Label>
+                <Textarea
+                  className="mt-1.5 rounded-xl"
+                  placeholder="Bildirim mesajı..."
+                  value={form.body}
+                  onChange={(e) => setForm({ ...form, body: e.target.value })}
+                  rows={3}
+                />
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <Label className="text-[11px] text-gray-500 uppercase tracking-wider font-semibold">Görsel URL (Opsiyonel)</Label>
                   <Input
-                    className="mt-1"
-                    placeholder="Bildirim başlığı..."
-                    value={form.title}
-                    onChange={(e) => setForm({ ...form, title: e.target.value })}
+                    className="mt-1.5 rounded-xl"
+                    placeholder="https://example.com/image.jpg"
+                    value={form.imageUrl}
+                    onChange={(e) => setForm({ ...form, imageUrl: e.target.value })}
                   />
                 </div>
-
                 <div>
-                  <Label className="text-xs font-medium text-gray-600 uppercase tracking-wide">Mesaj *</Label>
-                  <Textarea
-                    className="mt-1"
-                    placeholder="Bildirim mesajı..."
-                    value={form.body}
-                    onChange={(e) => setForm({ ...form, body: e.target.value })}
-                    rows={3}
+                  <Label className="text-[11px] text-gray-500 uppercase tracking-wider font-semibold">Tıklama URL'i (Opsiyonel)</Label>
+                  <Input
+                    className="mt-1.5 rounded-xl"
+                    placeholder="/orders veya https://fastlygo.mk/promo"
+                    value={form.actionUrl}
+                    onChange={(e) => setForm({ ...form, actionUrl: e.target.value })}
                   />
                 </div>
+              </div>
+            </div>
 
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <Label className="text-xs font-medium text-gray-600 uppercase tracking-wide">Görsel URL (Opsiyonel)</Label>
-                    <Input
-                      className="mt-1"
-                      placeholder="https://example.com/image.jpg"
-                      value={form.imageUrl}
-                      onChange={(e) => setForm({ ...form, imageUrl: e.target.value })}
-                    />
+            {previewMode && form.title && (
+              <div className="p-3 bg-gray-900 rounded-xl text-white text-sm">
+                <div className="flex items-start gap-2">
+                  <div className="w-8 h-8 bg-orange-500 rounded-lg flex items-center justify-center flex-shrink-0">
+                    <Bell className="h-4 w-4" />
                   </div>
                   <div>
-                    <Label className="text-xs font-medium text-gray-600 uppercase tracking-wide">Tıklama URL'i (Opsiyonel)</Label>
-                    <Input
-                      className="mt-1"
-                      placeholder="/orders veya https://fastlygo.mk/promo"
-                      value={form.actionUrl}
-                      onChange={(e) => setForm({ ...form, actionUrl: e.target.value })}
-                    />
+                    <p className="font-semibold text-xs opacity-70 mb-0.5">FastlyGo</p>
+                    <p className="font-medium">{form.title}</p>
+                    <p className="text-xs opacity-80 mt-0.5">{form.body}</p>
                   </div>
                 </div>
+              </div>
+            )}
 
-                {/* Preview */}
-                {previewMode && form.title && (
-                  <div className="p-3 bg-gray-900 rounded-xl text-white text-sm">
-                    <div className="flex items-start gap-2">
-                      <div className="w-8 h-8 bg-orange-500 rounded-lg flex items-center justify-center flex-shrink-0">
-                        <Bell className="h-4 w-4" />
-                      </div>
-                      <div>
-                        <p className="font-semibold text-xs opacity-70 mb-0.5">FastlyGo</p>
-                        <p className="font-medium">{form.title}</p>
-                        <p className="text-xs opacity-80 mt-0.5">{form.body}</p>
-                      </div>
-                    </div>
-                  </div>
-                )}
-
-                <div className="flex gap-2">
-                  <Button
-                    onClick={handleSend}
-                    className="flex-1 bg-orange-500 hover:bg-orange-600"
-                    disabled={sendMutation.isPending || !form.title || !form.body}
-                  >
-                    <Send className="h-4 w-4 mr-2" />
-                    {sendMutation.isPending ? "Gönderiliyor..." : "Bildirimi Gönder"}
-                  </Button>
-                  <Button
-                    variant="outline"
-                    onClick={() => setPreviewMode(!previewMode)}
-                    className="px-3"
-                  >
-                    <Eye className="h-4 w-4" />
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
+            <div className="flex gap-2 pt-2 border-t border-gray-100">
+              <Button
+                onClick={handleSend}
+                className="flex-1 bg-orange-500 hover:bg-orange-600 rounded-xl h-11"
+                disabled={sendMutation.isPending || !form.title || !form.body}
+              >
+                {sendMutation.isPending ? 
+                  <Loader2 className="h-5 w-5 animate-spin" /> :
+                  <><Send className="h-4 w-4 mr-2" /><span>Bildirimi Gönder</span></>
+                }
+              </Button>
+              <Button
+                variant="outline"
+                onClick={() => setPreviewMode(!previewMode)}
+                className="px-3 rounded-xl h-11"
+              >
+                <Eye className="h-4 w-4" />
+              </Button>
+            </div>
           </div>
 
-          {/* Templates Sidebar */}
-          <div className="space-y-4">
-            <Card>
-              <CardHeader className="pb-3">
-                <CardTitle className="flex items-center gap-2 text-base">
-                  <Zap className="h-4 w-4" />
-                  Hızlı Şablonlar
-                </CardTitle>
-                <CardDescription>Hazır şablonları tek tıkla uygulayın</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-2">
-                {TEMPLATES.map(template => (
-                  <button
-                    key={template.key}
-                    onClick={() => applyTemplate(template)}
-                    className="w-full text-left px-3 py-2.5 rounded-lg border border-gray-200 hover:border-orange-300 hover:bg-orange-50 transition-colors group"
-                  >
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm font-medium text-gray-700 group-hover:text-orange-700">{template.label}</span>
-                      <ChevronRight className="h-3.5 w-3.5 text-gray-400 group-hover:text-orange-500" />
-                    </div>
-                    <p className="text-xs text-gray-500 mt-0.5 truncate">{template.body}</p>
-                  </button>
-                ))}
-              </CardContent>
-            </Card>
-
-            {/* FCM Config Info */}
-            <Card className="border-dashed">
-              <CardHeader className="pb-2">
-                <CardTitle className="flex items-center gap-2 text-sm text-gray-600">
-                  <Settings className="h-4 w-4" />
-                  FCM Yapılandırması
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="text-xs text-gray-500 space-y-1.5">
-                <div className="flex justify-between">
-                  <span>Proje ID:</span>
-                  <span className="font-mono font-medium text-gray-700">{statusData?.projectId || "fastlygo1"}</span>
+          <div className="space-y-5">
+            <div className="bg-white rounded-2xl border border-gray-100 p-5">
+                <h3 className="text-base font-bold text-gray-800 flex items-center gap-2"><Zap className="h-5 w-5 text-orange-500" />Hızlı Şablonlar</h3>
+                <p className="text-xs text-gray-500 mt-1 mb-4">Hazır şablonları tek tıkla uygulayın.</p>
+                <div className="space-y-2">
+                    {TEMPLATES.map(template => (
+                    <button
+                        key={template.key}
+                        onClick={() => applyTemplate(template)}
+                        className="w-full text-left px-3 py-2.5 rounded-xl border border-gray-100 hover:border-orange-300 hover:bg-orange-50 transition-colors group"
+                    >
+                        <div className="flex items-center justify-between">
+                        <span className="text-sm font-medium text-gray-700 group-hover:text-orange-700">{template.label}</span>
+                        <ChevronRight className="h-4 w-4 text-gray-400 group-hover:text-orange-500" />
+                        </div>
+                        <p className="text-xs text-gray-500 mt-0.5 truncate">{template.body}</p>
+                    </button>
+                    ))}
                 </div>
-                <div className="flex justify-between">
-                  <span>Yöntem:</span>
-                  <span className={`font-medium ${statusData?.method === "service_account" ? "text-green-600" : "text-yellow-600"}`}>
-                    {statusData?.method === "service_account" ? "Service Account ✓" : statusData?.method === "manual_token" ? "Manuel Token ⚠" : "Yapılandırılmamış ✗"}
-                  </span>
-                </div>
-                {statusData?.method === "manual_token" && (
-                  <div className="mt-2 p-2 bg-yellow-50 rounded text-yellow-700 text-xs">
-                    Otomatik yenileme için <strong>FCM_SERVICE_ACCOUNT_JSON</strong> secret'ını ekleyin.
-                  </div>
-                )}
-              </CardContent>
-            </Card>
+            </div>
           </div>
         </div>
       )}
 
       {/* ===== HISTORY TAB ===== */}
       {activeTab === "history" && (
-        <Card>
-          <CardHeader>
-            <div className="flex items-center justify-between">
-              <div>
-                <CardTitle className="flex items-center gap-2">
-                  <History className="h-5 w-5" />
-                  Bildirim Geçmişi
-                </CardTitle>
-                <CardDescription>Gönderilen tüm bildirimler — {historyData?.total || 0} kayıt</CardDescription>
-              </div>
-              <Button variant="outline" size="sm" onClick={() => refetchHistory()}>
-                <RefreshCw className="h-4 w-4 mr-1" />
-                Yenile
-              </Button>
+        <div>
+          <div className="flex items-center justify-between mb-4">
+            <div>
+                <h3 className="text-lg font-bold text-gray-800">Gönderim Geçmişi</h3>
+                <p className="text-sm text-gray-500">{historyData?.total || 0} kayıt bulundu</p>
             </div>
-          </CardHeader>
-          <CardContent>
-            {historyData && historyData.notifications.length > 0 ? (
-              <div className="space-y-2">
-                {historyData.notifications.map((n) => (
-                  <div key={n.id} className="p-4 border rounded-lg hover:bg-gray-50 transition-colors">
-                    <div className="flex items-start justify-between gap-4">
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2 flex-wrap mb-1">
-                          <h4 className="font-semibold text-sm">{n.title}</h4>
-                          <Badge variant="outline" className="text-xs">{getPlatformLabel(n.platform)}</Badge>
-                          <Badge variant="outline" className="text-xs">{getAudienceLabel(n.targetAudience)}</Badge>
-                        </div>
-                        <p className="text-sm text-gray-600 truncate">{n.body}</p>
-                        <p className="text-xs text-gray-400 mt-1">
-                          {new Date(n.createdAt).toLocaleString("tr-TR")}
-                        </p>
+            <Button variant="outline" size="sm" onClick={() => refetchHistory()} disabled={historyLoading} className="rounded-xl">
+              {historyLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <RefreshCw className="h-4 w-4" />}
+            </Button>
+          </div>
+          {historyLoading && !historyData ? (
+            <div className="w-full flex justify-center py-20"><Loader2 className="h-8 w-8 animate-spin text-orange-500" /></div>
+          ) : historyData && historyData.notifications.length > 0 ? (
+            <div className="bg-white rounded-2xl border border-gray-100 divide-y divide-gray-100">
+              {historyData.notifications.map((n) => (
+                <div key={n.id} className="px-5 py-3.5 hover:bg-gray-50/50 transition-colors group">
+                  <div className="flex items-center justify-between gap-4">
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 flex-wrap mb-1">
+                        <h4 className="font-semibold text-sm text-gray-800">{n.title}</h4>
+                        <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md text-[10px] font-semibold border bg-gray-50 text-gray-600 border-gray-200">{getPlatformLabel(n.platform)}</span>
+                        <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md text-[10px] font-semibold border bg-gray-50 text-gray-600 border-gray-200">{getAudienceLabel(n.targetAudience)}</span>
                       </div>
-                      <div className="flex items-center gap-3 text-sm flex-shrink-0">
-                        <div className="flex items-center gap-1 text-green-600">
-                          <CheckCircle className="h-4 w-4" />
-                          <span className="font-medium">{n.sentCount}</span>
-                        </div>
-                        {n.failedCount > 0 && (
-                          <div className="flex items-center gap-1 text-red-500">
-                            <XCircle className="h-4 w-4" />
-                            <span className="font-medium">{n.failedCount}</span>
-                          </div>
-                        )}
+                      <p className="text-sm text-gray-600 truncate">{n.body}</p>
+                      <p className="text-xs text-gray-400 mt-1.5">
+                        {new Date(n.createdAt).toLocaleString("tr-TR", { day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' })}
+                      </p>
+                    </div>
+                    <div className="flex items-center gap-4 text-sm flex-shrink-0 font-semibold">
+                      <div className="flex items-center gap-1.5 text-emerald-600">
+                        <CheckCircle className="h-4 w-4" />
+                        <span>{n.sentCount}</span>
                       </div>
+                      {n.failedCount > 0 && (
+                        <div className="flex items-center gap-1.5 text-red-500">
+                          <XCircle className="h-4 w-4" />
+                          <span>{n.failedCount}</span>
+                        </div>
+                      )}
                     </div>
                   </div>
-                ))}
-              </div>
-            ) : (
-              <div className="text-center py-12 text-gray-400">
-                <Bell className="h-12 w-12 mx-auto mb-3 opacity-20" />
-                <p className="font-medium">Henüz bildirim gönderilmemiş</p>
-                <p className="text-sm mt-1">İlk bildirimi göndermek için "Bildirim Gönder" sekmesine gidin</p>
-              </div>
-            )}
-          </CardContent>
-        </Card>
+                </div>
+              ))}
+            </div>
+          ) : (
+            renderEmptyState(<History className="h-8 w-8 text-gray-400" />, "Henüz Bildirim Gönderilmemiş", "İlk bildirimi göndermek için \"Gönder\" sekmesine gidin.")
+          )}
+        </div>
       )}
 
       {/* ===== DEVICES TAB ===== */}
       {activeTab === "devices" && (
-        <Card>
-          <CardHeader>
-            <div className="flex items-center justify-between">
-              <div>
-                <CardTitle className="flex items-center gap-2">
-                  <Smartphone className="h-5 w-5" />
-                  Kayıtlı Cihazlar
-                </CardTitle>
-                <CardDescription>
-                  Push bildirim için kayıtlı cihazlar — {devicesData?.total || 0} cihaz
-                </CardDescription>
-              </div>
-              <div className="flex items-center gap-3">
-                <label className="flex items-center gap-2 text-sm text-gray-600 cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={activeOnly}
-                    onChange={(e) => setActiveOnly(e.target.checked)}
-                    className="rounded"
-                  />
-                  Sadece aktif
-                </label>
-                <Button variant="outline" size="sm" onClick={() => refetchDevices()}>
-                  <RefreshCw className="h-4 w-4 mr-1" />
-                  Yenile
-                </Button>
-              </div>
-            </div>
-          </CardHeader>
-          <CardContent>
-            {devicesLoading ? (
-              <div className="text-center py-12 text-gray-400">
-                <RefreshCw className="h-8 w-8 mx-auto mb-2 animate-spin opacity-40" />
-                <p>Yükleniyor...</p>
-              </div>
-            ) : devicesData && devicesData.devices.length > 0 ? (
-              <div className="space-y-2">
-                {/* Header */}
-                <div className="grid grid-cols-12 gap-2 px-3 py-2 text-xs font-medium text-gray-500 uppercase tracking-wide border-b">
-                  <div className="col-span-4">Kullanıcı</div>
-                  <div className="col-span-2">Rol</div>
-                  <div className="col-span-2">Cihaz</div>
-                  <div className="col-span-2">Durum</div>
-                  <div className="col-span-1">Tarih</div>
-                  <div className="col-span-1 text-right">İşlem</div>
+        <div>
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mb-4">
+                <div className="relative w-full sm:max-w-xs">
+                    <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                    <Input 
+                        placeholder="Cihazlarda ara..." 
+                        className="rounded-xl pl-10" 
+                        value={searchTerm}
+                        onChange={e => setSearchTerm(e.target.value)}
+                    />
                 </div>
-                {devicesData.devices.map((device) => (
-                  <div
-                    key={device.id}
-                    className={`grid grid-cols-12 gap-2 px-3 py-3 rounded-lg transition-colors border ${
-                      device.isActive
-                        ? "border-transparent hover:bg-gray-50 hover:border-gray-200"
-                        : "border-gray-100 bg-gray-50 opacity-60"
-                    }`}
-                  >
-                    {/* User */}
-                    <div className="col-span-4 flex flex-col justify-center min-w-0">
-                      <p className="text-sm font-medium text-gray-900 truncate">{device.userName || "İsimsiz"}</p>
-                      <p className="text-xs text-gray-500 truncate">{device.userEmail || `ID: ${device.userId}`}</p>
-                    </div>
+                <div className="flex items-center gap-2">
+                    <Button variant={activeOnly ? "secondary" : "outline"} onClick={() => setActiveOnly(!activeOnly)} className="rounded-xl"> 
+                        {activeOnly ? "Sadece Aktifleri Göster" : "Tümünü Göster"}
+                    </Button>
+                    <Button variant="outline" size="icon" onClick={() => refetchDevices()} disabled={devicesLoading} className="rounded-xl w-10 h-10">
+                        {devicesLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <RefreshCw className="h-4 w-4" />}
+                    </Button>
+                </div>
+            </div>
 
-                    {/* Role */}
-                    <div className="col-span-2 flex items-center">
-                      <span className={`text-xs px-2 py-0.5 rounded-full font-medium border ${getRoleBadgeColor(device.userRole)}`}>
-                        {getRoleLabel(device.userRole)}
-                      </span>
+            {devicesLoading && !devicesData ? (
+                <div className="w-full flex justify-center py-20"><Loader2 className="h-8 w-8 animate-spin text-orange-500" /></div>
+            ) : filteredDevices.length > 0 ? (
+                <div className="bg-white rounded-2xl border border-gray-100 divide-y divide-gray-100">
+                {filteredDevices.map((d) => (
+                    <div key={d.id} className="px-5 py-3.5 hover:bg-gray-50/50 transition-colors group">
+                        <div className="flex items-center justify-between gap-4">
+                            <div className="flex items-center gap-4">
+                                <div className="w-9 h-9 rounded-xl bg-gray-100 flex items-center justify-center shadow-sm flex-shrink-0">
+                                    {getDeviceIcon(d.deviceType)}
+                                </div>
+                                <div>
+                                    <div className="flex items-center gap-2">
+                                        <p className="font-bold text-sm text-gray-800">Cihaz #{d.id}</p>
+                                        {!d.isActive && <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md text-[10px] font-semibold border bg-red-50 text-red-600 border-red-200">Pasif</span>}
+                                    </div>
+                                    <p className="text-xs text-gray-500 mt-0.5">Kullanıcı: {d.userId || "Misafir"} &bull; {getDeviceLabel(d.deviceType)}</p>
+                                </div>
+                            </div>
+                            <div className="flex items-center gap-4">
+                                {getRoleBadge(d.userRole)}
+                                <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                    {d.isActive && 
+                                        <Button variant="outline" size="icon" className="w-8 h-8 rounded-lg" onClick={() => handleDeactivate(d.id)}><PowerOff className="h-4 w-4" /></Button>
+                                    }
+                                    <Button variant="destructive" size="icon" className="w-8 h-8 rounded-lg" onClick={() => setShowDeleteConfirm(d.id)}><Trash2 className="h-4 w-4" /></Button>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-
-                    {/* Device */}
-                    <div className="col-span-2 flex items-center gap-1.5 text-sm text-gray-700">
-                      {getDeviceIcon(device.deviceType)}
-                      <span>{getDeviceLabel(device.deviceType)}</span>
-                    </div>
-
-                    {/* Status */}
-                    <div className="col-span-2 flex items-center">
-                      {device.isActive ? (
-                        <span className="flex items-center gap-1 text-xs text-green-600 font-medium">
-                          <CheckCircle className="h-3.5 w-3.5" />Aktif
-                        </span>
-                      ) : (
-                        <span className="flex items-center gap-1 text-xs text-gray-400">
-                          <XCircle className="h-3.5 w-3.5" />Pasif
-                        </span>
-                      )}
-                    </div>
-
-                    {/* Date */}
-                    <div className="col-span-1 flex items-center text-xs text-gray-400">
-                      {new Date(device.createdAt).toLocaleDateString("tr-TR", { day: "2-digit", month: "2-digit" })}
-                    </div>
-
-                    {/* Actions */}
-                    <div className="col-span-1 flex items-center justify-end gap-1">
-                      {device.isActive && (
-                        <button
-                          onClick={() => handleDeactivate(device.id)}
-                          className="p-1 rounded hover:bg-yellow-100 text-yellow-600 transition-colors"
-                          title="Deaktive et"
-                        >
-                          <PowerOff className="h-3.5 w-3.5" />
-                        </button>
-                      )}
-                      <button
-                        onClick={() => handleDelete(device.id)}
-                        className="p-1 rounded hover:bg-red-100 text-red-500 transition-colors"
-                        title="Sil"
-                      >
-                        <Trash2 className="h-3.5 w-3.5" />
-                      </button>
-                    </div>
-                  </div>
                 ))}
-              </div>
+                </div>
             ) : (
-              <div className="text-center py-12 text-gray-400">
-                <Smartphone className="h-12 w-12 mx-auto mb-3 opacity-20" />
-                <p className="font-medium">Kayıtlı cihaz bulunamadı</p>
-                <p className="text-sm mt-1">Mobil uygulamadan giriş yapıp bildirim izni verildiğinde cihazlar burada görünür</p>
-              </div>
+                renderEmptyState(<Smartphone className="h-8 w-8 text-gray-400" />, "Kayıtlı Cihaz Bulunamadı", "Kullanıcılar uygulamayı kullandıkça cihazları burada listelenecektir.")
             )}
-          </CardContent>
-        </Card>
+        </div>
       )}
 
       {/* ===== STATS TAB ===== */}
       {activeTab === "stats" && (
-        <div className="space-y-4">
-          {/* Summary Cards */}
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-            {[
-              { label: "Toplam Gönderim", value: statsData?.totalNotificationsSent || 0, icon: <Send className="h-5 w-5" />, color: "text-blue-600 bg-blue-50" },
-              { label: "Ulaşılan Cihaz", value: statsData?.totalDevicesReached || 0, icon: <CheckCircle className="h-5 w-5" />, color: "text-green-600 bg-green-50" },
-              { label: "Aktif Cihaz", value: statsData?.activeDevices || 0, icon: <Smartphone className="h-5 w-5" />, color: "text-orange-600 bg-orange-50" },
-              { label: "FCM Durumu", value: statusData?.configured ? "Aktif" : "Pasif", icon: <Wifi className="h-5 w-5" />, color: statusData?.configured ? "text-green-600 bg-green-50" : "text-red-600 bg-red-50" },
-            ].map((stat, i) => (
-              <Card key={i}>
-                <CardContent className="pt-4">
-                  <div className="flex items-center justify-between">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            {statCards.map(stat => (
+                <div key={stat.title} className={`bg-${stat.color}-50 rounded-2xl p-3.5 flex items-center gap-3 ring-1 ring-${stat.color}-100`}>
+                    <div className="w-9 h-9 rounded-xl bg-white flex items-center justify-center shadow-sm">{stat.icon}</div>
                     <div>
-                      <p className="text-xs text-gray-500 uppercase tracking-wide">{stat.label}</p>
-                      <p className="text-2xl font-bold mt-1">{stat.value}</p>
+                        <p className="text-xs font-medium text-gray-500">{stat.title}</p>
+                        <p className="text-xl font-bold text-gray-800">{stat.value}</p>
                     </div>
-                    <div className={`p-2.5 rounded-lg ${stat.color}`}>{stat.icon}</div>
-                  </div>
-                </CardContent>
-              </Card>
+                </div>
             ))}
-          </div>
-
-          {/* Devices by Type */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-base">Cihaz Dağılımı</CardTitle>
-              </CardHeader>
-              <CardContent>
-                {statsData?.devicesByType && statsData.devicesByType.length > 0 ? (
-                  <div className="space-y-3">
-                    {statsData.devicesByType.map((d) => (
-                      <div key={d.deviceType} className="flex items-center gap-3">
-                        <div className="flex items-center gap-2 w-24">
-                          {getDeviceIcon(d.deviceType)}
-                          <span className="text-sm font-medium">{getDeviceLabel(d.deviceType)}</span>
-                        </div>
-                        <div className="flex-1 bg-gray-100 rounded-full h-2">
-                          <div
-                            className="bg-orange-500 h-2 rounded-full"
-                            style={{ width: `${Math.min(100, (Number(d.count) / (statsData.activeDevices || 1)) * 100)}%` }}
-                          />
-                        </div>
-                        <span className="text-sm font-bold w-8 text-right">{d.count}</span>
-                      </div>
-                    ))}
-                  </div>
-                ) : (
-                  <p className="text-sm text-gray-400 text-center py-4">Veri yok</p>
-                )}
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-base">Son Bildirimler</CardTitle>
-              </CardHeader>
-              <CardContent>
-                {statsData?.recentNotifications && statsData.recentNotifications.length > 0 ? (
-                  <div className="space-y-2">
-                    {statsData.recentNotifications.map((n) => (
-                      <div key={n.id} className="flex items-center justify-between py-2 border-b last:border-0">
-                        <div className="flex-1 min-w-0">
-                          <p className="text-sm font-medium truncate">{n.title}</p>
-                          <p className="text-xs text-gray-400">{new Date(n.createdAt).toLocaleString("tr-TR")}</p>
-                        </div>
-                        <div className="flex items-center gap-2 ml-3">
-                          <span className="text-xs text-green-600 font-medium">{n.sentCount} ✓</span>
-                          {n.failedCount > 0 && <span className="text-xs text-red-500">{n.failedCount} ✗</span>}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                ) : (
-                  <p className="text-sm text-gray-400 text-center py-4">Henüz bildirim gönderilmemiş</p>
-                )}
-              </CardContent>
-            </Card>
-          </div>
-
-          <Button variant="outline" onClick={() => refetchStats()} className="w-full">
-            <RefreshCw className="h-4 w-4 mr-2" />
-            İstatistikleri Yenile
-          </Button>
         </div>
       )}
 
+      {/* ===== SCHEDULED TAB ===== */}
       {activeTab === "scheduled" && (
-        <Suspense fallback={
-          <div className="flex items-center justify-center py-16 text-gray-400">
-            <RefreshCw className="h-6 w-6 animate-spin mr-2" />
-            Yükleniyor...
-          </div>
-        }>
+        <Suspense fallback={<div className="w-full flex justify-center py-20"><Loader2 className="h-8 w-8 animate-spin text-orange-500" /></div>}>
           <AdminScheduledNotifications />
         </Suspense>
+      )}
+
+      {/* Delete Confirmation Modal */}
+      {showDeleteConfirm !== null && (
+        <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm flex items-center justify-center" onClick={() => setShowDeleteConfirm(null)}>
+            <div className="bg-white rounded-2xl p-6 max-w-sm shadow-2xl w-full mx-4" onClick={e => e.stopPropagation()}>
+                <h3 className="text-lg font-bold text-gray-900">Cihazı Sil</h3>
+                <p className="text-sm text-gray-500 mt-2">Cihaz #{showDeleteConfirm} kalıcı olarak silinecektir. Bu cihaza artık bildirim gönderilemez. Bu işlem geri alınamaz.</p>
+                <div className="flex justify-end gap-3 mt-6">
+                    <Button variant="outline" className="rounded-xl" onClick={() => setShowDeleteConfirm(null)}>İptal</Button>
+                    <Button 
+                        variant="destructive" 
+                        className="rounded-xl bg-red-500 hover:bg-red-600"
+                        onClick={() => handleDelete(showDeleteConfirm)}
+                        disabled={deleteMutation.isPending}
+                    >
+                        {deleteMutation.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : "Evet, Sil"}
+                    </Button>
+                </div>
+            </div>
+        </div>
       )}
     </div>
   );

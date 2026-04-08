@@ -1,12 +1,10 @@
 import { useState } from "react";
 import { useAuth } from "@/_core/hooks/useAuth";
 import DashboardLayout from "@/components/DashboardLayout";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { trpc } from "@/lib/trpc";
-import { Star, AlertTriangle, Award, Search, Filter } from "lucide-react";
+import { Star, AlertTriangle, Award, Search, Users, Trophy, ChevronLeft, ChevronRight, Loader2, Frown } from "lucide-react";
 import { useLocation } from "wouter";
 
 export default function CourierRatings() {
@@ -15,8 +13,9 @@ export default function CourierRatings() {
   const [searchTerm, setSearchTerm] = useState("");
   const [filterRating, setFilterRating] = useState<string>("all");
   const [sortBy, setSortBy] = useState<string>("recent");
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
 
-  // Redirect if not admin
   if (!loading && (!isAuthenticated || user?.role !== "admin")) {
     navigate("/");
     return null;
@@ -24,260 +23,139 @@ export default function CourierRatings() {
 
   const { data: couriers, isLoading } = trpc.admin.getAllCouriersWithUsers.useQuery();
 
+  const processedCouriers = couriers?.map((c: any) => ({
+    ...c,
+    rating: c.averageRating || 0,
+    totalDeliveries: c.deliveries?.length || 0,
+  })) || [];
+
+  const filteredCouriers = processedCouriers
+    .filter((courier: any) =>
+      courier.name?.toLowerCase().includes(searchTerm.toLowerCase())
+    )
+    .filter((courier: any) => {
+      if (filterRating === "all") return true;
+      const minRating = parseInt(filterRating);
+      return (courier.rating || 0) >= minRating;
+    })
+    .sort((a, b) => {
+      switch (sortBy) {
+        case "highest":
+          return (b.rating || 0) - (a.rating || 0);
+        case "lowest":
+          return (a.rating || 0) - (b.rating || 0);
+        case "deliveries":
+          return (b.totalDeliveries || 0) - (a.totalDeliveries || 0);
+        default:
+          // Assuming recent means by creation date, which we don't have. 
+          // Let's sort by name as a default if not specified.
+          return a.name.localeCompare(b.name);
+      }
+    });
+
+  const totalPages = Math.ceil(filteredCouriers.length / itemsPerPage);
+  const paginatedCouriers = filteredCouriers.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
+
+  const getRatingBadge = (rating: number) => {
+    const baseClasses = "inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] font-semibold border";
+    if (rating >= 4.5) {
+      return <span className={`${baseClasses} bg-emerald-50 text-emerald-700 border-emerald-200`}>Mükemmel</span>;
+    } else if (rating >= 4.0) {
+      return <span className={`${baseClasses} bg-blue-50 text-blue-700 border-blue-200`}>İyi</span>;
+    } else if (rating >= 3.5) {
+      return <span className={`${baseClasses} bg-amber-50 text-amber-700 border-amber-200`}>Orta</span>;
+    } else {
+      return <span className={`${baseClasses} bg-red-50 text-red-700 border-red-200`}>Düşük</span>;
+    }
+  };
+
   if (loading || isLoading) {
     return (
       <DashboardLayout>
-        <div className="flex items-center justify-center min-h-[400px]">
-          <div className="text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-600 mx-auto mb-4"></div>
-            <p className="text-gray-600">Yükleniyor...</p>
-          </div>
+        <div className="flex items-center justify-center h-[calc(100vh-100px)]">
+            <Loader2 className="h-10 w-10 animate-spin text-orange-500" />
         </div>
       </DashboardLayout>
     );
   }
 
-  // Filter and sort couriers
-  let filteredCouriers = couriers?.map((c: any) => ({
-    ...c,
-    rating: c.averageRating || 0,
-    totalDeliveries: 0,
-  })) || [];
+  const averageRating = filteredCouriers.length > 0
+    ? (
+        filteredCouriers.reduce((sum: number, c: any) => sum + (c.rating || 0), 0) /
+        filteredCouriers.length
+      ).toFixed(1)
+    : "0.0";
 
-  // Search filter
-  if (searchTerm) {
-    filteredCouriers = filteredCouriers.filter((courier: any) =>
-      courier.name?.toLowerCase().includes(searchTerm.toLowerCase())
-    );
-  }
-
-  // Rating filter
-  if (filterRating !== "all") {
-    const minRating = parseInt(filterRating);
-    filteredCouriers = filteredCouriers.filter(
-      (courier: any) => (courier.rating || 0) >= minRating
-    );
-  }
-
-  // Sort
-  filteredCouriers = [...filteredCouriers].sort((a, b) => {
-    switch (sortBy) {
-      case "highest":
-        return (b.rating || 0) - (a.rating || 0);
-      case "lowest":
-        return (a.rating || 0) - (b.rating || 0);
-      case "deliveries":
-        return (b.totalDeliveries || 0) - (a.totalDeliveries || 0);
-      default:
-        return 0;
-    }
-  });
-
-  const getRatingBadge = (rating: number) => {
-    if (rating >= 4.5) {
-      return <Badge className="bg-green-600">Mükemmel</Badge>;
-    } else if (rating >= 4.0) {
-      return <Badge className="bg-blue-600">İyi</Badge>;
-    } else if (rating >= 3.5) {
-      return <Badge className="bg-yellow-600">Orta</Badge>;
-    } else if (rating >= 3.0) {
-      return <Badge className="bg-orange-600">Düşük</Badge>;
-    } else {
-      return <Badge className="bg-red-600">Çok Düşük</Badge>;
-    }
-  };
-
-  const getRozet = (courier: any) => {
-    const rating = courier.rating || 0;
-    const deliveries = courier.totalDeliveries || 0;
-
-    if (rating >= 4.8 && deliveries >= 100) {
-      return { icon: "🏆", label: "Gold", color: "text-yellow-600" };
-    } else if (rating >= 4.5 && deliveries >= 50) {
-      return { icon: "🥈", label: "Silver", color: "text-gray-400" };
-    } else if (rating >= 4.0 && deliveries >= 20) {
-      return { icon: "🥉", label: "Bronze", color: "text-orange-700" };
-    } else if (deliveries >= 10 && rating >= 4.0) {
-      return { icon: "⭐", label: "Rising Star", color: "text-blue-600" };
-    }
-    return null;
-  };
-
-  const lowRatedCouriers = filteredCouriers.filter((c: any) => (c.averageRating || 0) < 3.5);
-  const topPerformers = filteredCouriers.slice(0, 5);
+  const topPerformersCount = filteredCouriers.filter((c: any) => (c.rating || 0) >= 4.5).length;
+  const lowRatedCouriersCount = filteredCouriers.filter((c: any) => (c.rating || 0) < 3.5).length;
 
   return (
     <DashboardLayout>
-      <div className="p-6 space-y-6">
-        {/* Header */}
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900">Kurye Değerlendirmeleri</h1>
-          <p className="text-gray-600 mt-2">Kurye performansını takip edin ve yönetin</p>
-        </div>
+      <main className="p-4 lg:p-6 space-y-5 max-w-[1400px] mx-auto">
+        <header>
+          <h1 className="text-2xl font-bold text-gray-900 tracking-tight">Kurye Değerlendirmeleri</h1>
+          <p className="text-sm text-gray-500 mt-0.5">Kurye performansını ve puanlarını buradan takip edin.</p>
+        </header>
 
-        {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <Card>
-            <CardHeader className="pb-3">
-              <CardTitle className="text-sm font-medium text-gray-600">Toplam Kurye</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-3xl font-bold text-gray-900">{filteredCouriers.length}</div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader className="pb-3">
-              <CardTitle className="text-sm font-medium text-gray-600">Ortalama Puan</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-3xl font-bold text-orange-600">
-                {filteredCouriers.length > 0
-                  ? (
-                      filteredCouriers.reduce((sum: number, c: any) => sum + (c.rating || 0), 0) /
-                      filteredCouriers.length
-                    ).toFixed(1)
-                  : "0.0"}
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader className="pb-3">
-              <CardTitle className="text-sm font-medium text-gray-600">Top Performans</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-3xl font-bold text-green-600">
-                {filteredCouriers.filter((c: any) => (c.rating || 0) >= 4.5).length}
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader className="pb-3">
-              <CardTitle className="text-sm font-medium text-gray-600 flex items-center gap-2">
-                <AlertTriangle className="h-4 w-4 text-red-600" />
-                Düşük Puan
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-3xl font-bold text-red-600">{lowRatedCouriers.length}</div>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Low Rated Couriers Warning */}
-        {lowRatedCouriers.length > 0 && (
-          <Card className="border-red-200 bg-red-50">
-            <CardHeader>
-              <CardTitle className="text-red-800 flex items-center gap-2">
-                <AlertTriangle className="h-5 w-5" />
-                Düşük Puanlı Kuryeler ({lowRatedCouriers.length})
-              </CardTitle>
-              <CardDescription className="text-red-700">
-                Aşağıdaki kuryeler 3.5 puanın altında performans gösteriyor
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-2">
-              {filteredCouriers.slice(0, 5).map((courier: any) => (
-                  <div
-                    key={courier.id}
-                    className="flex items-center justify-between p-3 bg-white rounded-lg"
-                  >
-                    <div>
-                      <p className="font-semibold text-gray-900">{courier.name}</p>
-                      <p className="text-sm text-gray-600">
-                        {courier.totalDeliveries || 0} teslimat
-                      </p>
-                    </div>
-                    <div className="flex items-center gap-3">
-                      <div className="flex items-center gap-1">
-                        <Star className="h-4 w-4 fill-orange-500 text-orange-500" />
-                        <span className="font-bold text-red-600">{courier.rating || 0}</span>
-                      </div>
-                      {getRatingBadge(courier.rating || 0)}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-        )}
-
-        {/* Top Performers */}
-        <Card className="border-green-200 bg-green-50">
-          <CardHeader>
-            <CardTitle className="text-green-800 flex items-center gap-2">
-              <Award className="h-5 w-5" />
-              En İyi Performans Gösterenler
-            </CardTitle>
-            <CardDescription className="text-green-700">
-              Liderlik tablosu - Top 5 kurye
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-2">
-              {topPerformers.map((courier: any, index: number) => {
-                const rozet = getRozet(courier);
-                return (
-                  <div
-                    key={courier.id}
-                    className="flex items-center justify-between p-3 bg-white rounded-lg"
-                  >
-                    <div className="flex items-center gap-3">
-                      <div className="text-2xl font-bold text-gray-400">#{index + 1}</div>
-                      <div>
-                        <p className="font-semibold text-gray-900 flex items-center gap-2">
-                          {courier.name}
-                          {rozet && (
-                            <span className={`text-sm ${rozet.color}`}>
-                              {rozet.icon} {rozet.label}
-                            </span>
-                          )}
-                        </p>
-                        <p className="text-sm text-gray-600">
-                          {courier.totalDeliveries || 0} teslimat
-                        </p>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-3">
-                      <div className="flex items-center gap-1">
-                        <Star className="h-5 w-5 fill-orange-500 text-orange-500" />
-                        <span className="font-bold text-green-600 text-lg">
-                          {courier.rating || 0}
-                        </span>
-                      </div>
-                      {getRatingBadge(courier.rating || 0)}
-                    </div>
-                  </div>
-                );
-              })}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="bg-blue-50 rounded-2xl p-3.5 flex items-center gap-3 ring-1 ring-blue-100">
+            <div className="w-9 h-9 rounded-xl bg-white flex items-center justify-center shadow-sm">
+              <Users className="w-5 h-5 text-blue-500" />
             </div>
-          </CardContent>
-        </Card>
+            <div>
+              <p className="text-xs text-blue-800 font-medium">Toplam Kurye</p>
+              <p className="text-xl font-bold text-blue-900">{filteredCouriers.length}</p>
+            </div>
+          </div>
+          <div className="bg-orange-50 rounded-2xl p-3.5 flex items-center gap-3 ring-1 ring-orange-100">
+            <div className="w-9 h-9 rounded-xl bg-white flex items-center justify-center shadow-sm">
+              <Star className="w-5 h-5 text-orange-500" />
+            </div>
+            <div>
+              <p className="text-xs text-orange-800 font-medium">Ortalama Puan</p>
+              <p className="text-xl font-bold text-orange-900">{averageRating}</p>
+            </div>
+          </div>
+          <div className="bg-emerald-50 rounded-2xl p-3.5 flex items-center gap-3 ring-1 ring-emerald-100">
+            <div className="w-9 h-9 rounded-xl bg-white flex items-center justify-center shadow-sm">
+              <Trophy className="w-5 h-5 text-emerald-500" />
+            </div>
+            <div>
+              <p className="text-xs text-emerald-800 font-medium">Top Performans</p>
+              <p className="text-xl font-bold text-emerald-900">{topPerformersCount}</p>
+            </div>
+          </div>
+          <div className="bg-red-50 rounded-2xl p-3.5 flex items-center gap-3 ring-1 ring-red-100">
+            <div className="w-9 h-9 rounded-xl bg-white flex items-center justify-center shadow-sm">
+              <AlertTriangle className="w-5 h-5 text-red-500" />
+            </div>
+            <div>
+              <p className="text-xs text-red-800 font-medium">Düşük Puanlı</p>
+              <p className="text-xl font-bold text-red-900">{lowRatedCouriersCount}</p>
+            </div>
+          </div>
+        </div>
 
-        {/* Filters */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Tüm Kuryeler</CardTitle>
-            <CardDescription>Kurye listesini filtreleyin ve sıralayın</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+        <div className="bg-white rounded-2xl border border-gray-100">
+          <div className="p-5 border-b border-gray-100">
+            <h2 className="font-semibold text-gray-800">Tüm Kuryeler</h2>
+            <p className="text-sm text-gray-500">Kurye listesini arayın, filtreleyin ve sıralayın.</p>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mt-4">
               <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
                 <Input
-                  placeholder="Kurye ara..."
+                  placeholder="Kurye adı ile ara..."
                   value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-10"
+                  onChange={(e) => { setSearchTerm(e.target.value); setCurrentPage(1); }}
+                  className="pl-10 rounded-xl"
                 />
               </div>
-
-              <Select value={filterRating} onValueChange={setFilterRating}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Puan filtrele" />
+              <Select value={filterRating} onValueChange={(value) => { setFilterRating(value); setCurrentPage(1); }}>
+                <SelectTrigger className="rounded-xl">
+                  <SelectValue placeholder="Puan filtresi" />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">Tüm Puanlar</SelectItem>
@@ -286,82 +164,75 @@ export default function CourierRatings() {
                   <SelectItem value="2">2+ Yıldız</SelectItem>
                 </SelectContent>
               </Select>
-
-              <Select value={sortBy} onValueChange={setSortBy}>
-                <SelectTrigger>
+              <Select value={sortBy} onValueChange={(value) => { setSortBy(value); setCurrentPage(1); }}>
+                <SelectTrigger className="rounded-xl">
                   <SelectValue placeholder="Sırala" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="recent">Son Eklenenler</SelectItem>
+                  <SelectItem value="recent">Yeniye Göre</SelectItem>
                   <SelectItem value="highest">En Yüksek Puan</SelectItem>
                   <SelectItem value="lowest">En Düşük Puan</SelectItem>
-                  <SelectItem value="deliveries">En Çok Teslimat</SelectItem>
+                  <SelectItem value="deliveries">Teslimat Sayısı</SelectItem>
                 </SelectContent>
               </Select>
             </div>
+          </div>
 
-            {/* Courier List */}
-            <div className="space-y-3">
-              {filteredCouriers.map((courier: any) => {
-                const rozet = getRozet(courier);
-                return (
-                  <div
-                    key={courier.id}
-                    className="flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50 transition-colors"
-                  >
-                    <div className="flex items-center gap-4">
-                      <div className="h-12 w-12 rounded-full bg-orange-100 flex items-center justify-center">
-                        <span className="text-xl font-bold text-orange-600">
-                          {courier.name?.charAt(0) || "K"}
-                        </span>
-                      </div>
-                      <div>
-                        <p className="font-semibold text-gray-900 flex items-center gap-2">
-                          {courier.name}
-                          {rozet && (
-                            <span className={`text-sm ${rozet.color}`}>
-                              {rozet.icon} {rozet.label}
-                            </span>
-                          )}
-                        </p>
-                        <p className="text-sm text-gray-600">
-                          {courier.totalDeliveries || 0} teslimat • {courier.vehicleType}
-                        </p>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-4">
-                      <div className="text-right">
-                        <div className="flex items-center gap-1 mb-1">
-                          {[1, 2, 3, 4, 5].map((star) => (
-                            <Star
-                              key={star}
-                              className={`h-4 w-4 ${
-                                star <= (courier.rating || 0)
-                                  ? "fill-orange-500 text-orange-500"
-                                  : "text-gray-300"
-                              }`}
-                            />
-                          ))}
-                        </div>
-                        <p className="text-sm font-bold text-gray-900">
-                          {courier.rating || 0} / 5.0
-                        </p>
-                      </div>
-                      {getRatingBadge(courier.rating || 0)}
+          {paginatedCouriers.length > 0 ? (
+            <div className="divide-y divide-gray-50">
+              {paginatedCouriers.map((courier: any) => (
+                <div key={courier.id} className="px-5 py-3.5 hover:bg-gray-50/50 transition-colors group flex items-center justify-between">
+                  <div className="flex items-center gap-4">
+                    <img src={courier.user.image || `https://ui-avatars.com/api/?name=${courier.name}&background=random`} alt={courier.name} className="w-10 h-10 rounded-full object-cover" />
+                    <div>
+                      <p className="font-semibold text-gray-800">{courier.name}</p>
+                      <p className="text-sm text-gray-500">{courier.totalDeliveries} teslimat</p>
                     </div>
                   </div>
-                );
-              })}
-
-              {filteredCouriers.length === 0 && (
-                <div className="text-center py-12">
-                  <p className="text-gray-600">Kurye bulunamadı</p>
+                  <div className="flex items-center gap-4">
+                    <div className="flex items-center gap-1.5">
+                      <Star className="h-4 w-4 fill-orange-400 text-orange-500" />
+                      <span className="font-bold text-gray-800">{courier.rating.toFixed(1)}</span>
+                    </div>
+                    {getRatingBadge(courier.rating)}
+                  </div>
                 </div>
-              )}
+              ))}
             </div>
-          </CardContent>
-        </Card>
-      </div>
+          ) : (
+            <div className="text-center py-16">
+                <div className="w-16 h-16 rounded-2xl bg-gray-50 flex items-center justify-center mb-4 mx-auto">
+                    <Frown className="w-8 h-8 text-gray-400" />
+                </div>
+                <p className="text-sm font-medium text-gray-700">Sonuç bulunamadı</p>
+                <p className="text-xs text-gray-500 mt-1">Filtrelerinizi değiştirmeyi deneyin.</p>
+            </div>
+          )}
+
+          {totalPages > 1 && (
+            <div className="p-4 border-t border-gray-100 flex items-center justify-between text-sm">
+              <p className="text-gray-600">Toplam {filteredCouriers.length} kurye</p>
+              <div className="flex items-center gap-2">
+                <button 
+                  onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                  disabled={currentPage === 1}
+                  className="w-8 h-8 rounded-lg flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-100 transition-colors"
+                >
+                  <ChevronLeft className="h-4 w-4" />
+                </button>
+                <span className="font-medium">Sayfa {currentPage} / {totalPages}</span>
+                <button 
+                  onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                  disabled={currentPage === totalPages}
+                  className="w-8 h-8 rounded-lg flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-100 transition-colors"
+                >
+                  <ChevronRight className="h-4 w-4" />
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
+      </main>
     </DashboardLayout>
   );
 }

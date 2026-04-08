@@ -1,16 +1,13 @@
 import { useState, useCallback } from "react";
 import { trpc } from "@/lib/trpc";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from "@/components/ui/sheet";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
-import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Plus, Edit, Trash2, MapPinned, Search, Globe, ChevronUp, ChevronDown, Eye, EyeOff, MapPin } from "lucide-react";
+import { Plus, Edit, Trash2, MapPinned, Search, Globe, ChevronUp, ChevronDown, MapPin, Loader2, PackageOpen, AlertTriangle } from "lucide-react";
 import { toast } from "sonner";
 
 const LANGS = [
@@ -55,15 +52,19 @@ function parseSafe(val: any, fallback: any) {
 
 function LangBadge({ data }: { data: LangContent }) {
   const pct = Math.round(([data.name, data.title, data.description].filter(Boolean).length / 3) * 100);
+  const colorClasses = pct === 100 ? "bg-emerald-50 text-emerald-600 border-emerald-200"
+    : pct >= 50 ? "bg-amber-50 text-amber-600 border-amber-200"
+    : "bg-red-50 text-red-600 border-red-200";
+
   return (
-    <span className={`text-xs px-1.5 py-0.5 rounded-full font-medium ${
-      pct === 100 ? "bg-green-100 text-green-700" : pct >= 50 ? "bg-yellow-100 text-yellow-700" : "bg-red-100 text-red-600"
-    }`}>{pct}%</span>
+    <span className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded-lg text-[10px] font-semibold border ${colorClasses}`}>
+      {pct}%
+    </span>
   );
 }
 
 export function AdminAreas() {
-  const [dialogOpen, setDialogOpen] = useState(false);
+  const [sheetOpen, setSheetOpen] = useState(false);
   const [editingId, setEditingId] = useState<number | null>(null);
   const [formData, setFormData] = useState<AreaFormData>(emptyForm);
   const [activeLang, setActiveLang] = useState("tr");
@@ -76,11 +77,11 @@ export function AdminAreas() {
   const invalidate = () => { utils.areas.listAll.invalidate(); utils.areas.list.invalidate(); };
 
   const createMutation = trpc.areas.create.useMutation({
-    onSuccess: () => { toast.success("Bölge oluşturuldu"); invalidate(); setDialogOpen(false); resetForm(); },
+    onSuccess: () => { toast.success("Bölge oluşturuldu"); invalidate(); setSheetOpen(false); resetForm(); },
     onError: (e) => toast.error(`Hata: ${e.message}`),
   });
   const updateMutation = trpc.areas.update.useMutation({
-    onSuccess: () => { toast.success("Bölge güncellendi"); invalidate(); setDialogOpen(false); resetForm(); },
+    onSuccess: () => { toast.success("Bölge güncellendi"); invalidate(); setSheetOpen(false); resetForm(); },
     onError: (e) => toast.error(`Hata: ${e.message}`),
   });
   const deleteMutation = trpc.areas.delete.useMutation({
@@ -116,7 +117,7 @@ export function AdminAreas() {
       lat: area.lat?.toString() || "",
       lng: area.lng?.toString() || "",
     });
-    setActiveLang("tr"); setDialogOpen(true);
+    setActiveLang("tr"); setSheetOpen(true);
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -160,223 +161,199 @@ export function AdminAreas() {
   });
 
   return (
-    <div className="space-y-6 py-6">
+    <div className="p-4 lg:p-6 space-y-5 max-w-[1400px] mx-auto">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
-            <MapPinned className="w-7 h-7 text-orange-500" /> Bölge Yönetimi
-          </h1>
-          <p className="text-gray-500 text-sm mt-0.5">Hizmet bölgelerini tüm dillerde yönetin</p>
+          <h1 className="text-2xl font-bold text-gray-900 tracking-tight">Bölge Yönetimi</h1>
+          <p className="text-sm text-gray-500 mt-0.5">Hizmet bölgelerini tüm dillerde yönetin</p>
         </div>
-        <Button onClick={() => { resetForm(); setDialogOpen(true); }} className="bg-orange-500 hover:bg-orange-600 gap-2">
+        <Button onClick={() => { resetForm(); setSheetOpen(true); }} className="bg-orange-500 hover:bg-orange-600 gap-2 rounded-xl">
           <Plus className="w-4 h-4" /> Yeni Bölge
         </Button>
       </div>
 
-      <div className="grid grid-cols-3 gap-4">
-        <Card className="border-0 shadow-sm bg-gradient-to-br from-orange-50 to-orange-100">
-          <CardContent className="p-4"><div className="text-2xl font-bold text-orange-700">{areas?.length || 0}</div><div className="text-xs text-orange-600 mt-0.5">Toplam Bölge</div></CardContent>
-        </Card>
-        <Card className="border-0 shadow-sm bg-gradient-to-br from-green-50 to-green-100">
-          <CardContent className="p-4"><div className="text-2xl font-bold text-green-700">{areas?.filter(a => a.active).length || 0}</div><div className="text-xs text-green-600 mt-0.5">Aktif</div></CardContent>
-        </Card>
-        <Card className="border-0 shadow-sm bg-gradient-to-br from-blue-50 to-blue-100">
-          <CardContent className="p-4"><div className="text-2xl font-bold text-blue-700">{areas?.filter((a: any) => a.lat && a.lng).length || 0}</div><div className="text-xs text-blue-600 mt-0.5">Koordinatlı</div></CardContent>
-        </Card>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="bg-orange-50 rounded-2xl p-3.5 flex items-center gap-3 ring-1 ring-orange-100">
+            <div className="w-9 h-9 rounded-xl bg-white flex items-center justify-center shadow-sm"><MapPinned className="w-5 h-5 text-orange-500"/></div>
+            <div>
+                <div className="text-2xl font-bold text-orange-900">{areas?.length || 0}</div>
+                <div className="text-xs text-orange-700">Toplam Bölge</div>
+            </div>
+        </div>
+        <div className="bg-emerald-50 rounded-2xl p-3.5 flex items-center gap-3 ring-1 ring-emerald-100">
+            <div className="w-9 h-9 rounded-xl bg-white flex items-center justify-center shadow-sm"><Globe className="w-5 h-5 text-emerald-500"/></div>
+            <div>
+                <div className="text-2xl font-bold text-emerald-900">{areas?.filter(a => a.active).length || 0}</div>
+                <div className="text-xs text-emerald-700">Aktif</div>
+            </div>
+        </div>
+        <div className="bg-blue-50 rounded-2xl p-3.5 flex items-center gap-3 ring-1 ring-blue-100">
+            <div className="w-9 h-9 rounded-xl bg-white flex items-center justify-center shadow-sm"><MapPin className="w-5 h-5 text-blue-500"/></div>
+            <div>
+                <div className="text-2xl font-bold text-blue-900">{areas?.filter((a: any) => a.lat && a.lng).length || 0}</div>
+                <div className="text-xs text-blue-700">Koordinatlı</div>
+            </div>
+        </div>
       </div>
 
-      <Card className="shadow-sm">
-        <CardHeader className="pb-3">
-          <div className="flex items-center justify-between">
-            <CardTitle className="text-base">Bölgeler</CardTitle>
+      <div className="bg-white rounded-2xl border border-gray-100">
+        <div className="p-3 border-b border-gray-100">
             <div className="relative">
-              <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-400" />
-              <Input placeholder="Ara..." value={search} onChange={e => setSearch(e.target.value)} className="pl-8 h-8 w-48 text-sm" />
+              <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+              <Input placeholder="Bölgelerde ara..." value={search} onChange={e => setSearch(e.target.value)} className="pl-9 h-10 w-full sm:w-64 rounded-xl bg-gray-50 border-gray-100 focus:bg-white" />
             </div>
-          </div>
-        </CardHeader>
-        <CardContent className="p-0">
+        </div>
+        
+        <div className="divide-y divide-gray-50">
           {isLoading ? (
-            <div className="text-center py-12 text-gray-400">Yükleniyor...</div>
+            <div className="flex items-center justify-center py-20">
+                <Loader2 className="h-8 w-8 animate-spin text-orange-500" />
+            </div>
           ) : filtered.length === 0 ? (
-            <div className="text-center py-12 text-gray-400"><MapPinned className="w-12 h-12 mx-auto mb-3 opacity-30" /><p>Bölge bulunamadı</p></div>
+            <div className="text-center py-20">
+                <div className="w-16 h-16 rounded-2xl bg-gray-50 flex items-center justify-center mb-4 mx-auto"><PackageOpen className="w-8 h-8 text-gray-400" /></div>
+                <p className="text-sm font-medium text-gray-600">Bölge bulunamadı</p>
+                <p className="text-xs text-gray-500 mt-1">Arama kriterlerinizi değiştirin veya yeni bir bölge ekleyin.</p>
+            </div>
           ) : (
-            <Table>
-              <TableHeader>
-                <TableRow className="bg-gray-50/60">
-                  <TableHead className="w-14">Sıra</TableHead>
-                  <TableHead>Slug</TableHead>
-                  <TableHead>TR</TableHead>
-                  <TableHead>EN</TableHead>
-                  <TableHead>MK</TableHead>
-                  <TableHead>Koordinat</TableHead>
-                  <TableHead>SEO Doluluk</TableHead>
-                  <TableHead>Durum</TableHead>
-                  <TableHead className="text-right">İşlemler</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {filtered.map((area, idx) => {
-                  const sm = parseSafe(area.seoMeta, {});
-                  return (
-                    <TableRow key={area.id} className="hover:bg-gray-50/50">
-                      <TableCell>
-                        <div className="flex flex-col items-center gap-0.5">
-                          <button onClick={() => moveOrder(area.id, "up")} disabled={idx === 0} className="text-gray-400 hover:text-gray-700 disabled:opacity-20"><ChevronUp className="w-3.5 h-3.5" /></button>
-                          <span className="text-xs text-gray-500">{area.displayOrder}</span>
-                          <button onClick={() => moveOrder(area.id, "down")} disabled={idx === filtered.length - 1} className="text-gray-400 hover:text-gray-700 disabled:opacity-20"><ChevronDown className="w-3.5 h-3.5" /></button>
-                        </div>
-                      </TableCell>
-                      <TableCell className="font-mono text-xs text-gray-500">{area.slug}</TableCell>
-                      <TableCell className="font-medium text-sm">{sm.tr?.name || sm.tr?.title || "—"}</TableCell>
-                      <TableCell className="text-sm text-gray-600">{sm.en?.name || sm.en?.title || "—"}</TableCell>
-                      <TableCell className="text-sm text-gray-600">{sm.mk?.name || sm.mk?.title || "—"}</TableCell>
-                      <TableCell>
+            filtered.map((area, idx) => {
+              const sm = parseSafe(area.seoMeta, {});
+              const name = sm.tr?.name || sm.en?.name || area.slug;
+              return (
+                <div key={area.id} className="px-5 py-3.5 hover:bg-gray-50/50 transition-colors group flex items-center gap-4">
+                  <div className="flex flex-col items-center gap-0.5">
+                    <button onClick={() => moveOrder(area.id, "up")} disabled={idx === 0} className="text-gray-400 hover:text-gray-700 disabled:opacity-20 transition-colors"><ChevronUp className="w-4 h-4" /></button>
+                    <span className="text-xs font-bold text-gray-500 w-6 text-center">{area.displayOrder}</span>
+                    <button onClick={() => moveOrder(area.id, "down")} disabled={idx === filtered.length - 1} className="text-gray-400 hover:text-gray-700 disabled:opacity-20 transition-colors"><ChevronDown className="w-4 h-4" /></button>
+                  </div>
+                  <div className="flex-1">
+                    <div className="flex items-center gap-3">
+                        <span className={`w-2.5 h-2.5 rounded-full ${area.active ? 'bg-emerald-500' : 'bg-gray-300'}`}></span>
+                        <p className="font-semibold text-gray-800">{name}</p>
+                        <span className="font-mono text-[11px] text-gray-400 bg-gray-100 px-1.5 py-0.5 rounded">/{area.slug}</span>
+                    </div>
+                    <div className="flex items-center gap-2 mt-1">
                         {(area as any).lat && (area as any).lng ? (
-                          <span className="flex items-center gap-1 text-xs text-green-600">
+                          <span className="inline-flex items-center gap-1.5 text-xs text-blue-600">
                             <MapPin className="w-3 h-3" />
-                            {Number((area as any).lat).toFixed(4)}, {Number((area as any).lng).toFixed(4)}
+                            {Number((area as any).lat).toFixed(3)}, {Number((area as any).lng).toFixed(3)}
                           </span>
-                        ) : <span className="text-gray-300 text-xs">—</span>}
-                      </TableCell>
-                      <TableCell>
-                        <div className="flex gap-1">
-                          {LANGS.map(({ code }) => <LangBadge key={code} data={sm[code] || emptyLang} />)}
+                        ) : <span className="text-gray-400 text-xs">Koordinat yok</span>}
+                        <div className="flex gap-1.5">
+                          {LANGS.map(({ code, label }) => <div key={code} title={`${label} SEO Doluluk`}><LangBadge data={sm[code] || emptyLang} /></div>)}
                         </div>
-                        <div className="flex gap-1 mt-0.5">
-                          {LANGS.map(({ code }) => <span key={code} className="text-xs text-gray-400">{code.toUpperCase()}</span>)}
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        <Badge variant={area.active ? "default" : "secondary"} className="cursor-pointer gap-1 text-xs"
-                          onClick={() => toggleMutation.mutate({ id: area.id, active: !area.active })}>
-                          {area.active ? <Eye className="w-3 h-3" /> : <EyeOff className="w-3 h-3" />}
-                          {area.active ? "Aktif" : "Pasif"}
-                        </Badge>
-                      </TableCell>
-                      <TableCell className="text-right">
-                        <div className="flex justify-end gap-1.5">
-                          <Button variant="outline" size="sm" onClick={() => handleEdit(area)} className="h-7 px-2"><Edit className="w-3.5 h-3.5" /></Button>
-                          <Button variant="destructive" size="sm" onClick={() => setDeleteConfirmId(area.id)} className="h-7 px-2"><Trash2 className="w-3.5 h-3.5" /></Button>
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  );
-                })}
-              </TableBody>
-            </Table>
-          )}
-        </CardContent>
-      </Card>
-
-      <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-        <DialogContent className="max-w-4xl max-h-[92vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
-              <Globe className="w-5 h-5 text-orange-500" />
-              {editingId ? "Bölge Düzenle" : "Yeni Bölge Ekle"}
-            </DialogTitle>
-            <DialogDescription>Tüm dillerde içerik girin. İsim ve açıklama SEO için önemlidir.</DialogDescription>
-          </DialogHeader>
-          <form onSubmit={handleSubmit} className="space-y-5">
-            <div className="grid grid-cols-4 gap-4 p-4 bg-gray-50 rounded-lg">
-              <div className="col-span-2">
-                <Label className="text-xs font-semibold text-gray-600 uppercase tracking-wide">Slug (URL) *</Label>
-                <Input value={formData.slug} onChange={e => setFormData({ ...formData, slug: e.target.value.toLowerCase().replace(/\s+/g, "-") })} placeholder="centar" className="mt-1" required />
-              </div>
-              <div>
-                <Label className="text-xs font-semibold text-gray-600 uppercase tracking-wide">Sıralama</Label>
-                <Input type="number" value={formData.displayOrder} onChange={e => setFormData({ ...formData, displayOrder: parseInt(e.target.value) || 0 })} className="mt-1" />
-              </div>
-              <div className="flex items-end pb-0.5">
-                <div className="flex items-center gap-2">
-                  <Switch id="active-area" checked={formData.active} onCheckedChange={c => setFormData({ ...formData, active: c })} />
-                  <Label htmlFor="active-area" className="cursor-pointer text-sm">Aktif</Label>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <Button size="sm" variant="outline" onClick={() => handleEdit(area)} className="rounded-xl h-9 gap-2"><Edit className="w-3.5 h-3.5"/> Düzenle</Button>
+                    <Button size="sm" variant="destructive" onClick={() => setDeleteConfirmId(area.id)} className="rounded-xl h-9 gap-2"><Trash2 className="w-3.5 h-3.5"/> Sil</Button>
+                  </div>
                 </div>
-              </div>
-            </div>
+              );
+            })
+          )}
+        </div>
+      </div>
 
-            <div className="grid grid-cols-2 gap-4 p-4 bg-blue-50/50 rounded-lg border border-blue-100">
-              <div>
-                <Label className="text-xs font-semibold text-gray-600 uppercase tracking-wide flex items-center gap-1"><MapPin className="w-3.5 h-3.5" />Enlem (Latitude)</Label>
-                <Input value={formData.lat} onChange={e => setFormData({ ...formData, lat: e.target.value })} placeholder="41.9981" className="mt-1" />
-              </div>
-              <div>
-                <Label className="text-xs font-semibold text-gray-600 uppercase tracking-wide flex items-center gap-1"><MapPin className="w-3.5 h-3.5" />Boylam (Longitude)</Label>
-                <Input value={formData.lng} onChange={e => setFormData({ ...formData, lng: e.target.value })} placeholder="21.4254" className="mt-1" />
-              </div>
-            </div>
-
-            <Tabs value={activeLang} onValueChange={setActiveLang}>
-              <div className="flex items-center justify-between mb-2">
-                <Label className="text-xs font-semibold text-gray-600 uppercase tracking-wide">Çok Dilli İçerik</Label>
-                <TabsList className="h-8">
-                  {LANGS.map(({ code, label }) => (
-                    <TabsTrigger key={code} value={code} className="text-xs px-3 h-7 gap-1.5">
-                      {label.split(" ")[0]} {code.toUpperCase()}
-                      <LangBadge data={formData.seoMeta[code] || emptyLang} />
-                    </TabsTrigger>
-                  ))}
+      <Sheet open={sheetOpen} onOpenChange={setSheetOpen}>
+        <SheetContent className="sm:max-w-2xl overflow-y-auto">
+          <SheetHeader className="pb-4">
+            <SheetTitle>{editingId ? "Bölgeyi Düzenle" : "Yeni Bölge Oluştur"}</SheetTitle>
+            <SheetDescription>{editingId ? "Bölge detaylarını güncelleyin." : "Yeni bir hizmet bölgesi ekleyin."}</SheetDescription>
+          </SheetHeader>
+          <form onSubmit={handleSubmit} className="space-y-6">
+            <Tabs value={activeLang} onValueChange={setActiveLang} className="w-full">
+                <TabsList className="bg-gray-100 rounded-xl p-1 h-auto">
+                    {LANGS.map(l => <TabsTrigger key={l.code} value={l.code} className="text-xs rounded-lg flex-1 data-[state=active]:bg-white data-[state=active]:shadow-sm data-[state=active]:text-orange-600">{l.label}</TabsTrigger>)}
                 </TabsList>
-              </div>
-              {LANGS.map(({ code, label }) => (
-                <TabsContent key={code} value={code} className="space-y-3 border rounded-lg p-4">
-                  <div className="text-sm font-medium text-gray-700 mb-3">{label} İçeriği</div>
-                  <div className="grid grid-cols-2 gap-3">
-                    <div>
-                      <Label className="text-xs text-gray-500">Bölge Adı *</Label>
-                      <Input value={formData.seoMeta[code]?.name || ""} onChange={e => setSeo(code, "name", e.target.value)} placeholder={`Bölge adı (${code.toUpperCase()})`} className="mt-1" />
-                    </div>
-                    <div>
-                      <Label className="text-xs text-gray-500">Rozet / Badge</Label>
-                      <Input value={formData.seoMeta[code]?.badge || ""} onChange={e => setSeo(code, "badge", e.target.value)} placeholder={`Rozet metni (${code.toUpperCase()})`} className="mt-1" />
-                    </div>
-                  </div>
-                  <div>
-                    <Label className="text-xs text-gray-500">Sayfa Başlığı (SEO Title) *</Label>
-                    <Input value={formData.seoMeta[code]?.title || ""} onChange={e => setSeo(code, "title", e.target.value)} placeholder={`Başlık (${code.toUpperCase()})`} className="mt-1" />
-                  </div>
-                  <div>
-                    <Label className="text-xs text-gray-500">Alt Başlık (Subtitle)</Label>
-                    <Input value={formData.seoMeta[code]?.subtitle || ""} onChange={e => setSeo(code, "subtitle", e.target.value)} placeholder={`Alt başlık (${code.toUpperCase()})`} className="mt-1" />
-                  </div>
-                  <div>
-                    <Label className="text-xs text-gray-500">Açıklama (Meta Description) *</Label>
-                    <Textarea value={formData.seoMeta[code]?.description || ""} onChange={e => setSeo(code, "description", e.target.value)} placeholder={`Açıklama (${code.toUpperCase()})`} className="mt-1 resize-none" rows={3} />
-                    <div className="text-xs text-gray-400 mt-1">{(formData.seoMeta[code]?.description || "").length}/160 karakter</div>
-                  </div>
-                  <div>
-                    <Label className="text-xs text-gray-500">Anahtar Kelimeler (virgülle ayırın)</Label>
-                    <Input value={formData.seoMeta[code]?.keywords || ""} onChange={e => setSeo(code, "keywords", e.target.value)} placeholder={`anahtar, kelime (${code.toUpperCase()})`} className="mt-1" />
-                  </div>
-                </TabsContent>
-              ))}
+                {LANGS.map(l => (
+                    <TabsContent key={l.code} value={l.code} className="space-y-4 pt-5">
+                        <div className="grid grid-cols-2 gap-4">
+                            <div>
+                                <Label htmlFor={`name-${l.code}`} className="text-[11px] text-gray-500 uppercase tracking-wider font-semibold">Bölge Adı</Label>
+                                <Input id={`name-${l.code}`} value={formData.seoMeta[l.code]?.name || ''} onChange={e => setSeo(l.code, 'name', e.target.value)} className="mt-1 rounded-xl" />
+                            </div>
+                            <div>
+                                <Label htmlFor={`badge-${l.code}`} className="text-[11px] text-gray-500 uppercase tracking-wider font-semibold">Rozet Metni (Opsiyonel)</Label>
+                                <Input id={`badge-${l.code}`} value={formData.seoMeta[l.code]?.badge || ''} onChange={e => setSeo(l.code, 'badge', e.target.value)} className="mt-1 rounded-xl" />
+                            </div>
+                        </div>
+                        <div>
+                            <Label htmlFor={`title-${l.code}`} className="text-[11px] text-gray-500 uppercase tracking-wider font-semibold">SEO Başlığı</Label>
+                            <Input id={`title-${l.code}`} value={formData.seoMeta[l.code]?.title || ''} onChange={e => setSeo(l.code, 'title', e.target.value)} className="mt-1 rounded-xl" />
+                        </div>
+                        <div>
+                            <Label htmlFor={`subtitle-${l.code}`} className="text-[11px] text-gray-500 uppercase tracking-wider font-semibold">SEO Alt Başlığı</Label>
+                            <Input id={`subtitle-${l.code}`} value={formData.seoMeta[l.code]?.subtitle || ''} onChange={e => setSeo(l.code, 'subtitle', e.target.value)} className="mt-1 rounded-xl" />
+                        </div>
+                        <div>
+                            <Label htmlFor={`description-${l.code}`} className="text-[11px] text-gray-500 uppercase tracking-wider font-semibold">SEO Açıklaması</Label>
+                            <Textarea id={`description-${l.code}`} value={formData.seoMeta[l.code]?.description || ''} onChange={e => setSeo(l.code, 'description', e.target.value)} className="mt-1 rounded-xl" rows={4}/>
+                        </div>
+                        <div>
+                            <Label htmlFor={`keywords-${l.code}`} className="text-[11px] text-gray-500 uppercase tracking-wider font-semibold">SEO Anahtar Kelimeler</Label>
+                            <Input id={`keywords-${l.code}`} value={formData.seoMeta[l.code]?.keywords || ''} onChange={e => setSeo(l.code, 'keywords', e.target.value)} className="mt-1 rounded-xl" placeholder="kelime1, kelime2, kelime3"/>
+                        </div>
+                    </TabsContent>
+                ))}
             </Tabs>
+            
+            <div className="border-t border-gray-100 pt-6 space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                    <div>
+                        <Label htmlFor="slug" className="text-[11px] text-gray-500 uppercase tracking-wider font-semibold">URL (Slug)</Label>
+                        <Input id="slug" value={formData.slug} onChange={e => setFormData(p => ({...p, slug: e.target.value}))} className="mt-1 rounded-xl font-mono" required/>
+                    </div>
+                    <div>
+                        <Label htmlFor="displayOrder" className="text-[11px] text-gray-500 uppercase tracking-wider font-semibold">Sıralama</Label>
+                        <Input id="displayOrder" type="number" value={formData.displayOrder} onChange={e => setFormData(p => ({...p, displayOrder: parseInt(e.target.value, 10)}))} className="mt-1 rounded-xl" />
+                    </div>
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                    <div>
+                        <Label htmlFor="lat" className="text-[11px] text-gray-500 uppercase tracking-wider font-semibold">Latitude</Label>
+                        <Input id="lat" value={formData.lat} onChange={e => setFormData(p => ({...p, lat: e.target.value}))} className="mt-1 rounded-xl" />
+                    </div>
+                    <div>
+                        <Label htmlFor="lng" className="text-[11px] text-gray-500 uppercase tracking-wider font-semibold">Longitude</Label>
+                        <Input id="lng" value={formData.lng} onChange={e => setFormData(p => ({...p, lng: e.target.value}))} className="mt-1 rounded-xl" />
+                    </div>
+                </div>
+                <div className="flex items-center justify-between bg-gray-50 p-3 rounded-xl">
+                    <Label htmlFor="active" className="font-medium text-gray-700">Bölge Aktif</Label>
+                    <Switch id="active" checked={formData.active} onCheckedChange={c => setFormData(p => ({...p, active: c}))} />
+                </div>
+            </div>
 
-            <div className="flex justify-end gap-2 pt-2">
-              <Button type="button" variant="outline" onClick={() => setDialogOpen(false)}>İptal</Button>
-              <Button type="submit" className="bg-orange-500 hover:bg-orange-600 min-w-24" disabled={createMutation.isPending || updateMutation.isPending}>
-                {createMutation.isPending || updateMutation.isPending ? "Kaydediliyor..." : editingId ? "Güncelle" : "Oluştur"}
-              </Button>
+            <div className="flex justify-end gap-3 pt-4">
+                <Button type="button" variant="ghost" onClick={() => setSheetOpen(false)} className="rounded-xl">İptal</Button>
+                <Button type="submit" disabled={createMutation.isPending || updateMutation.isPending} className="rounded-xl bg-orange-500 hover:bg-orange-600 w-28">
+                    {createMutation.isPending || updateMutation.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : (editingId ? "Kaydet" : "Oluştur")}
+                </Button>
             </div>
           </form>
-        </DialogContent>
-      </Dialog>
+        </SheetContent>
+      </Sheet>
 
-      <Dialog open={deleteConfirmId !== null} onOpenChange={() => setDeleteConfirmId(null)}>
-        <DialogContent className="max-w-sm">
-          <DialogHeader>
-            <DialogTitle>Bölgeyi Sil</DialogTitle>
-            <DialogDescription>Bu işlem geri alınamaz. Emin misiniz?</DialogDescription>
-          </DialogHeader>
-          <div className="flex justify-end gap-2 mt-4">
-            <Button variant="outline" onClick={() => setDeleteConfirmId(null)}>İptal</Button>
-            <Button variant="destructive" disabled={deleteMutation.isPending} onClick={() => deleteConfirmId && deleteMutation.mutate({ id: deleteConfirmId })}>
-              {deleteMutation.isPending ? "Siliniyor..." : "Evet, Sil"}
-            </Button>
-          </div>
-        </DialogContent>
-      </Dialog>
+      {deleteConfirmId && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm animate-in fade-in-50">
+            <div className="bg-white rounded-2xl p-6 max-w-sm shadow-2xl w-full mx-4 animate-in zoom-in-95">
+                <div className="flex flex-col items-center text-center">
+                    <div className="w-14 h-14 rounded-full bg-red-100 flex items-center justify-center mb-4">
+                        <AlertTriangle className="w-7 h-7 text-red-500" />
+                    </div>
+                    <h3 className="text-lg font-bold text-gray-900">Bölgeyi Sil</h3>
+                    <p className="text-sm text-gray-500 mt-2">Bu bölgeyi kalıcı olarak silmek istediğinizden emin misiniz? Bu işlem geri alınamaz.</p>
+                </div>
+                <div className="grid grid-cols-2 gap-3 mt-6">
+                    <Button variant="outline" onClick={() => setDeleteConfirmId(null)} className="rounded-xl">İptal</Button>
+                    <Button variant="destructive" onClick={() => deleteMutation.mutate({ id: deleteConfirmId })} disabled={deleteMutation.isPending} className="rounded-xl">
+                        {deleteMutation.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : "Sil"}
+                    </Button>
+                </div>
+            </div>
+        </div>
+      )}
     </div>
   );
 }

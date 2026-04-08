@@ -312,3 +312,31 @@
 - [x] 4 dilde i18n key'leri eklendi (deliveryNetwork, deliveryZones, cities, exploreOnMap vb.)
 - [x] Sitemap'e 6 kategori eklendi (anchor link: /services#food-delivery vb.) - toplam 37 URL
 - [x] Services.tsx'deki kategori kartlarına id attribute eklendi (anchor link'ler çalışsın)
+
+## Admin Panel Tam Yenileme (08.04.2026)
+- [x] AdminDashboardLayout - Modern sidebar: gruplu menü, arama, bildirim zili, breadcrumb, top bar
+- [x] AdminHome dashboard - Gelişmiş KPI kartları, grafikler, aktivite feed, hızlı aksiyonlar
+- [x] Orders sayfası - Gelişmiş tablo, filtreler, detay drawer, durum değiştirme
+- [x] AdminUsers sayfası - Gelişmiş tablo, arama, filtre, rol badge'leri
+- [x] Couriers sayfası - Onay sistemi, durum göstergeleri, detay panel
+- [x] Businesses sayfası - İşletme yönetimi, onay, detay
+- [x] Customers sayfası - Müşteri listesi, sipariş geçmişi
+- [x] AdminPayments - Ödeme talepleri, onay/red, filtreler
+- [x] PricingAndRevenue - Fiyatlandırma ve gelir yönetimi
+- [x] SurgePricing - Dinamik fiyatlandırma (mevcut korundu)
+- [x] Reviews - Değerlendirme tabloları, yıldız dağılımı
+- [x] AdminNotifications - Bildirim gönderme formu, geçmiş, cihaz yönetimi
+- [x] AdminCategories - Kategori CRUD, sıralama
+- [x] AdminAreas - Bölge yönetimi, form, silme onayı
+- [x] AdminPages - Sayfa yönetimi (mevcut korundu)
+- [x] AdminSEO - Meta tag yönetimi, önizleme
+- [x] AdminSiteSettings - Site ayarları formu
+- [x] AdminRedirects - Yönlendirme CRUD
+- [x] AdminCoupons - Kupon yönetimi, istatistikler
+- [x] AdminSupport - Destek talepleri, yanıt sistemi
+- [x] AdminReferrals - Referans sistemi
+- [x] AdminAppVersions - Uygulama versiyonları
+- [x] ErrorLogs - Hata günlükleri, severity badge, metadata, filtreler
+- [x] Tutarlı design system: rounded-2xl, soft gölgeler, turuncu accent, modern tipografi
+- [x] Tüm TS hataları 0'a düşürüldü
+- [x] Tüm 63 test geçiyor
