@@ -1,4 +1,4 @@
-import { router, protectedProcedure } from "../_core/trpc";
+import { router, protectedProcedure, publicProcedure } from "../_core/trpc";
 import { z } from "zod";
 import { getDb } from "../db";
 import { notifications, pushTokens } from "../../drizzle/schema";
@@ -130,8 +130,8 @@ export const notificationRouter = router({
     };
   }),
 
-  // Register push token (web push subscription)
-  registerPushToken: protectedProcedure
+  // Register push token (web push subscription) - anonim kullanıcılar da kaydedebilir
+  registerPushToken: publicProcedure
     .input(z.object({
       endpoint: z.string(),
       p256dh: z.string(),
@@ -142,6 +142,9 @@ export const notificationRouter = router({
       const dbInstance = await getDb();
       if (!dbInstance) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database not available" });
 
+      // userId: giriş yapmışsa kullanıcı ID'si, yoksa null (anonim)
+      const userId = ctx.user?.id ?? null;
+
       // Check if token already exists
       const existing = await dbInstance
         .select()
@@ -150,11 +153,11 @@ export const notificationRouter = router({
         .limit(1);
 
       if (existing.length > 0) {
-        // Update existing token
+        // Update existing token - kullanıcı giriş yaptıysa userId'yi güncelle
         await dbInstance
           .update(pushTokens)
           .set({
-            userId: ctx.user.id,
+            ...(userId !== null ? { userId } : {}),
             p256dh: input.p256dh,
             auth: input.auth,
             isActive: true,
@@ -166,7 +169,7 @@ export const notificationRouter = router({
         await dbInstance
           .insert(pushTokens)
           .values({
-            userId: ctx.user.id,
+            userId,
             endpoint: input.endpoint,
             p256dh: input.p256dh,
             auth: input.auth,
@@ -178,20 +181,30 @@ export const notificationRouter = router({
       return { success: true };
     }),
 
-  // Unregister push token
-  unregisterPushToken: protectedProcedure
+  // Unregister push token - anonim kullanıcılar da kaldırabilir (sadece endpoint ile eşleşir)
+  unregisterPushToken: publicProcedure
     .input(z.object({ endpoint: z.string() }))
     .mutation(async ({ ctx, input }) => {
       const dbInstance = await getDb();
       if (!dbInstance) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database not available" });
 
-      await dbInstance
+      const userId = ctx.user?.id ?? null;
+
+      // Giriş yapmışsa userId + endpoint ile, anonim ise sadece endpoint ile eşleştir
+      if (userId !== null) {
+        await dbInstance
           .update(pushTokens)
           .set({ isActive: false })
           .where(and(
             eq(pushTokens.endpoint, input.endpoint),
-            eq(pushTokens.userId, ctx.user.id)
+            eq(pushTokens.userId, userId)
           ));
+      } else {
+        await dbInstance
+          .update(pushTokens)
+          .set({ isActive: false })
+          .where(eq(pushTokens.endpoint, input.endpoint));
+      }
 
       return { success: true };
     }),

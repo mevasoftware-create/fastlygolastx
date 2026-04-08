@@ -214,3 +214,9 @@
 - [x] hreflang: x-default + en/tr/mk/sq server-side enjekte ediliyor
 - [x] Türkçe/Makedonca/Arnavutça sayfada og:url doğru ?lang= parametresiyle gösteriyor
 - [x] Test edildi: dev server'da tüm taglar doğru çalışıyor
+
+## Bildirim 401 Hatası Düzeltme (08.04.2026)
+- [x] registerPushToken ve unregisterPushToken protectedProcedure → publicProcedure olarak değiştirildi
+- [x] Anonim kullanıcılar da push token kaydedebilir (userId=null olarak DB'ye yazılır)
+- [x] Giriş yapan kullanıcı token kaydedince userId otomatik atanır
+- [x] Kullanıcı giriş yaptıktan sonra mevcut token güncellenerek userId bağlanır
