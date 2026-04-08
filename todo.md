@@ -233,3 +233,16 @@
 - [x] Production'da sitemap.xml sadece 1 URL gösteriyor - disable-seo.mjs dosyaları siliyordu, kopyalamaya çevrildi
 - [x] robots.txt production'da doğru serve edilecek (disable-seo.mjs düzeltildi)
 - [x] Server route'ları doğru - sorun build script'inin dosyaları silmesiydi
+
+## Meta Tag Production Sorunu (08.04.2026)
+- [x] Manus'un otomatik OG/Twitter meta tag'leri bizim dinamik meta tag'leri eziyor - index.html'e varsayılan OG tag'ler eklendi
+- [x] Production'da sayfa bazlı dinamik meta tag'lerin çalışmasını sağla - server-side injection mevcut tag'leri replace ediyor
+- [x] index.html'de OG tag'ler zaten mevcut olduğu için Manus override etmeyecek
+
+## Manus Otomatik SEO Tamamen Devre Dışı Bırak (08.04.2026)
+- [ ] Manus'un otomatik sitemap oluşturmasını engelle (zaten disable-seo.mjs ile çözüldü)
+- [ ] Manus'un otomatik robots.txt oluşturmasını engelle (zaten disable-seo.mjs ile çözüldü)
+- [ ] Manus'un otomatik OG/Twitter meta tag enjeksiyonunu engelle
+- [ ] Manus'un otomatik title/description enjeksiyonunu engelle
+- [ ] Manus'un otomatik canonical tag enjeksiyonunu engelle
+- [ ] Production'da sadece bizim SEO kodumuzun çalıştığını doğrula
