@@ -1,12 +1,16 @@
-# FastlyGo Redirects
+# FastlyGo Netlify Redirects
+
 # www → non-www redirect (301 permanent)
-
-# www.fastlygo.mk → fastlygo.mk
 https://www.fastlygo.mk/*  https://fastlygo.mk/:splat  301!
-
-# HTTP → HTTPS redirect
 http://fastlygo.mk/*  https://fastlygo.mk/:splat  301!
 http://www.fastlygo.mk/*  https://fastlygo.mk/:splat  301!
 
-# SPA routing - tüm route'ları index.html'e yönlendir
+# Sitemap ve robots.txt - Manus backend'inden proxy (her zaman güncel)
+/sitemap.xml  https://fastlygo.mk/sitemap.xml  200
+/robots.txt   https://fastlygo.mk/robots.txt   200
+
+# API isteklerini Manus backend'ine proxy'le
+/api/*  https://fastlygo.mk/api/:splat  200
+
+# SPA routing - tüm route'ları index.html'e yönlendir (en sona)
 /*  /index.html  200

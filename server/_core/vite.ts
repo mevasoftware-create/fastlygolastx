@@ -183,16 +183,16 @@ export async function setupVite(app: Express, server: Server) {
 
   app.use(vite.middlewares);
 
-  // Serve sitemap.xml and robots.txt directly from client/public (bypasses React router)
+  // Serve sitemap.xml and robots.txt from server/static (Manus does not override this directory)
   app.get("/sitemap.xml", (_req, res) => {
-    const sitemapPath = path.resolve(import.meta.dirname, "../..", "client", "public", "sitemap.xml");
+    const sitemapPath = path.resolve(import.meta.dirname, "..", "static", "sitemap.xml");
     res.setHeader("Content-Type", "application/xml; charset=utf-8");
     res.setHeader("Cache-Control", "public, max-age=86400");
     res.sendFile(sitemapPath);
   });
 
   app.get("/robots.txt", (_req, res) => {
-    const robotsPath = path.resolve(import.meta.dirname, "../..", "client", "public", "robots.txt");
+    const robotsPath = path.resolve(import.meta.dirname, "..", "static", "robots.txt");
     res.setHeader("Content-Type", "text/plain; charset=utf-8");
     res.setHeader("Cache-Control", "public, max-age=86400");
     res.sendFile(robotsPath);
@@ -242,17 +242,16 @@ export function serveStatic(app: Express) {
     );
   }
 
-  // Serve sitemap.xml and robots.txt directly from source (bypasses React router)
-  // Works in both dev and production regardless of build state
-  const publicSourcePath = path.resolve(import.meta.dirname, "../..", "client", "public");
+  // Serve sitemap.xml and robots.txt from server/static (Manus does not override this directory)
+  const staticSourcePath = path.resolve(import.meta.dirname, "..", "static");
   app.get("/sitemap.xml", (_req, res) => {
-    const sitemapPath = path.join(publicSourcePath, "sitemap.xml");
+    const sitemapPath = path.join(staticSourcePath, "sitemap.xml");
     res.setHeader("Content-Type", "application/xml; charset=utf-8");
     res.setHeader("Cache-Control", "public, max-age=86400");
     res.sendFile(sitemapPath);
   });
   app.get("/robots.txt", (_req, res) => {
-    const robotsPath = path.join(publicSourcePath, "robots.txt");
+    const robotsPath = path.join(staticSourcePath, "robots.txt");
     res.setHeader("Content-Type", "text/plain; charset=utf-8");
     res.setHeader("Cache-Control", "public, max-age=86400");
     res.sendFile(robotsPath);
