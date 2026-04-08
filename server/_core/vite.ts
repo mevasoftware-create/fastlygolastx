@@ -122,6 +122,22 @@ export async function setupVite(app: Express, server: Server) {
   });
 
   app.use(vite.middlewares);
+
+  // Serve sitemap.xml and robots.txt directly from client/public (bypasses React router)
+  app.get("/sitemap.xml", (_req, res) => {
+    const sitemapPath = path.resolve(import.meta.dirname, "../..", "client", "public", "sitemap.xml");
+    res.setHeader("Content-Type", "application/xml; charset=utf-8");
+    res.setHeader("Cache-Control", "public, max-age=86400");
+    res.sendFile(sitemapPath);
+  });
+
+  app.get("/robots.txt", (_req, res) => {
+    const robotsPath = path.resolve(import.meta.dirname, "../..", "client", "public", "robots.txt");
+    res.setHeader("Content-Type", "text/plain; charset=utf-8");
+    res.setHeader("Cache-Control", "public, max-age=86400");
+    res.sendFile(robotsPath);
+  });
+
   app.use("*", async (req, res, next) => {
     const url = req.originalUrl;
 
@@ -163,6 +179,23 @@ export function serveStatic(app: Express) {
       `Could not find the build directory: ${distPath}, make sure to build the client first`
     );
   }
+
+  // Serve sitemap.xml and robots.txt directly from source (bypasses React router)
+  // Works in both dev and production regardless of build state
+  const publicSourcePath = path.resolve(import.meta.dirname, "../..", "client", "public");
+  app.get("/sitemap.xml", (_req, res) => {
+    const sitemapPath = path.join(publicSourcePath, "sitemap.xml");
+    res.setHeader("Content-Type", "application/xml; charset=utf-8");
+    res.setHeader("Cache-Control", "public, max-age=86400");
+    res.sendFile(sitemapPath);
+  });
+  app.get("/robots.txt", (_req, res) => {
+    const robotsPath = path.join(publicSourcePath, "robots.txt");
+    res.setHeader("Content-Type", "text/plain; charset=utf-8");
+    res.setHeader("Cache-Control", "public, max-age=86400");
+    res.sendFile(robotsPath);
+  });
+
   app.use(express.static(distPath));
 
   // fall through to index.html if the file doesn't exist

@@ -196,3 +196,11 @@
 - [x] Seçili alan kartı mobil'de daha büyük ve kullanışlı
 - [x] isMobile state kaldırıldı, Tailwind breakpoint sınıfları kullanıldı
 - [x] Masaüstü liste paneli başlığı eklendi (All Areas / alan sayısı)
+
+## Sitemap & robots.txt Temiz Sistem (08.04.2026)
+- [x] Tüm eski sitemap sistemleri kaldırıldı (sitemapRouter.ts, middleware, admin endpoint'leri)
+- [x] Tek temiz sistem: server/_core/vite.ts'te /sitemap.xml ve /robots.txt için Express route (hem dev hem production)
+- [x] client/public/sitemap.xml → fiziksel dosya, doğrudan sendFile ile sunuluyor
+- [x] client/public/robots.txt → fiziksel dosya, doğrudan sendFile ile sunuluyor
+- [x] React router'ın sitemap.xml/robots.txt'i yakalaması engellendi
+- [x] sitemap.xml 140 URL bloğu (35 sayfa × 4 dil: en/tr/mk/sq + x-default hreflang)
