@@ -403,11 +403,9 @@ function updateHreflangTags(page: keyof typeof pageSeoData, currentLanguage: Lan
  * @param page - Page identifier
  */
 function updateCanonicalURL(page: keyof typeof pageSeoData) {
-  // Remove existing canonical tag
-  const existingCanonical = document.querySelector('link[rel="canonical"]');
-  if (existingCanonical) {
-    existingCanonical.remove();
-  }
+  // Remove ALL existing canonical tags (including Manus-injected ones)
+  const existingCanonicals = document.querySelectorAll('link[rel="canonical"]');
+  existingCanonicals.forEach(tag => tag.remove());
 
   // Base URL (production domain - always HTTPS)
   const baseUrl = 'https://fastlygo.mk';

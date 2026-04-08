@@ -246,3 +246,19 @@
 - [ ] Manus'un otomatik title/description enjeksiyonunu engelle
 - [ ] Manus'un otomatik canonical tag enjeksiyonunu engelle
 - [ ] Production'da sadece bizim SEO kodumuzun çalıştığını doğrula
+
+## Manus SEO Sistemi Tam Devre Dışı Bırakma (08.04.2026)
+- [ ] Production HTML'i satır satır analiz et - Manus'un enjekte ettiği tüm öğeleri tespit et
+- [ ] Dev server vs Production farkını karşılaştır - Manus'un eklediği/değiştirdiği her şeyi bul
+- [ ] Tespit edilen tüm Manus otomatik SEO öğelerini devre dışı bırak
+- [ ] Deploy sonrası doğrula - hiçbir Manus otomatik SEO öğesi kalmamalı
+
+## Manus Enjeksiyonlarını Tamamen Kaldır (08.04.2026)
+- [ ] Manus title override'ını engelle (VITE_APP_TITLE → "FastlyGo" kısaltması)
+- [ ] Manus'un fazladan canonical tag enjeksiyonunu engelle
+- [ ] Production'da server-side injection çalışmadığı için client-side SEO hook oluştur
+- [ ] Tüm sayfalarda dinamik title/description/OG tag'ler client-side çalışsın
+- [ ] Deploy sonrası doğrula - Manus'un hiçbir SEO müdahalesi kalmamalı
+
+## Manus Fazladan Canonical Tag Kaldır (08.04.2026)
+- [x] Manus'un </head> öncesine eklediği fazladan canonical tag'ı engelle - index.html'den statik canonical kaldırıldı, client-side pageSeo.ts tüm canonical'ları temizleyip doğrusunu ekliyor
