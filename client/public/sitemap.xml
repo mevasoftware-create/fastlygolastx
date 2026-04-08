@@ -320,4 +320,26 @@
     <xhtml:link rel="alternate" hreflang="mk" href="https://fastlygo.mk/areas/prilep?lang=mk"/>
     <xhtml:link rel="alternate" hreflang="sq" href="https://fastlygo.mk/areas/prilep?lang=sq"/>
   </url>
+  <url>
+    <loc>https://fastlygo.mk/courier/register</loc>
+    <lastmod>2026-04-08</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://fastlygo.mk/courier/register"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://fastlygo.mk/courier/register"/>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://fastlygo.mk/courier/register?lang=tr"/>
+    <xhtml:link rel="alternate" hreflang="mk" href="https://fastlygo.mk/courier/register?lang=mk"/>
+    <xhtml:link rel="alternate" hreflang="sq" href="https://fastlygo.mk/courier/register?lang=sq"/>
+  </url>
+  <url>
+    <loc>https://fastlygo.mk/business/register</loc>
+    <lastmod>2026-04-08</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://fastlygo.mk/business/register"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://fastlygo.mk/business/register"/>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://fastlygo.mk/business/register?lang=tr"/>
+    <xhtml:link rel="alternate" hreflang="mk" href="https://fastlygo.mk/business/register?lang=mk"/>
+    <xhtml:link rel="alternate" hreflang="sq" href="https://fastlygo.mk/business/register?lang=sq"/>
+  </url>
 </urlset>

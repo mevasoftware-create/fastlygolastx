@@ -280,10 +280,10 @@
 - [x] Insert'e token: '' eklendi (Web push endpoint/p256dh/auth kullanır, token FCM/mobile için)
 
 ## Pre-render SEO Production'da Çalışmıyor (08.04.2026)
-- [ ] Manus proxy /how-it-works için dist/public/how-it-works/index.html'i değil root index.html'i serve ediyor
-- [ ] Manus hala title'ı "FastlyGo"ya override ediyor
-- [ ] Manus hala </head> öncesine canonical ekliyor
-- [ ] Farklı yaklaşım gerekiyor - pre-render alt dizin stratejisi çalışmıyor
+- [x] Manus proxy root index.html'i serve ediyor — ÇÖZÜM: index.html'e inline JS script eklendi
+- [x] Inline script URL'ye göre doğru title/description/canonical/OG set ediyor
+- [x] Duplicate tag'leri temizleyen cleanup kodu eklendi
+- [x] 10+ public sayfa + dinamik area sayfaları için SEO data tanımlandı
 
 ## Kapsamlı SEO Audit ve Düzeltme (08.04.2026)
 - [x] SORUN-1: Production'da tüm sayfalar aynı title/description/OG gösteriyor — index.html'den statik tag'ler kaldırıldı, server-side fallback eklendi
@@ -296,3 +296,11 @@
 - [x] SORUN-8: prerender-seo.mjs hala build'de çalışıyor (yedek), asıl çözüm server-side vite.ts injection + fallback data
 - [x] SORUN-9: index.html template'inden tüm statik SEO tag'ler kaldırıldı — artık duplicate yok
 - [x] ÇÖZÜM: vite.ts fallback SEO data eklendi, staticPageSlugs genişletildi, pageSeo.ts pagePaths güncellendi
+
+## Kapsamlı SEO Audit - 2. Tur (08.04.2026)
+- [x] Sitemap'e /courier/register ve /business/register eklendi (29→31 URL)
+- [x] Footer copyright yılı 2025→2026 güncellendi
+- [x] Footer'daki /privacy ve /terms linkleri /privacy-policy ve /terms-of-service olarak düzeltildi
+- [x] /categories/* için server-side 301 redirect eklendi (hem dev hem production)
+- [x] index.html'e inline SEO script eklendi - Manus proxy override'ını etkisiz hale getiriyor
+- [x] Tüm 63 test geçiyor

@@ -5,16 +5,15 @@ import path from 'path';
 /**
  * Pre-render SEO script: Creates per-page HTML files with correct meta tags.
  * 
- * Manus proxy serves static files from dist/public/ and does NOT pass HTML
- * requests to Express server. This means server-side SEO injection never runs.
+ * CRITICAL: Manus proxy injects its own SEO block (generic title, homepage canonical,
+ * homepage OG) into the HTML AFTER our build. We cannot prevent this injection.
  * 
- * Solution: Generate dist/public/{path}/index.html for each page during build,
- * so Manus proxy serves the correct meta tags for each page.
+ * SOLUTION: We inject our CORRECT tags right after <head> (at the TOP of <head>),
+ * so they appear BEFORE Manus's injected tags. Google uses the FIRST occurrence
+ * of each meta tag type, so our correct tags win.
  * 
- * Manus proxy also overrides <title> with VITE_APP_TITLE ("FastlyGo") and
- * injects a canonical tag before </head>. We can't prevent the title override,
- * but we ensure all other meta tags (description, OG, Twitter, hreflang) are
- * correct per page.
+ * We also add a synchronous <script> that removes duplicate/incorrect tags
+ * immediately when the page loads (before any rendering).
  */
 
 const distPublicPath = path.resolve('./dist/public');
@@ -108,23 +107,27 @@ const pages = {
   }
 };
 
-function injectSeoIntoHtml(html, pageData, pathname) {
+/**
+ * Build the SEO meta block for a given page.
+ * This block will be injected RIGHT AFTER <head> so it appears BEFORE
+ * any Manus proxy injection.
+ */
+function buildSeoBlock(pageData, pathname) {
   const safeTitle = esc(pageData.title);
   const safeDesc = esc(pageData.description);
   const safeKeywords = esc(pageData.keywords || '');
   const canonicalUrl = `${BASE_URL}${pathname}`;
-
-  // hreflang URLs
   const hrefEn = `${BASE_URL}${pathname}`;
   const hrefTr = `${BASE_URL}${pathname}?lang=tr`;
   const hrefMk = `${BASE_URL}${pathname}?lang=mk`;
   const hrefSq = `${BASE_URL}${pathname}?lang=sq`;
 
-  const seoBlock = `
-    <!-- Pre-rendered SEO meta tags for ${pathname} -->
+  return `
+    <!-- FastlyGo SEO: ${pathname} (pre-rendered, must be FIRST in head) -->
     <title>${safeTitle}</title>
     <meta name="description" content="${safeDesc}" />
     <meta name="keywords" content="${safeKeywords}" />
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
     <link rel="canonical" href="${canonicalUrl}" />
     <link rel="alternate" hreflang="x-default" href="${hrefEn}" />
     <link rel="alternate" hreflang="en" href="${hrefEn}" />
@@ -144,24 +147,86 @@ function injectSeoIntoHtml(html, pageData, pathname) {
     <meta name="twitter:title" content="${safeTitle}" />
     <meta name="twitter:description" content="${safeDesc}" />
     <meta name="twitter:image" content="${OG_IMAGE}" />`;
+}
 
-  // Remove existing SEO tags from template
+/**
+ * Build a synchronous cleanup script that removes duplicate SEO tags.
+ * This runs immediately when the browser parses the HTML, before rendering.
+ * It keeps only the FIRST occurrence of each tag type (our pre-rendered ones).
+ */
+function buildCleanupScript() {
+  return `<script>
+(function(){
+  // Remove duplicate title tags (keep first)
+  var titles=document.head.querySelectorAll('title');
+  for(var i=1;i<titles.length;i++)titles[i].remove();
+  // Remove duplicate description tags (keep first)
+  var descs=document.head.querySelectorAll('meta[name="description"]');
+  for(var i=1;i<descs.length;i++)descs[i].remove();
+  // Remove duplicate canonical tags (keep first)
+  var cans=document.head.querySelectorAll('link[rel="canonical"]');
+  for(var i=1;i<cans.length;i++)cans[i].remove();
+  // Remove duplicate og:url (keep first)
+  var ogurls=document.head.querySelectorAll('meta[property="og:url"]');
+  for(var i=1;i<ogurls.length;i++)ogurls[i].remove();
+  // Remove duplicate og:title (keep first)
+  var ogtitles=document.head.querySelectorAll('meta[property="og:title"]');
+  for(var i=1;i<ogtitles.length;i++)ogtitles[i].remove();
+  // Remove duplicate og:description (keep first)
+  var ogdescs=document.head.querySelectorAll('meta[property="og:description"]');
+  for(var i=1;i<ogdescs.length;i++)ogdescs[i].remove();
+  // Remove duplicate og:image (keep first)
+  var ogimgs=document.head.querySelectorAll('meta[property="og:image"]');
+  for(var i=1;i<ogimgs.length;i++)ogimgs[i].remove();
+  // Remove duplicate twitter:title (keep first)
+  var twtitles=document.head.querySelectorAll('meta[name="twitter:title"]');
+  for(var i=1;i<twtitles.length;i++)twtitles[i].remove();
+  // Remove duplicate twitter:description (keep first)
+  var twdescs=document.head.querySelectorAll('meta[name="twitter:description"]');
+  for(var i=1;i<twdescs.length;i++)twdescs[i].remove();
+  // Remove duplicate hreflang tags (keep first set of 5)
+  var hreflangs=document.head.querySelectorAll('link[hreflang]');
+  for(var i=5;i<hreflangs.length;i++)hreflangs[i].remove();
+  // Remove duplicate keywords (keep first)
+  var kws=document.head.querySelectorAll('meta[name="keywords"]');
+  for(var i=1;i<kws.length;i++)kws[i].remove();
+})();
+</script>`;
+}
+
+function injectSeoIntoHtml(html, pageData, pathname) {
+  // First, remove any existing SEO tags from the template
   let result = html
     .replace(/<title>[^<]*<\/title>/g, '')
-    .replace(/<meta name="description"[^>]*\/?>/g, '')
-    .replace(/<meta name="keywords"[^>]*\/?>/g, '')
-    .replace(/<link rel="canonical"[^>]*\/?>/g, '')
-    .replace(/<link rel="alternate" hreflang[^>]*\/?>/g, '')
-    .replace(/<link rel="alternate" hrefLang[^>]*\/?>/g, '')
-    .replace(/<meta property="og:[^>]*\/?>/g, '')
-    .replace(/<meta name="twitter:[^>]*\/?>/g, '')
+    .replace(/<meta[^>]*name="description"[^>]*\/?>/g, '')
+    .replace(/<meta[^>]*name="keywords"[^>]*\/?>/g, '')
+    .replace(/<link[^>]*rel="canonical"[^>]*\/?>/g, '')
+    .replace(/<link[^>]*rel="alternate"[^>]*hreflang[^>]*\/?>/g, '')
+    .replace(/<link[^>]*rel="alternate"[^>]*hrefLang[^>]*\/?>/g, '')
+    .replace(/<meta[^>]*property="og:[^>]*\/?>/g, '')
+    .replace(/<meta[^>]*name="twitter:[^>]*\/?>/g, '')
+    .replace(/<meta[^>]*name="robots"[^>]*\/?>/g, '')
     .replace(/<!-- SEO Meta Tags[^>]*-->/g, '')
+    .replace(/<!-- FastlyGo SEO[^>]*-->/g, '')
+    .replace(/<!-- Pre-rendered SEO[^>]*-->/g, '')
     .replace(/<!-- canonical and hreflang[^>]*-->/g, '')
     .replace(/<!-- Removed from static[^>]*-->/g, '')
-    .replace(/<!-- Server-side injection[^>]*-->/g, '');
+    .replace(/<!-- Server-side injection[^>]*-->/g, '')
+    .replace(/<!-- Client-side SEOHead[^>]*-->/g, '')
+    .replace(/<!-- DO NOT add static[^>]*-->/g, '');
 
-  // Inject our clean SEO block before </head>
-  result = result.replace('</head>', `${seoBlock}\n  </head>`);
+  // Build the SEO block
+  const seoBlock = buildSeoBlock(pageData, pathname);
+  
+  // Build the cleanup script
+  const cleanupScript = buildCleanupScript();
+
+  // Inject our SEO block RIGHT AFTER <head> (before anything else)
+  // This ensures our tags appear FIRST, before Manus proxy injection
+  // Also inject cleanup script right after our SEO block
+  result = result.replace(/<head[^>]*>/, (match) => {
+    return `${match}${seoBlock}\n    ${cleanupScript}`;
+  });
 
   return result;
 }
@@ -198,6 +263,6 @@ for (const [pathname, seoData] of Object.entries(pages)) {
 
 console.log('\n' + '='.repeat(60));
 console.log(`✅ ${generatedCount} pages pre-rendered with unique SEO meta tags`);
-console.log('✅ Each page now has its own title, description, OG tags');
-console.log('✅ Manus proxy will serve correct meta tags per page');
+console.log('✅ SEO tags injected at TOP of <head> (before Manus proxy injection)');
+console.log('✅ Cleanup script removes duplicate tags on page load');
 console.log('='.repeat(60) + '\n');

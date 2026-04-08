@@ -217,6 +217,14 @@ export async function setupVite(app: Express, server: Server) {
     res.sendFile(robotsPath);
   });
 
+  // 301 Redirect: /categories/* → /services (categories merged into services)
+  app.get('/categories/*', (_req, res) => {
+    res.redirect(301, '/services');
+  });
+  app.get('/categories', (_req, res) => {
+    res.redirect(301, '/services');
+  });
+
   app.use("*", async (req, res, next) => {
     const url = req.originalUrl;
 
@@ -277,6 +285,14 @@ export function serveStatic(app: Express) {
   });
 
   app.use(express.static(distPath));
+
+  // 301 Redirect: /categories/* → /services (categories merged into services)
+  app.get('/categories/*', (_req, res) => {
+    res.redirect(301, '/services');
+  });
+  app.get('/categories', (_req, res) => {
+    res.redirect(301, '/services');
+  });
 
   // Explicit page routes for SEO injection
   // Manus proxy forwards explicit routes to Express but bypasses wildcard SPA fallback

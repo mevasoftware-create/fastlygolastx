@@ -48,9 +48,63 @@
     <!-- Preload hero image for LCP optimization -->
     <link rel="preload" as="image" href="/images/optimized/hero-poster.webp" type="image/webp" fetchpriority="high" />
     
-    <!-- SEO Meta Tags: Injected by server-side (vite.ts) in dev, prerender-seo.mjs in production -->
-    <!-- Client-side SEOHead component updates these dynamically per page after hydration -->
-    <!-- DO NOT add static title/description/OG tags here - they will be duplicated -->
+    <!-- SEO: Inline script sets correct per-page meta before React hydration -->
+    <script>
+    (function(){
+      var B='https://fastlygo.mk',I='https://fastlygo.mk/og-image.e6740bbc.jpg',p=location.pathname.replace(/\/$/,'');
+      var S={
+        '/':{t:'FastlyGo - Food Delivery, Courier & Cargo Service in Skopje',d:'Fast courier & delivery service in Skopje. Food, cargo, package delivery in 15 minutes. Real-time tracking, affordable prices. Order now!',k:'food delivery, courier service, Skopje, fast delivery, cargo delivery, Macedonia'},
+        '/how-it-works':{t:'How It Works - FastlyGo Delivery Process | Skopje',d:'Learn how FastlyGo delivery works. Simple 4-step process: Order, courier accepts, real-time tracking, delivery in 15 minutes.',k:'delivery process, how to order, courier tracking, fast delivery'},
+        '/about-us':{t:'About FastlyGo - Courier & Delivery Service in Skopje',d:'FastlyGo is a professional courier and delivery service in Skopje, Macedonia. 53+ active couriers, 15-minute delivery.',k:'about fastlygo, courier company, delivery service, Skopje'},
+        '/services':{t:'Our Services - FastlyGo Delivery Categories | Skopje',d:'Explore FastlyGo delivery services: food, grocery, pharmacy, cargo, document delivery and more in Skopje.',k:'delivery services, food delivery, grocery delivery, pharmacy delivery'},
+        '/areas':{t:'Delivery Areas - FastlyGo Coverage in Skopje',d:'Check FastlyGo delivery coverage areas in Skopje and surrounding regions. Fast delivery to 38+ neighborhoods.',k:'delivery areas, coverage, Skopje neighborhoods, delivery zones'},
+        '/new-order':{t:'Call a Courier in Skopje - Fast Delivery Service | FastlyGo',d:'Place your delivery order with FastlyGo. Enter pickup and delivery addresses, choose package size, get instant delivery.',k:'order delivery, call courier, fast delivery, Skopje'},
+        '/courier/register':{t:'Become a Courier - Earn Money with FastlyGo',d:'Join FastlyGo as a courier driver. Flexible hours, competitive pay, instant payouts. Register now and start earning.',k:'courier registration, driver signup, delivery driver, earn money'},
+        '/business/register':{t:'Business Partnership - FastlyGo Delivery Solutions',d:'Partner with FastlyGo for your business deliveries. Restaurant, market, pharmacy integration.',k:'business registration, partner program, restaurant delivery'},
+        '/privacy-policy':{t:'Privacy Policy | FastlyGo',d:'FastlyGo privacy policy. Learn how we collect, use, and protect your personal data.',k:'privacy policy, data protection'},
+        '/terms-of-service':{t:'Terms of Service | FastlyGo',d:'FastlyGo terms of service. Read our terms and conditions for using the delivery platform.',k:'terms of service, terms and conditions'}
+      };
+      // Area pages
+      if(p.indexOf('/areas/')===0){
+        var slug=p.split('/areas/')[1];
+        var name=slug.replace(/-/g,' ').replace(/\b\w/g,function(c){return c.toUpperCase();});
+        S[p]={t:'Delivery in '+name+' | FastlyGo',d:'Fast delivery service in '+name+'. Food, grocery, pharmacy & package delivery. 15-min courier with GPS tracking.',k:name+' delivery, courier, FastlyGo'};
+      }
+      var d=S[p]||S['/'];
+      // Set title
+      document.title=d.t;
+      // Helper: set or create meta
+      function setMeta(attr,val,content){
+        var sel='meta['+attr+'="'+val+'"]';
+        var el=document.head.querySelector(sel);
+        if(el){el.setAttribute('content',content);}
+        else{el=document.createElement('meta');el.setAttribute(attr==='property'?'property':'name',val);el.setAttribute('content',content);document.head.appendChild(el);}
+      }
+      // Helper: set or create link
+      function setLink(rel,href,extra){
+        var sel='link[rel="'+rel+'"]';
+        if(extra)sel+='['+extra+']';
+        var el=document.head.querySelector(sel);
+        if(el){el.setAttribute('href',href);}
+        else{el=document.createElement('link');el.setAttribute('rel',rel);if(extra){var kv=extra.split('=');el.setAttribute(kv[0],kv[1].replace(/"/g,''));}el.setAttribute('href',href);document.head.appendChild(el);}
+      }
+      setMeta('name','description',d.d);
+      setMeta('name','keywords',d.k);
+      var can=B+(p||'/');
+      setLink('canonical',can);
+      setMeta('property','og:url',can);
+      setMeta('property','og:title',d.t);
+      setMeta('property','og:description',d.d);
+      setMeta('property','og:image',I);
+      setMeta('name','twitter:title',d.t);
+      setMeta('name','twitter:description',d.d);
+      // Remove duplicate tags (keep only first of each)
+      ['title','meta[name="description"]','link[rel="canonical"]','meta[property="og:url"]','meta[property="og:title"]','meta[property="og:description"]','meta[property="og:image"]','meta[name="twitter:title"]','meta[name="twitter:description"]'].forEach(function(sel){
+        var els=document.head.querySelectorAll(sel);
+        for(var i=1;i<els.length;i++)els[i].remove();
+      });
+    })();
+    </script>
   </head>
 
   <body>

@@ -176,13 +176,13 @@ export default function Footer() {
           <div className="mt-16 pt-8 border-t border-white/10">
             <div className="flex flex-col md:flex-row items-center justify-between gap-4">
               <p className="text-sm text-gray-500">
-                © 2025 FastlyGo. {t('allRightsReserved')}
+                © 2026 FastlyGo. {t('allRightsReserved')}
               </p>
               <div className="flex items-center gap-6 text-sm text-gray-500">
-                <Link href="/privacy" className="hover:text-orange-500 transition-colors">
+                <Link href="/privacy-policy" className="hover:text-orange-500 transition-colors">
                   {t('privacyPolicy')}
                 </Link>
-                <Link href="/terms" className="hover:text-orange-500 transition-colors">
+                <Link href="/terms-of-service" className="hover:text-orange-500 transition-colors">
                   {t('termsOfService')}
                 </Link>
               </div>
