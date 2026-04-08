@@ -170,6 +170,7 @@ export const notificationRouter = router({
           .insert(pushTokens)
           .values({
             userId,
+            token: '', // Web push uses endpoint/p256dh/auth, token is for FCM/mobile
             endpoint: input.endpoint,
             p256dh: input.p256dh,
             auth: input.auth,

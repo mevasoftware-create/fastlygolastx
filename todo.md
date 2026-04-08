@@ -269,12 +269,15 @@
 - [x] prerender-seo.mjs: Build sırasında 16 sayfa için ayrı HTML dosyaları oluşturuluyor
 
 ## Sitemap Duplicate Lang URL'leri Kaldır (08.04.2026)
-- [ ] Sitemap'te ?lang=tr, ?lang=mk, ?lang=sq ayrı <url> entry'leri var - bunlar gereksiz, hreflang alternate yeterli
-- [ ] Sadece ana URL'ler <loc>'ta olsun, dil varyantları sadece xhtml:link alternate olarak kalsın
+- [x] Sitemap'te ?lang= duplicate entry'ler kaldırıldı: 140 → 34 URL (105 duplicate silindi)
+- [x] Sadece ana URL'ler <loc>'ta, dil varyantları sadece xhtml:link alternate olarak kalıyor
+- [x] /categories/* URL'leri sitemap'ten kaldırıldı (34 → 29 URL) - categories artık /services'e redirect oluyor
+- [x] /new-order sayfası sitemap'e eklendi
+- [x] lastmod tarihleri 2026-04-08 olarak güncellendi
 
 ## registerPushToken 500 Hatası (08.04.2026)
-- [ ] push_tokens INSERT sorgusu 500 veriyor - auth kolonu null/geçersiz değer alıyor olabilir
-- [ ] Anonim kullanıcılar için auth kolonunun doğru değer aldığını kontrol et
+- [x] push_tokens INSERT sorgusu 500 veriyor - token kolonu NOT NULL ama insert'te değer gönderilmiyordu
+- [x] Insert'e token: '' eklendi (Web push endpoint/p256dh/auth kullanır, token FCM/mobile için)
 
 ## Pre-render SEO Production'da Çalışmıyor (08.04.2026)
 - [ ] Manus proxy /how-it-works için dist/public/how-it-works/index.html'i değil root index.html'i serve ediyor
