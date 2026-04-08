@@ -304,3 +304,11 @@
 - [x] /categories/* için server-side 301 redirect eklendi (hem dev hem production)
 - [x] index.html'e inline SEO script eklendi - Manus proxy override'ını etkisiz hale getiriyor
 - [x] Tüm 63 test geçiyor
+
+## Areas Sayfası Yeniden Tasarım + Sitemap Kategoriler (08.04.2026)
+- [x] Areas sayfasının tasarımı tamamen yenilendi - hero banner, şehir kartları (expand/collapse), area grid, interaktif harita, CTA
+- [x] Site tasarım dili ile uyumlu: turuncu gradient, soft gölgeler, rounded corners, emoji ikonlar
+- [x] Mobil + masaüstü responsive: tek kolon mobil, 3 kolon masaüstü, harita toggle
+- [x] 4 dilde i18n key'leri eklendi (deliveryNetwork, deliveryZones, cities, exploreOnMap vb.)
+- [x] Sitemap'e 6 kategori eklendi (anchor link: /services#food-delivery vb.) - toplam 37 URL
+- [x] Services.tsx'deki kategori kartlarına id attribute eklendi (anchor link'ler çalışsın)

@@ -896,5 +896,15 @@
   "testimonial5Text": "Müşterilerimize hızlı teslimat yapabiliyoruz. Kuryeleri gerçek zamanlı takip edebilmek harika!",
   "testimonial6Name": "Stefan Nikolov",
   "testimonial6Role": "E-ticaret Satıcısı",
-  "testimonial6Text": "Paket teslimatlarım için en iyi çözüm. Fiyatlar uygun ve servis kaliteli."
+  "testimonial6Text": "Paket teslimatlarım için en iyi çözüm. Fiyatlar uygun ve servis kaliteli.",
+  "deliveryNetwork": "Teslimat Ağı",
+  "deliveryZones": "Teslimat Bölgesi",
+  "minuteDelivery": "Dk Teslimat",
+  "cities": "Şehir",
+  "exploreOnMap": "Haritada Keşfet",
+  "exploreOnMapDesc": "Teslimat bölgesi detaylarını görmek için herhangi bir pini tıklayın",
+  "clearSearch": "Aramayı temizle",
+  "showMap": "Haritayı Göster",
+  "hideMap": "Haritayı Gizle",
+  "allAreas": "Tüm Bölgeler"
 }

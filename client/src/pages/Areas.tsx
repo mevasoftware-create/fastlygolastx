@@ -1,28 +1,36 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useMemo } from 'react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import SEOHead from '@/components/SEOHead';
 import { MapView } from '@/components/Map';
-import { MapPin, Search, CheckCircle, ArrowRight, Loader2, Zap, List, Map as MapIcon, X } from 'lucide-react';
+import { MapPin, Search, ArrowRight, Loader2, Zap, X, Navigation, Clock, ChevronDown, ChevronUp } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { Link } from 'wouter';
 import { trpc } from '@/lib/trpc';
 
-const cityColors: Record<string, string> = {
-  Skopje:   '#f97316',
-  Tetovo:   '#3b82f6',
-  Bitola:   '#a855f7',
-  Ohrid:    '#14b8a6',
-  Kumanovo: '#f43f5e',
-  Gostivar: '#22c55e',
-  Strumica: '#eab308',
-  Veles:    '#6366f1',
-  Kocani:   '#f59e0b',
-  Istip:    '#06b6d4',
-  Prilep:   '#d946ef',
+/* ── City config ───────────────────────────────────────────── */
+interface CityConfig {
+  color: string;
+  gradient: string;
+  lightBg: string;
+  emoji: string;
+}
+
+const cityConfig: Record<string, CityConfig> = {
+  Skopje:   { color: '#f97316', gradient: 'from-orange-500 to-amber-500', lightBg: 'bg-orange-50', emoji: '🏙️' },
+  Tetovo:   { color: '#3b82f6', gradient: 'from-blue-500 to-indigo-500', lightBg: 'bg-blue-50', emoji: '🏔️' },
+  Bitola:   { color: '#a855f7', gradient: 'from-purple-500 to-violet-500', lightBg: 'bg-purple-50', emoji: '🏛️' },
+  Ohrid:    { color: '#14b8a6', gradient: 'from-teal-500 to-emerald-500', lightBg: 'bg-teal-50', emoji: '🌊' },
+  Kumanovo: { color: '#f43f5e', gradient: 'from-rose-500 to-pink-500', lightBg: 'bg-rose-50', emoji: '🌄' },
+  Gostivar: { color: '#22c55e', gradient: 'from-green-500 to-emerald-500', lightBg: 'bg-green-50', emoji: '🌲' },
+  Strumica: { color: '#eab308', gradient: 'from-yellow-500 to-amber-500', lightBg: 'bg-yellow-50', emoji: '☀️' },
+  Veles:    { color: '#6366f1', gradient: 'from-indigo-500 to-blue-500', lightBg: 'bg-indigo-50', emoji: '🌉' },
+  Kocani:   { color: '#f59e0b', gradient: 'from-amber-500 to-orange-500', lightBg: 'bg-amber-50', emoji: '🌾' },
+  Istip:    { color: '#06b6d4', gradient: 'from-cyan-500 to-teal-500', lightBg: 'bg-cyan-50', emoji: '⛰️' },
+  Prilep:   { color: '#d946ef', gradient: 'from-fuchsia-500 to-purple-500', lightBg: 'bg-fuchsia-50', emoji: '🏺' },
 };
-const defaultHex = '#6b7280';
+const defaultConfig: CityConfig = { color: '#6b7280', gradient: 'from-gray-500 to-slate-500', lightBg: 'bg-gray-50', emoji: '📍' };
 
 function getCityForSlug(slug: string): string {
   if (slug.includes('tetovo')) return 'Tetovo';
@@ -38,15 +46,13 @@ function getCityForSlug(slug: string): string {
   return 'Skopje';
 }
 
-type MobileTab = 'list' | 'map';
-
 export default function Areas() {
   const { language } = useLanguage();
   const { t } = useTranslation();
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedArea, setSelectedArea] = useState<any | null>(null);
+  const [expandedCity, setExpandedCity] = useState<string | null>('Skopje');
   const [mapInstance, setMapInstance] = useState<any>(null);
-  const [mobileTab, setMobileTab] = useState<MobileTab>('list');
+  const [showMap, setShowMap] = useState(false);
   const markersRef = useRef<Map<number, any>>(new Map());
   const infoWindowRef = useRef<any>(null);
 
@@ -58,7 +64,7 @@ export default function Areas() {
 
   const getAreaName = (area: any) => {
     const meta = area.seoMeta?.[language] || area.seoMeta?.en || {};
-    return meta.heading || meta.badge || area.slug;
+    return meta.heading || meta.badge || area.slug.replace(/-/g, ' ').replace(/\b\w/g, (c: string) => c.toUpperCase());
   };
 
   const getAreaSubtitle = (area: any) => {
@@ -66,23 +72,34 @@ export default function Areas() {
     return meta.subtitle || '';
   };
 
-  const filteredAreas = (areas || []).filter((area: any) =>
-    getAreaName(area).toLowerCase().includes(searchQuery.toLowerCase())
+  const filteredAreas = useMemo(() =>
+    (areas || []).filter((area: any) =>
+      getAreaName(area).toLowerCase().includes(searchQuery.toLowerCase()) ||
+      getCityForSlug(area.slug).toLowerCase().includes(searchQuery.toLowerCase())
+    ), [areas, searchQuery, language]
   );
 
-  const groupedAreas = filteredAreas.reduce((acc: Record<string, any[]>, area: any) => {
-    const city = getCityForSlug(area.slug);
-    if (!acc[city]) acc[city] = [];
-    acc[city].push(area);
-    return acc;
-  }, {});
+  const groupedAreas = useMemo(() =>
+    filteredAreas.reduce((acc: Record<string, any[]>, area: any) => {
+      const city = getCityForSlug(area.slug);
+      if (!acc[city]) acc[city] = [];
+      acc[city].push(area);
+      return acc;
+    }, {}), [filteredAreas]
+  );
 
-  const sortedCities = Object.keys(groupedAreas).sort((a, b) => {
-    if (a === 'Skopje') return -1;
-    if (b === 'Skopje') return 1;
-    return a.localeCompare(b);
-  });
+  const sortedCities = useMemo(() =>
+    Object.keys(groupedAreas).sort((a, b) => {
+      if (a === 'Skopje') return -1;
+      if (b === 'Skopje') return 1;
+      return a.localeCompare(b);
+    }), [groupedAreas]
+  );
 
+  const totalAreas = filteredAreas.length;
+  const totalCities = sortedCities.length;
+
+  /* ── Map markers ────────────────────────────────────────── */
   useEffect(() => {
     if (!mapInstance || !areas || areas.length === 0) return;
     if (markersRef.current.size > 0) return;
@@ -92,18 +109,18 @@ export default function Areas() {
         { featureType: 'poi', elementType: 'labels', stylers: [{ visibility: 'off' }] },
         { featureType: 'transit', elementType: 'labels', stylers: [{ visibility: 'off' }] },
         { featureType: 'road', elementType: 'labels.icon', stylers: [{ visibility: 'off' }] },
-        { featureType: 'landscape', elementType: 'geometry', stylers: [{ color: '#f0f0eb' }] },
-        { featureType: 'water', elementType: 'geometry', stylers: [{ color: '#b8d8e8' }] },
+        { featureType: 'landscape', elementType: 'geometry', stylers: [{ color: '#f5f0eb' }] },
+        { featureType: 'water', elementType: 'geometry', stylers: [{ color: '#c4dfe6' }] },
+        { featureType: 'road', elementType: 'geometry', stylers: [{ color: '#ffffff' }] },
       ]
     });
 
-    infoWindowRef.current = new window.google.maps.InfoWindow({ maxWidth: 240 });
+    infoWindowRef.current = new window.google.maps.InfoWindow({ maxWidth: 260 });
 
     areas.forEach((area: any) => {
       if (!area.lat || !area.lng) return;
-
       const city = getCityForSlug(area.slug);
-      const hex = cityColors[city] || defaultHex;
+      const hex = (cityConfig[city] || defaultConfig).color;
       const areaName = getAreaName(area);
 
       const marker = new window.google.maps.Marker({
@@ -115,29 +132,28 @@ export default function Areas() {
           fillColor: hex,
           fillOpacity: 1,
           strokeColor: '#ffffff',
-          strokeWeight: 2.5,
-          scale: 1.8,
+          strokeWeight: 2,
+          scale: 1.6,
           anchor: new window.google.maps.Point(12, 22),
         },
       });
 
       marker.addListener('click', () => {
-        setSelectedArea(area);
         const subtitle = getAreaSubtitle(area);
         const subtitleHtml = subtitle
-          ? `<p style="font-size:11px;color:#6b7280;margin:0 0 8px 0;line-height:1.4;padding-left:13px;">${subtitle.length > 70 ? subtitle.slice(0, 70) + '...' : subtitle}</p>`
+          ? `<p style="font-size:12px;color:#6b7280;margin:4px 0 10px;line-height:1.5;">${subtitle.length > 80 ? subtitle.slice(0, 80) + '...' : subtitle}</p>`
           : '';
         infoWindowRef.current.setContent(
-          `<div style="font-family:-apple-system,sans-serif;padding:2px 0;min-width:150px;">
-            <div style="display:flex;align-items:center;gap:6px;margin-bottom:${subtitle ? '4px' : '8px'};">
-              <span style="width:7px;height:7px;border-radius:50%;background:${hex};flex-shrink:0;"></span>
-              <strong style="font-size:13px;color:#111827;">${areaName}</strong>
+          `<div style="font-family:Inter,-apple-system,sans-serif;padding:4px 0;min-width:160px;">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
+              <span style="width:8px;height:8px;border-radius:50%;background:${hex};flex-shrink:0;"></span>
+              <strong style="font-size:14px;color:#111827;">${areaName}</strong>
             </div>
             ${subtitleHtml}
             <a href="/areas/${area.slug}"
                onclick="event.preventDefault();window.__navigateTo('/areas/${area.slug}')"
-               style="display:inline-flex;align-items:center;gap:4px;background:${hex};color:white;font-size:11px;font-weight:600;padding:4px 10px;border-radius:6px;text-decoration:none;margin-left:13px;">
-              View Area
+               style="display:inline-flex;align-items:center;gap:5px;background:${hex};color:white;font-size:12px;font-weight:600;padding:6px 14px;border-radius:8px;text-decoration:none;">
+              View Area →
             </a>
           </div>`
         );
@@ -149,97 +165,9 @@ export default function Areas() {
   }, [mapInstance, areas]);
 
   useEffect(() => {
-    if (!selectedArea || !mapInstance || !selectedArea.lat || !selectedArea.lng) return;
-    mapInstance.panTo({ lat: selectedArea.lat, lng: selectedArea.lng });
-    mapInstance.setZoom(13);
-    const marker = markersRef.current.get(selectedArea.id);
-    if (marker) window.google?.maps?.event?.trigger(marker, 'click');
-  }, [selectedArea?.id]);
-
-  useEffect(() => {
     (window as any).__navigateTo = (path: string) => { window.location.href = path; };
     return () => { delete (window as any).__navigateTo; };
   }, []);
-
-  useEffect(() => {
-    if (mobileTab === 'map' && mapInstance) {
-      setTimeout(() => {
-        window.google?.maps?.event?.trigger(mapInstance, 'resize');
-        mapInstance.setCenter({ lat: 41.9981, lng: 21.4254 });
-      }, 100);
-    }
-  }, [mobileTab, mapInstance]);
-
-  const AreaListContent = () => (
-    <div className="flex-1 overflow-y-auto">
-      {isLoading ? (
-        <div className="flex items-center justify-center h-40">
-          <Loader2 className="w-6 h-6 text-orange-400 animate-spin" />
-        </div>
-      ) : filteredAreas.length === 0 ? (
-        <div className="flex flex-col items-center justify-center h-40 gap-3 text-gray-300">
-          <MapPin className="w-8 h-8" />
-          <p className="text-sm">{t('noAreasFound') || 'No areas found.'}</p>
-        </div>
-      ) : (
-        <div className="pb-4">
-          {sortedCities.map(cityName => {
-            const hex = cityColors[cityName] || defaultHex;
-            return (
-              <div key={cityName}>
-                <div className="flex items-center gap-2 px-4 py-2.5 sticky top-0 bg-white/95 backdrop-blur-sm z-10 border-b border-gray-50">
-                  <span className="w-2.5 h-2.5 rounded-full flex-shrink-0" style={{ background: hex }} />
-                  <span className="text-[11px] font-bold text-gray-400 uppercase tracking-widest">{cityName}</span>
-                  <span className="ml-auto text-[10px] text-gray-300 font-medium">{groupedAreas[cityName].length}</span>
-                </div>
-
-                {groupedAreas[cityName]
-                  .sort((a: any, b: any) => (a.displayOrder || 0) - (b.displayOrder || 0))
-                  .map((area: any) => {
-                    const areaName = getAreaName(area);
-                    const isSelected = selectedArea?.id === area.id;
-                    return (
-                      <button
-                        key={area.id}
-                        onClick={() => {
-                          setSelectedArea(isSelected ? null : area);
-                          if (!isSelected) setMobileTab('map');
-                        }}
-                        className={`w-full text-left px-4 py-3 flex items-center gap-3 transition-all group border-l-[3px] ${
-                          isSelected
-                            ? 'bg-orange-50 border-l-orange-400'
-                            : 'hover:bg-gray-50 border-l-transparent hover:border-l-orange-200'
-                        }`}
-                      >
-                        <div
-                          className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0"
-                          style={{ background: hex + '18' }}
-                        >
-                          <MapPin className="w-3.5 h-3.5" style={{ color: hex }} />
-                        </div>
-                        <span className={`text-sm flex-1 truncate font-medium ${isSelected ? 'text-orange-600' : 'text-gray-700 group-hover:text-gray-900'}`}>
-                          {areaName}
-                        </span>
-                        {area.active && (
-                          <CheckCircle className="w-3.5 h-3.5 text-green-400 flex-shrink-0" />
-                        )}
-                        <Link
-                          href={`/areas/${area.slug}`}
-                          onClick={(e) => e.stopPropagation()}
-                          className="flex-shrink-0"
-                        >
-                          <ArrowRight className={`w-3.5 h-3.5 ${isSelected ? 'text-orange-400' : 'text-gray-300 group-hover:text-orange-300'}`} />
-                        </Link>
-                      </button>
-                    );
-                  })}
-              </div>
-            );
-          })}
-        </div>
-      )}
-    </div>
-  );
 
   return (
     <>
@@ -250,231 +178,244 @@ export default function Areas() {
         isLoading={isPageLoading}
       />
 
-      <div className="min-h-screen flex flex-col bg-white">
+      <div className="min-h-screen flex flex-col bg-gradient-to-b from-orange-50/30 via-white to-amber-50/20">
         <Header />
 
-        {/* Page Header */}
-        <div className="bg-gradient-to-r from-orange-50 to-amber-50/60 border-b border-orange-100/60">
-          <div className="max-w-7xl mx-auto px-4 py-4 sm:py-5">
-            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-orange-100 flex items-center justify-center flex-shrink-0">
-                  <MapPin className="w-5 h-5 text-orange-500" />
-                </div>
-                <div>
-                  <h1 className="text-xl font-extrabold text-gray-900 tracking-tight leading-tight">
-                    {seoData.heading || t('areasPageTitle') || 'Delivery Areas'}
-                  </h1>
-                  <p className="text-gray-500 text-sm mt-0.5">
-                    {seoData.subtitle || t('areasPageSubtitle') || 'Fast and reliable delivery across North Macedonia.'}
-                  </p>
-                </div>
+        {/* ── Hero Section ──────────────────────────────────── */}
+        <section className="relative overflow-hidden">
+          {/* Background decoration */}
+          <div className="absolute inset-0 bg-gradient-to-br from-orange-50 via-white to-amber-50/40" />
+          <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-to-bl from-orange-100/40 to-transparent rounded-full blur-3xl -translate-y-1/2 translate-x-1/3" />
+          <div className="absolute bottom-0 left-0 w-72 h-72 bg-gradient-to-tr from-amber-100/30 to-transparent rounded-full blur-3xl translate-y-1/2 -translate-x-1/4" />
+
+          <div className="relative max-w-6xl mx-auto px-4 pt-12 pb-10 md:pt-16 md:pb-14">
+            <div className="text-center max-w-3xl mx-auto">
+              {/* Badge */}
+              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-orange-100/70 border border-orange-200/50 mb-6">
+                <Navigation className="w-4 h-4 text-orange-500" />
+                <span className="text-sm font-semibold text-orange-700">
+                  {t('deliveryNetwork') || 'Delivery Network'}
+                </span>
               </div>
 
-              <div className="relative w-full sm:w-64 flex-shrink-0">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+              <h1 className="text-3xl md:text-5xl font-extrabold text-gray-900 tracking-tight leading-tight mb-4">
+                {seoData.heading || t('areasPageTitle') || 'Where We Deliver'}
+              </h1>
+              <p className="text-gray-500 text-base md:text-lg leading-relaxed max-w-2xl mx-auto mb-8">
+                {seoData.subtitle || t('areasPageSubtitle') || 'Fast and reliable delivery service across North Macedonia. Choose your city and district to get started.'}
+              </p>
+
+              {/* Search */}
+              <div className="relative max-w-md mx-auto mb-10">
+                <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                 <input
                   type="text"
-                  placeholder={t('searchCityOrDistrict') || 'Search area...'}
+                  placeholder={t('searchCityOrDistrict') || 'Search city or district...'}
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full pl-10 pr-9 py-2.5 rounded-xl border border-orange-200/80 bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-orange-200 focus:border-orange-300 text-sm"
+                  className="w-full pl-12 pr-10 py-3.5 rounded-2xl border border-orange-200/60 bg-white/80 backdrop-blur-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-orange-300/50 focus:border-orange-300 text-sm transition-all"
                 />
                 {searchQuery && (
                   <button
                     onClick={() => setSearchQuery('')}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                    className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
                   >
-                    <X className="w-3.5 h-3.5" />
+                    <X className="w-4 h-4" />
                   </button>
                 )}
               </div>
-            </div>
-          </div>
-        </div>
 
-        {/* MOBILE: Tab switcher */}
-        <div className="md:hidden border-b border-gray-100 bg-white sticky top-0 z-20 shadow-sm">
-          <div className="flex">
-            <button
-              onClick={() => setMobileTab('list')}
-              className={`flex-1 flex items-center justify-center gap-2 py-3 text-sm font-semibold transition-colors border-b-2 ${
-                mobileTab === 'list'
-                  ? 'border-orange-500 text-orange-600 bg-orange-50/40'
-                  : 'border-transparent text-gray-500 hover:text-gray-700'
-              }`}
-            >
-              <List className="w-4 h-4" />
-              {t('listView') || 'List'}
-              <span className="bg-orange-100 text-orange-600 text-xs font-bold px-1.5 py-0.5 rounded-full">
-                {filteredAreas.length}
-              </span>
-            </button>
-            <button
-              onClick={() => setMobileTab('map')}
-              className={`flex-1 flex items-center justify-center gap-2 py-3 text-sm font-semibold transition-colors border-b-2 ${
-                mobileTab === 'map'
-                  ? 'border-orange-500 text-orange-600 bg-orange-50/40'
-                  : 'border-transparent text-gray-500 hover:text-gray-700'
-              }`}
-            >
-              <MapIcon className="w-4 h-4" />
-              {t('mapView') || 'Map'}
-            </button>
-          </div>
-        </div>
-
-        {/* MOBILE: Tab content */}
-        <div className="md:hidden flex-1 flex flex-col" style={{ minHeight: '60vh' }}>
-          {mobileTab === 'list' ? (
-            <div className="flex flex-col flex-1">
-              <AreaListContent />
-            </div>
-          ) : (
-            <div className="relative flex-1" style={{ minHeight: '60vh' }}>
-              <MapView
-                center={{ lat: 41.9981, lng: 21.4254 }}
-                zoom={10}
-                className="w-full h-full absolute inset-0"
-                onMapReady={(map) => {
-                  map.setCenter({ lat: 41.9981, lng: 21.4254 });
-                  map.setZoom(10);
-                  setMapInstance(map);
-                }}
-              />
-
-              {selectedArea && (
-                <div className="absolute bottom-4 left-4 right-4 z-10">
-                  <div className="bg-white rounded-2xl shadow-2xl border border-gray-100 p-4">
-                    <div className="flex items-start gap-3">
-                      <div
-                        className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0"
-                        style={{ background: (cityColors[getCityForSlug(selectedArea.slug)] || defaultHex) + '18' }}
-                      >
-                        <MapPin className="w-5 h-5" style={{ color: cityColors[getCityForSlug(selectedArea.slug)] || defaultHex }} />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="font-bold text-gray-900 text-base">{getAreaName(selectedArea)}</p>
-                        {getAreaSubtitle(selectedArea) && (
-                          <p className="text-sm text-gray-500 mt-0.5 line-clamp-2">{getAreaSubtitle(selectedArea)}</p>
-                        )}
-                        <Link href={`/areas/${selectedArea.slug}`}>
-                          <span
-                            className="inline-flex items-center gap-1.5 text-sm font-bold mt-2.5 px-3 py-1.5 rounded-lg text-white"
-                            style={{ background: cityColors[getCityForSlug(selectedArea.slug)] || defaultHex }}
-                          >
-                            {t('viewArea') || 'View Area'} <ArrowRight className="w-3.5 h-3.5" />
-                          </span>
-                        </Link>
-                      </div>
-                      <button
-                        onClick={() => setSelectedArea(null)}
-                        className="text-gray-400 hover:text-gray-600 p-1 rounded-lg hover:bg-gray-100 transition-colors flex-shrink-0"
-                      >
-                        <X className="w-4 h-4" />
-                      </button>
-                    </div>
-                  </div>
+              {/* Stats */}
+              <div className="flex items-center justify-center gap-6 md:gap-10">
+                <div className="text-center">
+                  <div className="text-2xl md:text-3xl font-extrabold text-orange-500">{totalCities}</div>
+                  <div className="text-xs md:text-sm text-gray-500 font-medium mt-0.5">{t('cities') || 'Cities'}</div>
                 </div>
-              )}
-
-              <div className="absolute top-3 right-3 z-10">
-                <div className="bg-white/90 backdrop-blur-sm rounded-xl shadow-sm px-3 py-1.5 flex items-center gap-1.5 text-sm font-semibold text-gray-600 border border-white/80">
-                  <MapPin className="w-3.5 h-3.5 text-orange-500" />
-                  {filteredAreas.length} {t('areas') || 'areas'}
+                <div className="w-px h-10 bg-gray-200" />
+                <div className="text-center">
+                  <div className="text-2xl md:text-3xl font-extrabold text-orange-500">{totalAreas}</div>
+                  <div className="text-xs md:text-sm text-gray-500 font-medium mt-0.5">{t('deliveryZones') || 'Delivery Zones'}</div>
+                </div>
+                <div className="w-px h-10 bg-gray-200" />
+                <div className="text-center">
+                  <div className="text-2xl md:text-3xl font-extrabold text-orange-500">15</div>
+                  <div className="text-xs md:text-sm text-gray-500 font-medium mt-0.5">{t('minuteDelivery') || 'Min Delivery'}</div>
                 </div>
               </div>
             </div>
-          )}
-        </div>
-
-        {/* DESKTOP: Side-by-side layout */}
-        <div className="hidden md:flex flex-1" style={{ minHeight: '600px' }}>
-          <div className="w-72 lg:w-80 flex-shrink-0 flex flex-col border-r border-gray-100 bg-white overflow-hidden">
-            <div className="px-4 py-3 border-b border-gray-100 bg-gray-50/50 flex items-center justify-between flex-shrink-0">
-              <span className="text-xs font-bold text-gray-500 uppercase tracking-widest">
-                {t('allAreas') || 'All Areas'}
-              </span>
-              <span className="text-xs text-gray-400 font-medium">
-                {filteredAreas.length} {t('areas') || 'areas'}
-              </span>
-            </div>
-            <AreaListContent />
           </div>
+        </section>
 
-          <div className="flex-1 relative overflow-hidden">
-            <MapView
-              center={{ lat: 41.9981, lng: 21.4254 }}
-              zoom={11}
-              className="w-full h-full absolute inset-0"
-              onMapReady={(map) => {
-                map.setCenter({ lat: 41.9981, lng: 21.4254 });
-                map.setZoom(11);
-                setMapInstance(map);
-              }}
-            />
+        {/* ── City Cards Section ────────────────────────────── */}
+        <section className="py-10 md:py-14">
+          <div className="max-w-6xl mx-auto px-4">
+            {isLoading ? (
+              <div className="flex items-center justify-center h-40">
+                <Loader2 className="w-8 h-8 text-orange-400 animate-spin" />
+              </div>
+            ) : filteredAreas.length === 0 ? (
+              <div className="flex flex-col items-center justify-center h-40 gap-3 text-gray-400">
+                <MapPin className="w-10 h-10" />
+                <p className="text-base font-medium">{t('noAreasFound') || 'No areas found.'}</p>
+                {searchQuery && (
+                  <button onClick={() => setSearchQuery('')} className="text-sm text-orange-500 hover:underline">
+                    {t('clearSearch') || 'Clear search'}
+                  </button>
+                )}
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {sortedCities.map(cityName => {
+                  const config = cityConfig[cityName] || defaultConfig;
+                  const cityAreas = groupedAreas[cityName].sort((a: any, b: any) => (a.displayOrder || 0) - (b.displayOrder || 0));
+                  const isExpanded = expandedCity === cityName;
 
-            {selectedArea && (
-              <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-10 w-64">
-                <div className="bg-white rounded-2xl shadow-2xl border border-gray-100 p-4">
-                  <div className="flex items-start gap-3">
-                    <div
-                      className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0"
-                      style={{ background: (cityColors[getCityForSlug(selectedArea.slug)] || defaultHex) + '18' }}
-                    >
-                      <MapPin className="w-4 h-4" style={{ color: cityColors[getCityForSlug(selectedArea.slug)] || defaultHex }} />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="font-bold text-gray-900 text-sm">{getAreaName(selectedArea)}</p>
-                      {getAreaSubtitle(selectedArea) && (
-                        <p className="text-xs text-gray-400 mt-0.5 line-clamp-2">{getAreaSubtitle(selectedArea)}</p>
-                      )}
-                      <Link href={`/areas/${selectedArea.slug}`}>
-                        <span
-                          className="inline-flex items-center gap-1 text-xs font-bold mt-2 px-2.5 py-1.5 rounded-lg text-white"
-                          style={{ background: cityColors[getCityForSlug(selectedArea.slug)] || defaultHex }}
+                  return (
+                    <div key={cityName} className="rounded-2xl border border-gray-100 bg-white shadow-sm overflow-hidden transition-all hover:shadow-md">
+                      {/* City Header */}
+                      <button
+                        onClick={() => setExpandedCity(isExpanded ? null : cityName)}
+                        className="w-full flex items-center gap-4 p-4 md:p-5 text-left transition-colors hover:bg-gray-50/50"
+                      >
+                        {/* City Icon */}
+                        <div
+                          className={`w-12 h-12 md:w-14 md:h-14 rounded-xl bg-gradient-to-br ${config.gradient} flex items-center justify-center flex-shrink-0 shadow-sm`}
                         >
-                          {t('viewArea') || 'View Area'} <ArrowRight className="w-3 h-3" />
-                        </span>
-                      </Link>
+                          <span className="text-xl md:text-2xl">{config.emoji}</span>
+                        </div>
+
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2">
+                            <h2 className="text-lg md:text-xl font-bold text-gray-900">{cityName}</h2>
+                            <span
+                              className="text-xs font-bold px-2 py-0.5 rounded-full text-white"
+                              style={{ backgroundColor: config.color }}
+                            >
+                              {cityAreas.length}
+                            </span>
+                          </div>
+                          <p className="text-sm text-gray-500 mt-0.5">
+                            {cityAreas.length} {t('deliveryZones') || 'delivery zones'} · <Clock className="w-3 h-3 inline" /> 15 min
+                          </p>
+                        </div>
+
+                        <div className="flex-shrink-0 text-gray-400 transition-transform">
+                          {isExpanded ? <ChevronUp className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
+                        </div>
+                      </button>
+
+                      {/* Area Grid - Expandable */}
+                      {isExpanded && (
+                        <div className="px-4 pb-4 md:px-5 md:pb-5">
+                          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                            {cityAreas.map((area: any) => {
+                              const areaName = getAreaName(area);
+                              const subtitle = getAreaSubtitle(area);
+                              return (
+                                <Link
+                                  key={area.id}
+                                  href={`/areas/${area.slug}`}
+                                  className="group flex items-center gap-3 p-3.5 rounded-xl border border-gray-100 bg-gray-50/40 hover:bg-white hover:border-orange-200/60 hover:shadow-sm transition-all"
+                                >
+                                  <div
+                                    className="w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0 transition-transform group-hover:scale-110"
+                                    style={{ backgroundColor: config.color + '14' }}
+                                  >
+                                    <MapPin className="w-4.5 h-4.5" style={{ color: config.color }} />
+                                  </div>
+                                  <div className="flex-1 min-w-0">
+                                    <p className="text-sm font-semibold text-gray-800 group-hover:text-gray-900 truncate">
+                                      {areaName}
+                                    </p>
+                                    {subtitle && (
+                                      <p className="text-xs text-gray-400 mt-0.5 truncate">{subtitle}</p>
+                                    )}
+                                  </div>
+                                  <ArrowRight className="w-4 h-4 text-gray-300 group-hover:text-orange-400 flex-shrink-0 transition-all group-hover:translate-x-0.5" />
+                                </Link>
+                              );
+                            })}
+                          </div>
+                        </div>
+                      )}
                     </div>
-                    <button
-                      onClick={() => setSelectedArea(null)}
-                      className="text-gray-300 hover:text-gray-500 p-0.5 rounded hover:bg-gray-100 transition-colors flex-shrink-0"
-                    >
-                      <X className="w-4 h-4" />
-                    </button>
-                  </div>
-                </div>
+                  );
+                })}
               </div>
             )}
+          </div>
+        </section>
 
-            <div className="absolute top-3 right-3 z-10">
-              <div className="bg-white/90 backdrop-blur-sm rounded-xl shadow-sm px-2.5 py-1.5 flex items-center gap-1.5 text-xs font-semibold text-gray-600 border border-white/80">
-                <MapPin className="w-3 h-3 text-orange-500" />
-                {filteredAreas.length} {t('areas') || 'areas'}
+        {/* ── Interactive Map Section ──────────────────────── */}
+        <section className="py-10 md:py-14 bg-gradient-to-b from-white to-gray-50/50">
+          <div className="max-w-6xl mx-auto px-4">
+            <div className="text-center mb-8">
+              <h2 className="text-2xl md:text-3xl font-extrabold text-gray-900 mb-2">
+                {t('exploreOnMap') || 'Explore on Map'}
+              </h2>
+              <p className="text-gray-500 text-sm md:text-base">
+                {t('exploreOnMapDesc') || 'Click on any pin to see delivery area details'}
+              </p>
+            </div>
+
+            <div className="rounded-2xl overflow-hidden border border-gray-200/60 shadow-lg bg-white">
+              {/* Map Toggle for Mobile */}
+              <button
+                onClick={() => setShowMap(!showMap)}
+                className="w-full md:hidden flex items-center justify-center gap-2 py-4 text-sm font-semibold text-orange-600 bg-orange-50/50 border-b border-gray-100 transition-colors hover:bg-orange-50"
+              >
+                <MapPin className="w-4 h-4" />
+                {showMap ? (t('hideMap') || 'Hide Map') : (t('showMap') || 'Show Interactive Map')}
+              </button>
+
+              <div className={`${showMap ? 'block' : 'hidden'} md:block relative`} style={{ height: '500px' }}>
+                <MapView
+                  center={{ lat: 41.5, lng: 21.4254 }}
+                  zoom={9}
+                  className="w-full h-full"
+                  onMapReady={(map) => {
+                    map.setCenter({ lat: 41.5, lng: 21.4254 });
+                    map.setZoom(9);
+                    setMapInstance(map);
+                  }}
+                />
+
+                {/* Map overlay badge */}
+                <div className="absolute top-3 right-3 z-10">
+                  <div className="bg-white/95 backdrop-blur-sm rounded-xl shadow-md px-3 py-2 flex items-center gap-2 text-sm font-semibold text-gray-700 border border-white/80">
+                    <MapPin className="w-4 h-4 text-orange-500" />
+                    {totalAreas} {t('areas') || 'areas'}
+                  </div>
+                </div>
               </div>
             </div>
           </div>
-        </div>
+        </section>
 
-        {/* CTA Section */}
-        <section className="py-10 bg-gradient-to-br from-orange-50/60 to-amber-50/30 border-t border-orange-100/40">
-          <div className="max-w-2xl mx-auto px-4 text-center">
-            <h2 className="text-2xl font-extrabold text-gray-900 mb-2">
-              {t('orderNow') || 'Call Courier Now!'}
+        {/* ── CTA Section ─────────────────────────────────── */}
+        <section className="py-14 md:py-20 relative overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-br from-orange-500 to-amber-500" />
+          <div className="absolute top-0 right-0 w-80 h-80 bg-white/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/3" />
+          <div className="absolute bottom-0 left-0 w-64 h-64 bg-white/10 rounded-full blur-3xl translate-y-1/2 -translate-x-1/4" />
+
+          <div className="relative max-w-2xl mx-auto px-4 text-center">
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/20 backdrop-blur-sm mb-6">
+              <Zap className="w-4 h-4 text-white" />
+              <span className="text-sm font-semibold text-white/90">{t('fastDelivery') || 'Fast Delivery'}</span>
+            </div>
+
+            <h2 className="text-3xl md:text-4xl font-extrabold text-white mb-3">
+              {t('orderNow') || 'Ready to Order?'}
             </h2>
-            <p className="text-gray-500 text-sm mb-5">
-              {t('orderNowDesc') || 'Get your package delivered in minutes.'}
+            <p className="text-white/80 text-base md:text-lg mb-8 leading-relaxed">
+              {t('orderNowDesc') || 'Get your package delivered in minutes. Available across all listed areas.'}
             </p>
+
             <Link href="/new-order">
-              <button
-                className="inline-flex items-center gap-2 text-white font-bold px-6 py-3 rounded-xl hover:scale-105 transition-all shadow-md text-sm"
-                style={{ background: 'linear-gradient(135deg, #ff7a35 0%, #f55f00 100%)' }}
-              >
-                <Zap className="w-4 h-4" />
+              <button className="inline-flex items-center gap-2.5 bg-white text-orange-600 font-bold px-8 py-4 rounded-2xl hover:scale-105 hover:shadow-xl transition-all shadow-lg text-base">
+                <Zap className="w-5 h-5" />
                 {t('callCourier') || 'Call a Courier'}
-                <ArrowRight className="w-4 h-4" />
+                <ArrowRight className="w-5 h-5" />
               </button>
             </Link>
           </div>

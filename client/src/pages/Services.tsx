@@ -408,6 +408,7 @@ export default function Services() {
                 return (
                   <div
                     key={cat.id}
+                    id={slug}
                     ref={(el) => { cardRefs.current[index] = el; }}
                     data-index={index}
                     className={`group relative rounded-3xl overflow-hidden border ${theme.border} bg-white transition-all duration-700 hover:shadow-2xl hover:-translate-y-1.5 cursor-pointer ${

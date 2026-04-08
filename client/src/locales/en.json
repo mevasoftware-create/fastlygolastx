@@ -985,5 +985,15 @@
   "testimonial5Text": "We can deliver fast to our customers. Being able to track couriers in real time is amazing!",
   "testimonial6Name": "Stefan Nikolov",
   "testimonial6Role": "E-commerce Seller",
-  "testimonial6Text": "The best solution for my package deliveries. Prices are reasonable and service quality is excellent."
+  "testimonial6Text": "The best solution for my package deliveries. Prices are reasonable and service quality is excellent.",
+  "deliveryNetwork": "Delivery Network",
+  "deliveryZones": "Delivery Zones",
+  "minuteDelivery": "Min Delivery",
+  "cities": "Cities",
+  "exploreOnMap": "Explore on Map",
+  "exploreOnMapDesc": "Click on any pin to see delivery area details",
+  "clearSearch": "Clear search",
+  "showMap": "Show Interactive Map",
+  "hideMap": "Hide Map",
+  "allAreas": "All Areas"
 }

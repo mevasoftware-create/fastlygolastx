@@ -983,5 +983,15 @@
   "testimonial5Text": "Mund të dërgojmë shpejt tek klientët tanë. Gjurmimi i kurierëve në kohë reale është i mrekullueshëm!",
   "testimonial6Name": "Stefan Nikolov",
   "testimonial6Role": "Shitës i tregtisë elektronike",
-  "testimonial6Text": "Zgjidhja më e mirë për dërgimin e paketave. Çmimet janë të arsyeshme dhe cilësia e shërbimit është e shkëlqyer."
+  "testimonial6Text": "Zgjidhja më e mirë për dërgimin e paketave. Çmimet janë të arsyeshme dhe cilësia e shërbimit është e shkëlqyer.",
+  "deliveryNetwork": "Rrjeti i Dorëzimit",
+  "deliveryZones": "Zona Dorëzimi",
+  "minuteDelivery": "Min Dorëzim",
+  "cities": "Qytete",
+  "exploreOnMap": "Eksploro në Hartë",
+  "exploreOnMapDesc": "Klikoni në çdo pin për të parë detajet e zonës së dorëzimit",
+  "clearSearch": "Pastro kërkimin",
+  "showMap": "Shfaq Hartën Interaktive",
+  "hideMap": "Fshih Hartën",
+  "allAreas": "Të Gjitha Zonat"
 }

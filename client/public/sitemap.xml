@@ -321,6 +321,72 @@
     <xhtml:link rel="alternate" hreflang="sq" href="https://fastlygo.mk/areas/prilep?lang=sq"/>
   </url>
   <url>
+    <loc>https://fastlygo.mk/services#food-delivery</loc>
+    <lastmod>2026-04-08</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://fastlygo.mk/services#food-delivery"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://fastlygo.mk/services#food-delivery"/>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://fastlygo.mk/services?lang=tr#food-delivery"/>
+    <xhtml:link rel="alternate" hreflang="mk" href="https://fastlygo.mk/services?lang=mk#food-delivery"/>
+    <xhtml:link rel="alternate" hreflang="sq" href="https://fastlygo.mk/services?lang=sq#food-delivery"/>
+  </url>
+  <url>
+    <loc>https://fastlygo.mk/services#grocery-delivery</loc>
+    <lastmod>2026-04-08</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://fastlygo.mk/services#grocery-delivery"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://fastlygo.mk/services#grocery-delivery"/>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://fastlygo.mk/services?lang=tr#grocery-delivery"/>
+    <xhtml:link rel="alternate" hreflang="mk" href="https://fastlygo.mk/services?lang=mk#grocery-delivery"/>
+    <xhtml:link rel="alternate" hreflang="sq" href="https://fastlygo.mk/services?lang=sq#grocery-delivery"/>
+  </url>
+  <url>
+    <loc>https://fastlygo.mk/services#pharmacy-delivery</loc>
+    <lastmod>2026-04-08</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://fastlygo.mk/services#pharmacy-delivery"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://fastlygo.mk/services#pharmacy-delivery"/>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://fastlygo.mk/services?lang=tr#pharmacy-delivery"/>
+    <xhtml:link rel="alternate" hreflang="mk" href="https://fastlygo.mk/services?lang=mk#pharmacy-delivery"/>
+    <xhtml:link rel="alternate" hreflang="sq" href="https://fastlygo.mk/services?lang=sq#pharmacy-delivery"/>
+  </url>
+  <url>
+    <loc>https://fastlygo.mk/services#flower-delivery</loc>
+    <lastmod>2026-04-08</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://fastlygo.mk/services#flower-delivery"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://fastlygo.mk/services#flower-delivery"/>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://fastlygo.mk/services?lang=tr#flower-delivery"/>
+    <xhtml:link rel="alternate" hreflang="mk" href="https://fastlygo.mk/services?lang=mk#flower-delivery"/>
+    <xhtml:link rel="alternate" hreflang="sq" href="https://fastlygo.mk/services?lang=sq#flower-delivery"/>
+  </url>
+  <url>
+    <loc>https://fastlygo.mk/services#pet-supplies</loc>
+    <lastmod>2026-04-08</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://fastlygo.mk/services#pet-supplies"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://fastlygo.mk/services#pet-supplies"/>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://fastlygo.mk/services?lang=tr#pet-supplies"/>
+    <xhtml:link rel="alternate" hreflang="mk" href="https://fastlygo.mk/services?lang=mk#pet-supplies"/>
+    <xhtml:link rel="alternate" hreflang="sq" href="https://fastlygo.mk/services?lang=sq#pet-supplies"/>
+  </url>
+  <url>
+    <loc>https://fastlygo.mk/services#cargo-package-delivery</loc>
+    <lastmod>2026-04-08</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://fastlygo.mk/services#cargo-package-delivery"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://fastlygo.mk/services#cargo-package-delivery"/>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://fastlygo.mk/services?lang=tr#cargo-package-delivery"/>
+    <xhtml:link rel="alternate" hreflang="mk" href="https://fastlygo.mk/services?lang=mk#cargo-package-delivery"/>
+    <xhtml:link rel="alternate" hreflang="sq" href="https://fastlygo.mk/services?lang=sq#cargo-package-delivery"/>
+  </url>
+  <url>
     <loc>https://fastlygo.mk/courier/register</loc>
     <lastmod>2026-04-08</lastmod>
     <changefreq>monthly</changefreq>
