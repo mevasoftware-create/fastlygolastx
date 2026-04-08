@@ -17,7 +17,7 @@ import Register from "./pages/Register";
 import CategoryPage from "./pages/CategoryPage";
 import AreaPage from "./pages/AreaPage";
 import Areas from "./pages/Areas";
-import Categories from "./pages/Categories";
+// Categories sayfası Services ile birleştirildi
 
 // Lazy load non-critical pages to reduce initial bundle
 const HowItWorks = lazy(() => import("./pages/HowItWorks"));
@@ -70,7 +70,7 @@ function Router() {
       <Switch>
         {/* Dynamic Category and Area Pages - MUST be before Home route */}
         <Route path={"/categories/:slug"} component={CategoryPage} />
-        <Route path={"/categories"} component={Categories} />
+        <Route path={"/categories"}>{() => { window.location.replace('/services'); return null; }}</Route>
         <Route path={"/areas/:slug"} component={AreaPage} />
         <Route path={"/areas"} component={Areas} />
         

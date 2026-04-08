@@ -220,3 +220,11 @@
 - [x] Anonim kullanıcılar da push token kaydedebilir (userId=null olarak DB'ye yazılır)
 - [x] Giriş yapan kullanıcı token kaydedince userId otomatik atanır
 - [x] Kullanıcı giriş yaptıktan sonra mevcut token güncellenerek userId bağlanır
+
+## /categories ve /services Sayfa Birleştirme (08.04.2026)
+- [x] Mevcut /categories ve /services sayfalarını analiz et
+- [x] Birleştirilmiş yeni /services sayfası tasarla ve oluştur
+- [x] /categories route'unu /services'e yönlendir
+- [x] Header menüsünü güncelle (Services dropdown ile birleştirildi)
+- [x] SEO: sitemap.xml güncellendi (/categories → /services)
+- [x] Eski /categories linklerini /services'e redirect et (App.tsx)

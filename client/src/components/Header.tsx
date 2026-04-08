@@ -125,17 +125,22 @@ export default function Header() {
           <nav className="hidden lg:flex items-center gap-1">
             <NavLink href="/about-us">{t('aboutUs')}</NavLink>
             <NavLink href="/how-it-works">{t('howItWorks')}</NavLink>
-            <NavLink href="/services">{t('services')}</NavLink>
-            
-            {/* Categories Dropdown */}
+            {/* Services Dropdown - Categories ve Services birleştirildi */}
             <DropdownMenu modal={false}>
               <DropdownMenuTrigger asChild>
                 <button className="flex items-center gap-1 px-4 py-2 rounded-xl text-muted-foreground hover:text-foreground hover:bg-accent/50 transition-all font-medium text-sm">
-                  {t('categories', language)}
+                  {t('services')}
                   <ChevronDown className="w-4 h-4 opacity-50" />
                 </button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="start" className="w-56 glass-card border-border/50">
+                <DropdownMenuItem 
+                  onClick={() => setLocation('/services')}
+                  className="cursor-pointer hover:bg-accent/50 rounded-lg transition-colors font-medium"
+                >
+                  <span className="text-sm">{t('services')}</span>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
                 {categories.map((category) => {
                   let shortName: Record<string, string> = {};
                   try {
@@ -473,18 +478,21 @@ export default function Header() {
               <MobileNavLink href="/how-it-works" onClick={() => setMobileMenuOpen(false)}>
                 {t('howItWorks')}
               </MobileNavLink>
-              <MobileNavLink href="/services" onClick={() => setMobileMenuOpen(false)}>
-                {t('services')}
-              </MobileNavLink>
               <MobileNavLink href="/about-us" onClick={() => setMobileMenuOpen(false)}>
                 {t('aboutUs')}
               </MobileNavLink>
 
-              {/* Categories Section */}
+              {/* Services & Categories Section - Birleştirildi */}
               <div className="px-2 py-2">
                 <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2 px-2">
-                  {t('categories', language)}
+                  {t('services')}
                 </div>
+                <MobileNavLink 
+                  href="/services" 
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  {t('services')}
+                </MobileNavLink>
                 {categories.map((category) => {
                   let shortName: Record<string, string> = {};
                   try {
