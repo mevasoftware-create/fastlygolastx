@@ -116,8 +116,8 @@ export default function Header() {
               alt="FastlyGo" 
               className="h-10 md:h-12 w-auto transition-transform duration-300 group-hover:scale-105" 
             />
-            <span className="text-lg md:text-xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
-              Fast<span className="bg-gradient-to-r from-orange-500 to-amber-500 bg-clip-text">ly</span>Go
+            <span className="text-xl md:text-2xl font-extrabold tracking-tight" style={{ fontFamily: 'Poppins, sans-serif' }}>
+              <span className="text-gray-900">Fast</span><span className="text-orange-500">ly</span><span className="text-gray-900">Go</span>
             </span>
           </a>
 

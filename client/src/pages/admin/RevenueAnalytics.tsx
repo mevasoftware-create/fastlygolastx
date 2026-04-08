@@ -22,7 +22,7 @@ export default function RevenueAnalytics() {
     <div className="p-6 space-y-6">
       <div className="flex items-center justify-between mb-2">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Gelir & Analiz</h1>
+          <h1 className="text-2xl font-bold text-gray-900 tracking-tight">Gelir & Analiz</h1>
           <p className="text-sm text-gray-500">Tarih aralığına göre gelir istatistikleri</p>
         </div>
       </div>

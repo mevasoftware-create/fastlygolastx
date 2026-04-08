@@ -88,7 +88,7 @@ export function ReviewsPage() {
         <div className="space-y-2">
           {[5, 4, 3, 2, 1].map((r) => (
             <button key={r} onClick={() => { setRatingFilter(ratingFilter === r ? null : r); setPage(1); }}
-              className={`flex items-center gap-3 w-full group transition-all rounded-lg p-1.5 -m-1.5 ${ratingFilter === r ? "bg-amber-50" : "hover:bg-gray-50"}`}>
+              className={`flex items-center gap-3 w-full group transition-all rounded-xl p-1.5 -m-1.5 ${ratingFilter === r ? "bg-amber-50" : "hover:bg-gray-50"}`}>
               <span className="text-xs font-medium text-gray-500 w-3">{r}</span>
               <Star className="h-3.5 w-3.5 fill-amber-400 text-amber-400" />
               <div className="flex-1 h-2 bg-gray-100 rounded-full overflow-hidden">
@@ -117,8 +117,8 @@ export function ReviewsPage() {
         {isLoading ? (
           <div className="space-y-0">{[...Array(5)].map((_, i) => (
             <div key={i} className="flex items-center gap-4 px-5 py-4 border-b border-gray-50">
-              <div className="w-8 h-8 rounded-lg bg-gray-100 animate-pulse" />
-              <div className="flex-1 h-4 bg-gray-100 rounded-lg animate-pulse" />
+              <div className="w-8 h-8 rounded-xl bg-gray-100 animate-pulse" />
+              <div className="flex-1 h-4 bg-gray-100 rounded-xl animate-pulse" />
             </div>
           ))}</div>
         ) : !filtered.length ? (
@@ -156,12 +156,12 @@ export function ReviewsPage() {
               <div className="flex items-center justify-between px-5 py-3.5 border-t border-gray-100">
                 <p className="text-xs text-gray-500">{filtered.length} sonuçtan {(page-1)*ITEMS_PER_PAGE+1}-{Math.min(page*ITEMS_PER_PAGE, filtered.length)} gösteriliyor</p>
                 <div className="flex items-center gap-1">
-                  <button onClick={() => setPage(Math.max(1, page-1))} disabled={page === 1} className="w-8 h-8 rounded-lg flex items-center justify-center text-gray-400 hover:text-gray-600 hover:bg-gray-100 disabled:opacity-30"><ChevronLeft className="h-4 w-4" /></button>
+                  <button onClick={() => setPage(Math.max(1, page-1))} disabled={page === 1} className="w-8 h-8 rounded-xl flex items-center justify-center text-gray-400 hover:text-gray-600 hover:bg-gray-100 disabled:opacity-30"><ChevronLeft className="h-4 w-4" /></button>
                   {[...Array(Math.min(totalPages, 5))].map((_, i) => {
                     const p = i + 1;
-                    return <button key={p} onClick={() => setPage(p)} className={`w-8 h-8 rounded-lg text-xs font-medium transition-colors ${p === page ? "bg-orange-500 text-white" : "text-gray-500 hover:bg-gray-100"}`}>{p}</button>;
+                    return <button key={p} onClick={() => setPage(p)} className={`w-8 h-8 rounded-xl text-xs font-medium transition-colors ${p === page ? "bg-orange-500 text-white" : "text-gray-500 hover:bg-gray-100"}`}>{p}</button>;
                   })}
-                  <button onClick={() => setPage(Math.min(totalPages, page+1))} disabled={page === totalPages} className="w-8 h-8 rounded-lg flex items-center justify-center text-gray-400 hover:text-gray-600 hover:bg-gray-100 disabled:opacity-30"><ChevronRight className="h-4 w-4" /></button>
+                  <button onClick={() => setPage(Math.min(totalPages, page+1))} disabled={page === totalPages} className="w-8 h-8 rounded-xl flex items-center justify-center text-gray-400 hover:text-gray-600 hover:bg-gray-100 disabled:opacity-30"><ChevronRight className="h-4 w-4" /></button>
                 </div>
               </div>
             )}

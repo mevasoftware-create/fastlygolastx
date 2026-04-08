@@ -64,8 +64,8 @@ export default function Footer() {
                   alt="FastlyGo" 
                   className="h-12 w-auto transition-transform duration-300 group-hover:scale-105" 
                 />
-                <span className="text-3xl font-bold">
-                  Fast<span className="text-orange-500">ly</span>Go
+                <span className="text-3xl font-extrabold tracking-tight" style={{ fontFamily: 'Poppins, sans-serif' }}>
+                  <span className="text-white">Fast</span><span className="text-orange-500">ly</span><span className="text-white">Go</span>
                 </span>
               </a>
               <p className="text-base text-gray-400 leading-relaxed max-w-md">

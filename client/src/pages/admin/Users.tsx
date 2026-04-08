@@ -60,10 +60,10 @@ export function UsersPage() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="p-4 lg:p-6 space-y-5 max-w-[1400px] mx-auto">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-3xl font-bold tracking-tight">Kullanıcılar</h2>
+          <h2 className="text-2xl font-bold text-gray-900 tracking-tight">Kullanıcılar</h2>
           <p className="text-muted-foreground">Tüm kullanıcıları yönetin</p>
         </div>
       </div>

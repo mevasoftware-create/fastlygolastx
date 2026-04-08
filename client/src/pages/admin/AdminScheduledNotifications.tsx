@@ -248,8 +248,8 @@ export default function AdminScheduledNotifications() {
           { label: "İptal", value: statsData?.cancelled ?? 0, color: "text-gray-600 bg-gray-50", icon: <Ban className="h-4 w-4" /> },
           { label: "Başarısız", value: statsData?.failed ?? 0, color: "text-red-600 bg-red-50", icon: <XCircle className="h-4 w-4" /> },
         ].map((s, i) => (
-          <div key={i} className={`flex items-center gap-3 p-3 rounded-lg border ${s.color.split(" ")[1]} border-current/10`}>
-            <div className={`p-2 rounded-lg ${s.color}`}>{s.icon}</div>
+          <div key={i} className={`flex items-center gap-3 p-3 rounded-xl border ${s.color.split(" ")[1]} border-current/10`}>
+            <div className={`p-2 rounded-xl ${s.color}`}>{s.icon}</div>
             <div>
               <p className="text-xs text-gray-500">{s.label}</p>
               <p className="text-xl font-bold">{s.value}</p>
@@ -358,7 +358,7 @@ export default function AdminScheduledNotifications() {
             </div>
 
             {/* Zamanlama */}
-            <div className="p-3 bg-white rounded-lg border border-orange-100 space-y-3">
+            <div className="p-3 bg-white rounded-xl border border-orange-100 space-y-3">
               <Label className="text-xs font-medium text-orange-700 uppercase tracking-wide flex items-center gap-1.5">
                 <Clock className="h-3.5 w-3.5" />
                 Zamanlama
@@ -399,7 +399,7 @@ export default function AdminScheduledNotifications() {
                       <button
                         key={i}
                         onClick={() => toggleRepeatDay(i)}
-                        className={`w-9 h-9 rounded-lg text-xs font-medium transition-colors ${
+                        className={`w-9 h-9 rounded-xl text-xs font-medium transition-colors ${
                           form.repeatDays.includes(i)
                             ? "bg-orange-500 text-white"
                             : "bg-gray-100 text-gray-600 hover:bg-orange-100"
@@ -481,7 +481,7 @@ export default function AdminScheduledNotifications() {
               {listData.notifications.map((notif) => (
                 <div
                   key={notif.id}
-                  className={`border rounded-lg transition-colors ${
+                  className={`border rounded-xl transition-colors ${
                     notif.status === "pending"
                       ? "border-blue-100 hover:border-blue-200 bg-blue-50/30"
                       : notif.status === "sent"

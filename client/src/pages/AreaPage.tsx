@@ -215,7 +215,15 @@ export default function AreaPage() {
     return (
       <>
         <meta name="prerender-status-code" content="200" />
-        {/* Loading skeleton or spinner can be added here */}
+        {/* During loading, render SEOHead with empty title to suppress client-side title
+            This preserves the server-side injected title until data arrives */}
+        <SEOHead 
+          title=""
+          description=""
+          keywords=""
+          canonical={currentUrl}
+          noindex={false}
+        />
       </>
     );
   }

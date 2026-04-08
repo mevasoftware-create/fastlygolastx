@@ -129,7 +129,7 @@ export default function AdminSEO() {
           <div className="p-5 space-y-4">
             <div className="flex items-center gap-2 p-3 bg-gray-50 rounded-xl border">
               <code className="text-sm text-gray-700 flex-1 break-all">https://fastlygo.mk/sitemap.xml</code>
-              <Button variant="ghost" size="icon" onClick={handleCopySitemapUrl} className="shrink-0 h-8 w-8 rounded-lg">
+              <Button variant="ghost" size="icon" onClick={handleCopySitemapUrl} className="shrink-0 h-8 w-8 rounded-xl">
                 {copied ? <CheckCircle2 className="h-4 w-4 text-emerald-500" /> : <Copy className="h-4 w-4 text-gray-500" />}
               </Button>
             </div>
@@ -213,7 +213,7 @@ export default function AdminSEO() {
                 </p>
             </div>
             {sitemapData && (
-                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] font-semibold border bg-gray-50 border-gray-200 text-gray-600">
+                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-[11px] font-semibold border bg-gray-50 border-gray-200 text-gray-600">
                     {sitemapData.urlCount} URL
                 </span>
             )}

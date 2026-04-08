@@ -57,7 +57,7 @@ function LangBadge({ data }: { data: LangContent }) {
     : "bg-red-50 text-red-600 border-red-200";
 
   return (
-    <span className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded-lg text-[10px] font-semibold border ${colorClasses}`}>
+    <span className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded-xl text-[10px] font-semibold border ${colorClasses}`}>
       {pct}%
     </span>
   );
@@ -264,7 +264,7 @@ export function AdminAreas() {
           <form onSubmit={handleSubmit} className="space-y-6">
             <Tabs value={activeLang} onValueChange={setActiveLang} className="w-full">
                 <TabsList className="bg-gray-100 rounded-xl p-1 h-auto">
-                    {LANGS.map(l => <TabsTrigger key={l.code} value={l.code} className="text-xs rounded-lg flex-1 data-[state=active]:bg-white data-[state=active]:shadow-sm data-[state=active]:text-orange-600">{l.label}</TabsTrigger>)}
+                    {LANGS.map(l => <TabsTrigger key={l.code} value={l.code} className="text-xs rounded-xl flex-1 data-[state=active]:bg-white data-[state=active]:shadow-sm data-[state=active]:text-orange-600">{l.label}</TabsTrigger>)}
                 </TabsList>
                 {LANGS.map(l => (
                     <TabsContent key={l.code} value={l.code} className="space-y-4 pt-5">

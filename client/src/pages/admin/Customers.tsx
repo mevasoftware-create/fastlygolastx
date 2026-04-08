@@ -145,7 +145,7 @@ export function CustomersPage() {
                         <span className="text-xs text-gray-500 flex items-center gap-1"><Mail className="h-3 w-3" />{c.email || "—"}</span>
                       </td>
                       <td className="px-5 py-3.5">
-                        <span className="inline-flex items-center gap-1 px-2 py-1 rounded-lg bg-blue-50 text-blue-700 text-[11px] font-semibold">
+                        <span className="inline-flex items-center gap-1 px-2 py-1 rounded-xl bg-blue-50 text-blue-700 text-[11px] font-semibold">
                           <Package className="h-3 w-3" />{getOrderCount(c.id)}
                         </span>
                       </td>
@@ -160,8 +160,8 @@ export function CustomersPage() {
                       </td>
                       <td className="px-5 py-3.5 text-right">
                         <div className="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                          <button onClick={() => setSelectedCustomer(c)} className="w-7 h-7 rounded-lg flex items-center justify-center text-gray-400 hover:text-blue-600 hover:bg-blue-50 transition-colors"><Eye className="h-3.5 w-3.5" /></button>
-                          <button onClick={() => setDeletingUserId(c.id)} className="w-7 h-7 rounded-lg flex items-center justify-center text-gray-400 hover:text-red-600 hover:bg-red-50 transition-colors"><Trash2 className="h-3.5 w-3.5" /></button>
+                          <button onClick={() => setSelectedCustomer(c)} className="w-7 h-7 rounded-xl flex items-center justify-center text-gray-400 hover:text-blue-600 hover:bg-blue-50 transition-colors"><Eye className="h-3.5 w-3.5" /></button>
+                          <button onClick={() => setDeletingUserId(c.id)} className="w-7 h-7 rounded-xl flex items-center justify-center text-gray-400 hover:text-red-600 hover:bg-red-50 transition-colors"><Trash2 className="h-3.5 w-3.5" /></button>
                         </div>
                       </td>
                     </tr>
@@ -173,12 +173,12 @@ export function CustomersPage() {
               <div className="flex items-center justify-between px-5 py-3.5 border-t border-gray-100">
                 <p className="text-xs text-gray-500">{filtered.length} sonuçtan {(page-1)*ITEMS_PER_PAGE+1}-{Math.min(page*ITEMS_PER_PAGE, filtered.length)} gösteriliyor</p>
                 <div className="flex items-center gap-1">
-                  <button onClick={() => setPage(Math.max(1, page-1))} disabled={page === 1} className="w-8 h-8 rounded-lg flex items-center justify-center text-gray-400 hover:text-gray-600 hover:bg-gray-100 disabled:opacity-30"><ChevronLeft className="h-4 w-4" /></button>
+                  <button onClick={() => setPage(Math.max(1, page-1))} disabled={page === 1} className="w-8 h-8 rounded-xl flex items-center justify-center text-gray-400 hover:text-gray-600 hover:bg-gray-100 disabled:opacity-30"><ChevronLeft className="h-4 w-4" /></button>
                   {[...Array(Math.min(totalPages, 5))].map((_, i) => {
                     const p = i + 1;
-                    return <button key={p} onClick={() => setPage(p)} className={`w-8 h-8 rounded-lg text-xs font-medium transition-colors ${p === page ? "bg-orange-500 text-white" : "text-gray-500 hover:bg-gray-100"}`}>{p}</button>;
+                    return <button key={p} onClick={() => setPage(p)} className={`w-8 h-8 rounded-xl text-xs font-medium transition-colors ${p === page ? "bg-orange-500 text-white" : "text-gray-500 hover:bg-gray-100"}`}>{p}</button>;
                   })}
-                  <button onClick={() => setPage(Math.min(totalPages, page+1))} disabled={page === totalPages} className="w-8 h-8 rounded-lg flex items-center justify-center text-gray-400 hover:text-gray-600 hover:bg-gray-100 disabled:opacity-30"><ChevronRight className="h-4 w-4" /></button>
+                  <button onClick={() => setPage(Math.min(totalPages, page+1))} disabled={page === totalPages} className="w-8 h-8 rounded-xl flex items-center justify-center text-gray-400 hover:text-gray-600 hover:bg-gray-100 disabled:opacity-30"><ChevronRight className="h-4 w-4" /></button>
                 </div>
               </div>
             )}
@@ -252,7 +252,7 @@ export function CustomersPage() {
                             <p className="text-[11px] text-gray-400">{new Date(order.createdAt).toLocaleDateString("tr-TR")}</p>
                           </div>
                           <div className="flex items-center gap-3">
-                            <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-lg text-[10px] font-semibold border ${st.bg} ${st.color}`}>
+                            <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-xl text-[10px] font-semibold border ${st.bg} ${st.color}`}>
                               <div className={`w-1 h-1 rounded-full ${st.dotColor}`} />{st.label}
                             </span>
                             <span className="font-bold text-sm text-gray-900">{formatEUR(order.totalFee || 0)}</span>

@@ -29,7 +29,7 @@ const ITEMS_PER_PAGE = 15;
 function StatusBadge({ status }: { status: string }) {
   const cfg = STATUS_CONFIG[status] || { label: status, color: "text-gray-700", bg: "bg-gray-50 border-gray-200", icon: AlertCircle, dotColor: "bg-gray-400" };
   return (
-    <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] font-semibold border ${cfg.bg} ${cfg.color}`}>
+    <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-[11px] font-semibold border ${cfg.bg} ${cfg.color}`}>
       <div className={`w-1.5 h-1.5 rounded-full ${cfg.dotColor}`} />
       {cfg.label}
     </span>
@@ -89,10 +89,10 @@ export function OrdersPage() {
         </div>
         <div className="flex items-center gap-2">
           <div className="flex items-center bg-gray-100 rounded-xl p-1">
-            <button onClick={() => setViewMode("list")} className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${viewMode === "list" ? "bg-white shadow-sm text-gray-900" : "text-gray-500 hover:text-gray-700"}`}>
+            <button onClick={() => setViewMode("list")} className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium transition-all ${viewMode === "list" ? "bg-white shadow-sm text-gray-900" : "text-gray-500 hover:text-gray-700"}`}>
               <List className="h-3.5 w-3.5" />Liste
             </button>
-            <button onClick={() => setViewMode("map")} className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${viewMode === "map" ? "bg-white shadow-sm text-gray-900" : "text-gray-500 hover:text-gray-700"}`}>
+            <button onClick={() => setViewMode("map")} className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium transition-all ${viewMode === "map" ? "bg-white shadow-sm text-gray-900" : "text-gray-500 hover:text-gray-700"}`}>
               <Map className="h-3.5 w-3.5" />Harita
             </button>
           </div>
@@ -166,10 +166,10 @@ export function OrdersPage() {
             <div className="space-y-0">
               {[...Array(5)].map((_, i) => (
                 <div key={i} className="flex items-center gap-4 px-5 py-4 border-b border-gray-50">
-                  <div className="w-16 h-4 bg-gray-100 rounded-lg animate-pulse" />
-                  <div className="flex-1 h-4 bg-gray-100 rounded-lg animate-pulse" />
-                  <div className="w-24 h-4 bg-gray-100 rounded-lg animate-pulse" />
-                  <div className="w-20 h-6 bg-gray-100 rounded-lg animate-pulse" />
+                  <div className="w-16 h-4 bg-gray-100 rounded-xl animate-pulse" />
+                  <div className="flex-1 h-4 bg-gray-100 rounded-xl animate-pulse" />
+                  <div className="w-24 h-4 bg-gray-100 rounded-xl animate-pulse" />
+                  <div className="w-20 h-6 bg-gray-100 rounded-xl animate-pulse" />
                 </div>
               ))}
             </div>
@@ -219,7 +219,7 @@ export function OrdersPage() {
                         </td>
                         <td className="px-5 py-3.5 text-xs text-gray-500">
                           {order.courierId ? (
-                            <span className="inline-flex items-center gap-1.5 px-2 py-1 rounded-lg bg-gray-50 font-medium text-gray-700">
+                            <span className="inline-flex items-center gap-1.5 px-2 py-1 rounded-xl bg-gray-50 font-medium text-gray-700">
                               <User className="h-3 w-3" />#{order.courierId}
                             </span>
                           ) : <span className="text-gray-300">Atanmadı</span>}
@@ -234,13 +234,13 @@ export function OrdersPage() {
                         </td>
                         <td className="px-5 py-3.5 text-right">
                           <div className="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                            <button onClick={() => setSelectedOrder(order)} className="w-7 h-7 rounded-lg flex items-center justify-center text-gray-400 hover:text-blue-600 hover:bg-blue-50 transition-colors">
+                            <button onClick={() => setSelectedOrder(order)} className="w-7 h-7 rounded-xl flex items-center justify-center text-gray-400 hover:text-blue-600 hover:bg-blue-50 transition-colors">
                               <Eye className="h-3.5 w-3.5" />
                             </button>
-                            <button onClick={() => { setEditingOrder(order); setEditStatus(order.status); }} className="w-7 h-7 rounded-lg flex items-center justify-center text-gray-400 hover:text-orange-600 hover:bg-orange-50 transition-colors">
+                            <button onClick={() => { setEditingOrder(order); setEditStatus(order.status); }} className="w-7 h-7 rounded-xl flex items-center justify-center text-gray-400 hover:text-orange-600 hover:bg-orange-50 transition-colors">
                               <Edit className="h-3.5 w-3.5" />
                             </button>
-                            <button onClick={() => setDeletingOrderId(order.id)} className="w-7 h-7 rounded-lg flex items-center justify-center text-gray-400 hover:text-red-600 hover:bg-red-50 transition-colors">
+                            <button onClick={() => setDeletingOrderId(order.id)} className="w-7 h-7 rounded-xl flex items-center justify-center text-gray-400 hover:text-red-600 hover:bg-red-50 transition-colors">
                               <Trash2 className="h-3.5 w-3.5" />
                             </button>
                           </div>
@@ -255,17 +255,17 @@ export function OrdersPage() {
                 <div className="flex items-center justify-between px-5 py-3.5 border-t border-gray-100">
                   <p className="text-xs text-gray-500">{filteredOrders.length} sonuçtan {(page-1)*ITEMS_PER_PAGE+1}-{Math.min(page*ITEMS_PER_PAGE, filteredOrders.length)} gösteriliyor</p>
                   <div className="flex items-center gap-1">
-                    <button onClick={() => setPage(Math.max(1, page-1))} disabled={page === 1} className="w-8 h-8 rounded-lg flex items-center justify-center text-gray-400 hover:text-gray-600 hover:bg-gray-100 disabled:opacity-30 transition-colors">
+                    <button onClick={() => setPage(Math.max(1, page-1))} disabled={page === 1} className="w-8 h-8 rounded-xl flex items-center justify-center text-gray-400 hover:text-gray-600 hover:bg-gray-100 disabled:opacity-30 transition-colors">
                       <ChevronLeft className="h-4 w-4" />
                     </button>
                     {[...Array(Math.min(totalPages, 5))].map((_, i) => {
                       const p = i + 1;
                       return (
-                        <button key={p} onClick={() => setPage(p)} className={`w-8 h-8 rounded-lg text-xs font-medium transition-colors ${p === page ? "bg-orange-500 text-white" : "text-gray-500 hover:bg-gray-100"}`}>{p}</button>
+                        <button key={p} onClick={() => setPage(p)} className={`w-8 h-8 rounded-xl text-xs font-medium transition-colors ${p === page ? "bg-orange-500 text-white" : "text-gray-500 hover:bg-gray-100"}`}>{p}</button>
                       );
                     })}
                     {totalPages > 5 && <span className="text-gray-400 text-xs px-1">...</span>}
-                    <button onClick={() => setPage(Math.min(totalPages, page+1))} disabled={page === totalPages} className="w-8 h-8 rounded-lg flex items-center justify-center text-gray-400 hover:text-gray-600 hover:bg-gray-100 disabled:opacity-30 transition-colors">
+                    <button onClick={() => setPage(Math.min(totalPages, page+1))} disabled={page === totalPages} className="w-8 h-8 rounded-xl flex items-center justify-center text-gray-400 hover:text-gray-600 hover:bg-gray-100 disabled:opacity-30 transition-colors">
                       <ChevronRight className="h-4 w-4" />
                     </button>
                   </div>

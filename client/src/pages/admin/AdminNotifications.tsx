@@ -145,7 +145,7 @@ export default function AdminNotifications() {
   };
 
   const getRoleBadge = (role: string | null) => {
-    const baseClasses = "inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] font-semibold border";
+    const baseClasses = "inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-[11px] font-semibold border";
     if (role === "admin") return <span className={`${baseClasses} bg-red-50 text-red-700 border-red-200`}>Admin</span>;
     if (role === "courier") return <span className={`${baseClasses} bg-blue-50 text-blue-700 border-blue-200`}>Kurye</span>;
     if (role === "business") return <span className={`${baseClasses} bg-amber-50 text-amber-700 border-amber-200`}>İşletme</span>;
@@ -232,7 +232,7 @@ export default function AdminNotifications() {
           <button
             key={tab.id}
             onClick={() => setActiveTab(tab.id)}
-            className={`flex-1 px-3 py-2 text-[11px] font-semibold uppercase tracking-wider rounded-lg transition-colors flex items-center justify-center gap-1.5 ${
+            className={`flex-1 px-3 py-2 text-[11px] font-semibold uppercase tracking-wider rounded-xl transition-colors flex items-center justify-center gap-1.5 ${
               activeTab === tab.id
                 ? "bg-white text-gray-800 shadow-sm"
                 : "text-gray-500 hover:bg-white/50 hover:text-gray-700"
@@ -328,7 +328,7 @@ export default function AdminNotifications() {
             {previewMode && form.title && (
               <div className="p-3 bg-gray-900 rounded-xl text-white text-sm">
                 <div className="flex items-start gap-2">
-                  <div className="w-8 h-8 bg-orange-500 rounded-lg flex items-center justify-center flex-shrink-0">
+                  <div className="w-8 h-8 bg-orange-500 rounded-xl flex items-center justify-center flex-shrink-0">
                     <Bell className="h-4 w-4" />
                   </div>
                   <div>
@@ -483,9 +483,9 @@ export default function AdminNotifications() {
                                 {getRoleBadge(d.userRole)}
                                 <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                                     {d.isActive && 
-                                        <Button variant="outline" size="icon" className="w-8 h-8 rounded-lg" onClick={() => handleDeactivate(d.id)}><PowerOff className="h-4 w-4" /></Button>
+                                        <Button variant="outline" size="icon" className="w-8 h-8 rounded-xl" onClick={() => handleDeactivate(d.id)}><PowerOff className="h-4 w-4" /></Button>
                                     }
-                                    <Button variant="destructive" size="icon" className="w-8 h-8 rounded-lg" onClick={() => setShowDeleteConfirm(d.id)}><Trash2 className="h-4 w-4" /></Button>
+                                    <Button variant="destructive" size="icon" className="w-8 h-8 rounded-xl" onClick={() => setShowDeleteConfirm(d.id)}><Trash2 className="h-4 w-4" /></Button>
                                 </div>
                             </div>
                         </div>

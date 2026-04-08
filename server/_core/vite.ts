@@ -98,22 +98,83 @@ function injectSeoIntoHtml(
   language: string
 ): string {
   const esc = (s: string) => s.replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-  // Fallback SEO data for pages not in DB (new-order, privacy-policy, etc.)
-  const fallbackSeo: Record<string, { title: string; description: string }> = {
-    "/": { title: "FastlyGo - Food Delivery, Courier and Cargo Services in Skopje", description: "Fast courier & delivery service in Skopje. Food, cargo, package delivery in 15 minutes. Real-time tracking, affordable prices. Order now with FastlyGo!" },
-    "/how-it-works": { title: "How It Works - FastlyGo Delivery Process | Skopje", description: "Learn how FastlyGo delivery works. Simple 4-step process: Order online, courier accepts, real-time tracking, delivery in 15 minutes. Fast & reliable." },
-    "/about-us": { title: "About FastlyGo - Courier & Delivery Service in Skopje", description: "FastlyGo is a professional courier and delivery service in Skopje, Macedonia. 53+ active couriers, 15-minute delivery, real-time tracking." },
-    "/services": { title: "Our Services - FastlyGo Delivery Categories | Skopje", description: "Explore FastlyGo delivery services: food delivery, grocery shopping, pharmacy delivery, cargo transport, document delivery and more in Skopje." },
-    "/areas": { title: "Delivery Areas - FastlyGo Coverage in Skopje", description: "Check FastlyGo delivery coverage areas in Skopje and surrounding regions. Fast delivery to 38+ neighborhoods and districts." },
-    "/new-order": { title: "Order Now - FastlyGo Quick Courier | Skopje", description: "Place your delivery order with FastlyGo. Fast courier service in Skopje. Enter pickup and delivery addresses, choose package size, and get instant delivery." },
-    "/privacy-policy": { title: "Privacy Policy - FastlyGo", description: "FastlyGo privacy policy. Learn how we collect, use, and protect your personal data." },
-    "/terms-of-service": { title: "Terms of Service - FastlyGo", description: "FastlyGo terms of service. Read our terms and conditions for using the delivery platform." },
-    "/courier/register": { title: "Become a Courier - FastlyGo Driver Registration", description: "Join FastlyGo as a courier driver. Flexible hours, competitive pay, instant payouts. Register now and start earning in Skopje." },
-    "/business/register": { title: "Business Registration - FastlyGo Partner Program", description: "Partner with FastlyGo for your business deliveries. Restaurant, market, pharmacy integration. Grow your business with fast delivery." },
-    "/login": { title: "Login - FastlyGo Account", description: "Log in to your FastlyGo account. Track orders, manage deliveries, and access your courier dashboard." },
-    "/register": { title: "Register - Create FastlyGo Account", description: "Create your FastlyGo account. Join thousands of users enjoying fast delivery." },
+  // Fallback SEO data for pages not in DB - multi-language
+  const fallbackSeoAll: Record<string, Record<string, { title: string; description: string }>> = {
+    "/": {
+      en: { title: "FastlyGo - Food Delivery, Courier and Cargo Services in Skopje", description: "Fast courier & delivery service in Skopje. Food, cargo, package delivery in 15 minutes. Real-time tracking, affordable prices." },
+      tr: { title: "FastlyGo - Üsküp Yemek Teslimat, Kurye ve Kargo Hizmetleri", description: "Üsküp'te hızlı kurye ve teslimat hizmeti. Yemek, kargo, paket teslimatı 15 dakikada. Gerçek zamanlı takip, uygun fiyatlar." },
+      mk: { title: "FastlyGo - Достава на Храна, Курирски Услуги во Скопје", description: "Брза курирска и доставна услуга во Скопје. Храна, карго, пакети за 15 минути." },
+      sq: { title: "FastlyGo - Dorëzim Ushqimi, Shërbime Korrierë në Shkup", description: "Shërbim i shpejtë korrieri në Shkup. Ushqim, kargo, dorëzim pako në 15 minuta." },
+    },
+    "/how-it-works": {
+      en: { title: "How It Works - FastlyGo Delivery Process | Skopje", description: "Learn how FastlyGo delivery works. Simple 4-step process: Order online, courier accepts, real-time tracking, delivery in 15 minutes." },
+      tr: { title: "Nasıl Çalışır - FastlyGo Teslimat Süreci | Üsküp", description: "FastlyGo teslimat sürecini öğrenin. 4 basit adım: Online sipariş, kurye kabul, gerçek zamanlı takip, 15 dakikada teslimat." },
+      mk: { title: "Како Функционира - FastlyGo Процес на Достава", description: "Научете како функционира FastlyGo доставата. 4 едноставни чекори." },
+      sq: { title: "Si Funksionon - Procesi i Dorëzimit FastlyGo", description: "Mësoni si funksionon dorëzimi FastlyGo. 4 hapa të thjeshtë." },
+    },
+    "/about-us": {
+      en: { title: "About FastlyGo - Courier & Delivery Service in Skopje", description: "FastlyGo is a professional courier and delivery service in Skopje, Macedonia. 53+ active couriers, 15-minute delivery." },
+      tr: { title: "Hakkımızda - FastlyGo Üsküp Kurye Hizmeti", description: "FastlyGo, Üsküp Makedonya'da profesyonel kurye ve teslimat hizmeti. 53+ aktif kurye, 15 dakika teslimat." },
+      mk: { title: "За Нас - FastlyGo Курирска Услуга во Скопје", description: "FastlyGo е професионална курирска услуга во Скопје. 53+ активни курири." },
+      sq: { title: "Rreth Nesh - FastlyGo Shërbim Korrieri në Shkup", description: "FastlyGo është shërbim profesional korrieri në Shkup. 53+ korrierë aktivë." },
+    },
+    "/services": {
+      en: { title: "Our Services - FastlyGo Delivery Categories | Skopje", description: "Explore FastlyGo delivery services: food, grocery, pharmacy, cargo, document delivery in Skopje." },
+      tr: { title: "Hizmetlerimiz - FastlyGo Teslimat Kategorileri | Üsküp", description: "FastlyGo teslimat hizmetlerini keşfedin: yemek, market, eczane, kargo, evrak teslimatı." },
+      mk: { title: "Наши Услуги - FastlyGo Категории на Достава", description: "Истражете ги услугите на FastlyGo: храна, маркет, аптека, карго." },
+      sq: { title: "Shërbimet Tona - FastlyGo Kategori Dorëzimi", description: "Eksploroni shërbimet e FastlyGo: ushqim, market, farmaci, kargo." },
+    },
+    "/areas": {
+      en: { title: "Delivery Areas - FastlyGo Coverage in Skopje", description: "Check FastlyGo delivery coverage areas in Skopje. Fast delivery to 38+ neighborhoods." },
+      tr: { title: "Teslimat Bölgeleri - FastlyGo Üsküp Kapsam Alanı", description: "FastlyGo Üsküp teslimat bölgelerini kontrol edin. 38+ mahalleye hızlı teslimat." },
+      mk: { title: "Области на Достава - FastlyGo Покриеност во Скопје", description: "Проверете ги областите на достава на FastlyGo. 38+ населби." },
+      sq: { title: "Zonat e Dorëzimit - FastlyGo Mbulimi në Shkup", description: "Kontrolloni zonat e dorëzimit të FastlyGo. Dorëzim i shpejtë në 38+ lagje." },
+    },
+    "/new-order": {
+      en: { title: "Order Now - FastlyGo Quick Courier | Skopje", description: "Place your delivery order with FastlyGo. Fast courier service in Skopje." },
+      tr: { title: "Hemen Sipariş Ver - FastlyGo Hızlı Kurye | Üsküp", description: "FastlyGo ile teslimat siparişinizi verin. Üsküp'te hızlı kurye hizmeti." },
+      mk: { title: "Нарачај Сега - FastlyGo Брз Курир", description: "Направете нарачка со FastlyGo. Брза курирска услуга." },
+      sq: { title: "Porosit Tani - FastlyGo Korrier i Shpejtë", description: "Bëni porosi me FastlyGo. Shërbim i shpejtë korrieri në Shkup." },
+    },
+    "/privacy-policy": {
+      en: { title: "Privacy Policy - FastlyGo", description: "FastlyGo privacy policy. How we collect, use, and protect your data." },
+      tr: { title: "Gizlilik Politikası - FastlyGo", description: "FastlyGo gizlilik politikası. Verilerinizi nasıl topladığımızı öğrenin." },
+      mk: { title: "Политика на Приватност - FastlyGo", description: "FastlyGo политика на приватност." },
+      sq: { title: "Politika e Privatësisë - FastlyGo", description: "Politika e privatësisë e FastlyGo." },
+    },
+    "/terms-of-service": {
+      en: { title: "Terms of Service - FastlyGo", description: "FastlyGo terms of service." },
+      tr: { title: "Hizmet Koşulları - FastlyGo", description: "FastlyGo hizmet koşulları." },
+      mk: { title: "Услови на Употреба - FastlyGo", description: "FastlyGo услови на употреба." },
+      sq: { title: "Kushtet e Shërbimit - FastlyGo", description: "Kushtet e shërbimit të FastlyGo." },
+    },
+    "/courier/register": {
+      en: { title: "Become a Courier - FastlyGo Driver Registration", description: "Join FastlyGo as a courier. Flexible hours, competitive pay." },
+      tr: { title: "Kurye Ol - FastlyGo Sürücü Kayıt", description: "FastlyGo'ya kurye olarak katılın. Esnek saatler, rekabetçi ücret." },
+      mk: { title: "Стани Курир - FastlyGo Регистрација", description: "Придружете се на FastlyGo како курир." },
+      sq: { title: "Bëhu Korrier - Regjistrimi FastlyGo", description: "Bashkohuni me FastlyGo si korrier." },
+    },
+    "/business/register": {
+      en: { title: "Business Registration - FastlyGo Partner Program", description: "Partner with FastlyGo for business deliveries." },
+      tr: { title: "İşletme Kayıt - FastlyGo Partner Programı", description: "FastlyGo ile işletme teslimatlarınız için ortak olun." },
+      mk: { title: "Регистрација на Бизнис - FastlyGo", description: "Партнерирајте со FastlyGo." },
+      sq: { title: "Regjistrimi i Biznesit - FastlyGo", description: "Partnerizohu me FastlyGo." },
+    },
+    "/login": {
+      en: { title: "Login - FastlyGo Account", description: "Log in to your FastlyGo account." },
+      tr: { title: "Giriş - FastlyGo Hesabı", description: "FastlyGo hesabınıza giriş yapın." },
+      mk: { title: "Најава - FastlyGo Сметка", description: "Најавете се на вашата FastlyGo сметка." },
+      sq: { title: "Hyrje - Llogaria FastlyGo", description: "Hyni në llogarinë tuaj FastlyGo." },
+    },
+    "/register": {
+      en: { title: "Register - Create FastlyGo Account", description: "Create your FastlyGo account." },
+      tr: { title: "Kayıt Ol - FastlyGo Hesabı Oluştur", description: "FastlyGo hesabınızı oluşturun." },
+      mk: { title: "Регистрација - FastlyGo Сметка", description: "Креирајте FastlyGo сметка." },
+      sq: { title: "Regjistrohu - Krijo Llogari FastlyGo", description: "Krijoni llogarinë tuaj FastlyGo." },
+    },
   };
-  const fb = fallbackSeo[pathname];
+  const fbLang = fallbackSeoAll[pathname];
+  const fb = fbLang ? (fbLang[language] || fbLang.en) : null;
   const safeTitle = title ? esc(title) : (fb ? esc(fb.title) : "FastlyGo");
   const safeDesc = esc(description || fb?.description || "");
 
@@ -217,14 +278,6 @@ export async function setupVite(app: Express, server: Server) {
     res.sendFile(robotsPath);
   });
 
-  // 301 Redirect: /categories/* → /services (categories merged into services)
-  app.get('/categories/*', (_req, res) => {
-    res.redirect(301, '/services');
-  });
-  app.get('/categories', (_req, res) => {
-    res.redirect(301, '/services');
-  });
-
   app.use("*", async (req, res, next) => {
     const url = req.originalUrl;
 
@@ -285,14 +338,6 @@ export function serveStatic(app: Express) {
   });
 
   app.use(express.static(distPath));
-
-  // 301 Redirect: /categories/* → /services (categories merged into services)
-  app.get('/categories/*', (_req, res) => {
-    res.redirect(301, '/services');
-  });
-  app.get('/categories', (_req, res) => {
-    res.redirect(301, '/services');
-  });
 
   // Explicit page routes for SEO injection
   // Manus proxy forwards explicit routes to Express but bypasses wildcard SPA fallback

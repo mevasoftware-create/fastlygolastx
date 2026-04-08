@@ -165,10 +165,10 @@ export function AdminSupport() {
                   </div>
                   <div className="col-span-4 lg:col-span-2"><span className="text-xs text-gray-500 font-medium">{CATEGORY_MAP[t.category] || t.category}</span></div>
                   <div className="col-span-4 lg:col-span-2">
-                    <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] font-semibold border ${pr.color}`}>{pr.label}</span>
+                    <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-[11px] font-semibold border ${pr.color}`}>{pr.label}</span>
                   </div>
                   <div className="col-span-4 lg:col-span-2">
-                    <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] font-semibold border ${st.color}`}><st.icon className="w-3 h-3" />{st.label}</span>
+                    <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-[11px] font-semibold border ${st.color}`}><st.icon className="w-3 h-3" />{st.label}</span>
                   </div>
                   <div className="col-span-12 lg:col-span-2 flex items-center justify-end gap-4">
                     <span className="text-xs text-gray-400">{new Date(t.createdAt).toLocaleDateString("tr-TR")}</span>
@@ -207,7 +207,7 @@ export function AdminSupport() {
                   </div>
                   <div className="flex items-center gap-2">
                     <Label className="text-[11px] text-gray-500 uppercase tracking-wider font-semibold">Öncelik</Label>
-                    <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] font-semibold border ${PRIORITY_MAP[selectedTicket.priority]?.color}`}>
+                    <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-[11px] font-semibold border ${PRIORITY_MAP[selectedTicket.priority]?.color}`}>
                       {PRIORITY_MAP[selectedTicket.priority]?.label}
                     </span>
                   </div>

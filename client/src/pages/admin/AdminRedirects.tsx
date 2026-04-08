@@ -149,7 +149,7 @@ export function AdminRedirects() {
                             </div>
                         </div>
                         <div className="flex items-center gap-4 ml-4">
-                            <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] font-semibold border bg-blue-50 text-blue-600 border-blue-200">
+                            <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-[11px] font-semibold border bg-blue-50 text-blue-600 border-blue-200">
                                 {r.redirectType}
                             </div>
                             <div className="flex items-center gap-1.5 text-sm font-semibold text-gray-600 w-16">
@@ -157,8 +157,8 @@ export function AdminRedirects() {
                                 {r.hitCount || 0}
                             </div>
                             <div className="flex justify-end gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity">
-                                <Button variant="outline" size="icon" onClick={() => handleEdit(r)} className="h-8 w-8 rounded-lg"><Edit className="w-4 h-4" /></Button>
-                                <Button variant="destructive" size="icon" onClick={() => setDeleteId(r.id)} className="h-8 w-8 rounded-lg"><Trash2 className="w-4 h-4" /></Button>
+                                <Button variant="outline" size="icon" onClick={() => handleEdit(r)} className="h-8 w-8 rounded-xl"><Edit className="w-4 h-4" /></Button>
+                                <Button variant="destructive" size="icon" onClick={() => setDeleteId(r.id)} className="h-8 w-8 rounded-xl"><Trash2 className="w-4 h-4" /></Button>
                             </div>
                         </div>
                     </div>

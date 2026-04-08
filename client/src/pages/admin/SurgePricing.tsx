@@ -3,7 +3,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
 import { TrendingUp, Plus, Trash2, Power, PowerOff, AlertTriangle } from "lucide-react";
@@ -25,56 +24,33 @@ export default function SurgePricing() {
   
   const createMutation = trpc.admin.createSurgeConfig.useMutation({
     onSuccess: () => {
-      toast.success("Surge configuration created successfully");
+      toast.success("Surge yapılandırması başarıyla oluşturuldu");
       refetch();
       setShowCreateForm(false);
-      setFormData({
-        name: "",
-        reason: "",
-        multiplier: "1.0",
-        isActive: false,
-        startDate: "",
-        endDate: "",
-      });
+      setFormData({ name: "", reason: "", multiplier: "1.0", isActive: false, startDate: "", endDate: "" });
     },
-    onError: (error) => {
-      toast.error(`Error: ${error.message}`);
-    },
+    onError: (error) => toast.error(`Hata: ${error.message}`),
   });
 
   const toggleMutation = trpc.admin.toggleSurgeConfig.useMutation({
-    onSuccess: () => {
-      toast.success("Surge configuration updated");
-      refetch();
-    },
-    onError: (error) => {
-      toast.error(`Error: ${error.message}`);
-    },
+    onSuccess: () => { toast.success("Surge yapılandırması güncellendi"); refetch(); },
+    onError: (error) => toast.error(`Hata: ${error.message}`),
   });
 
   const deleteMutation = trpc.admin.deleteSurgeConfig.useMutation({
-    onSuccess: () => {
-      toast.success("Surge configuration deleted");
-      refetch();
-    },
-    onError: (error) => {
-      toast.error(`Error: ${error.message}`);
-    },
+    onSuccess: () => { toast.success("Surge yapılandırması silindi"); refetch(); },
+    onError: (error) => toast.error(`Hata: ${error.message}`),
   });
 
   const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault();
-    
     const multiplier = parseFloat(formData.multiplier);
     if (isNaN(multiplier) || multiplier < 0.5 || multiplier > 5.0) {
-      toast.error("Multiplier must be between 0.5 and 5.0");
+      toast.error("Çarpan 0.5 ile 5.0 arasında olmalıdır");
       return;
     }
-
     await createMutation.mutateAsync({
-      name: formData.name,
-      reason: formData.reason,
-      multiplier,
+      name: formData.name, reason: formData.reason, multiplier,
       isActive: formData.isActive,
       startDate: formData.startDate || undefined,
       endDate: formData.endDate || undefined,
@@ -86,7 +62,7 @@ export default function SurgePricing() {
   };
 
   const handleDelete = async (id: number) => {
-    if (confirm("Are you sure you want to delete this surge configuration?")) {
+    if (confirm("Bu surge yapılandırmasını silmek istediğinize emin misiniz?")) {
       await deleteMutation.mutateAsync({ id });
     }
   };
@@ -98,208 +74,133 @@ export default function SurgePricing() {
   };
 
   return (
-    <div className="p-6 space-y-6">
-      {/* Header */}
+    <div className="p-4 lg:p-6 space-y-5 max-w-[1400px] mx-auto">
+      {/* Başlık */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold flex items-center gap-2">
-            <TrendingUp className="h-8 w-8" />
-            Surge Pricing Management
+          <h1 className="text-2xl font-bold text-gray-900 tracking-tight flex items-center gap-2">
+            <TrendingUp className="h-7 w-7 text-orange-500" />
+            Surge Fiyatlandırma
           </h1>
-          <p className="text-gray-600 mt-1">
-            Control dynamic pricing for special conditions (weather, holidays, events)
-          </p>
+          <p className="text-sm text-gray-500 mt-0.5">Özel koşullar için dinamik fiyatlandırmayı yönetin</p>
         </div>
-        <Button onClick={() => setShowCreateForm(!showCreateForm)}>
-          <Plus className="h-4 w-4 mr-2" />
-          Create Surge
+        <Button onClick={() => setShowCreateForm(!showCreateForm)} className="bg-orange-500 hover:bg-orange-600 gap-2">
+          <Plus className="h-4 w-4" /> Yeni Surge Oluştur
         </Button>
       </div>
 
-      {/* Active Surge Alert */}
+      {/* Aktif Surge Uyarısı */}
       {activeSurge && (
-        <Card className="border-orange-500 bg-orange-50">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-orange-700">
-              <AlertTriangle className="h-5 w-5" />
-              Active Surge Pricing
-            </CardTitle>
-            <CardDescription>
-              {activeSurge.name} - {formatMultiplier(activeSurge.multiplier)}
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <p className="text-sm text-gray-700">{activeSurge.reason}</p>
-          </CardContent>
-        </Card>
+        <div className="rounded-2xl border border-orange-200 bg-orange-50 p-4 flex items-start gap-3">
+          <div className="w-9 h-9 rounded-xl bg-orange-100 flex items-center justify-center flex-shrink-0">
+            <AlertTriangle className="h-5 w-5 text-orange-600" />
+          </div>
+          <div>
+            <p className="font-semibold text-orange-800">Aktif Surge Fiyatlandırma</p>
+            <p className="text-sm text-orange-700 mt-0.5">{activeSurge.name} — {formatMultiplier(activeSurge.multiplier)}</p>
+            {activeSurge.reason && <p className="text-xs text-orange-600 mt-1">{activeSurge.reason}</p>}
+          </div>
+        </div>
       )}
 
-      {/* Create Form */}
+      {/* Oluşturma Formu */}
       {showCreateForm && (
-        <Card>
-          <CardHeader>
-            <CardTitle>Create New Surge Configuration</CardTitle>
-            <CardDescription>
-              Define manual surge pricing for special conditions
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <form onSubmit={handleCreate} className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <Label htmlFor="name">Name</Label>
-                  <Input
-                    id="name"
-                    value={formData.name}
-                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                    placeholder="e.g., Snow Storm Surge"
-                    required
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="multiplier">Multiplier (0.5 - 5.0)</Label>
-                  <Input
-                    id="multiplier"
-                    type="number"
-                    step="0.1"
-                    min="0.5"
-                    max="5.0"
-                    value={formData.multiplier}
-                    onChange={(e) => setFormData({ ...formData, multiplier: e.target.value })}
-                    required
-                  />
-                  <p className="text-xs text-gray-500 mt-1">
-                    1.0 = no change, 1.5 = +50%, 2.0 = +100%
-                  </p>
-                </div>
-              </div>
-
+        <div className="bg-white rounded-2xl border border-gray-100 p-5 space-y-4">
+          <div>
+            <h2 className="font-semibold text-gray-800">Yeni Surge Yapılandırması</h2>
+            <p className="text-sm text-gray-500">Özel koşullar için manuel surge fiyatlandırma tanımlayın</p>
+          </div>
+          <form onSubmit={handleCreate} className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <Label htmlFor="reason">Reason</Label>
-                <Textarea
-                  id="reason"
-                  value={formData.reason}
-                  onChange={(e) => setFormData({ ...formData, reason: e.target.value })}
-                  placeholder="e.g., Heavy snowfall, limited courier availability"
-                  required
-                />
+                <Label htmlFor="name">Ad</Label>
+                <Input id="name" value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} placeholder="ör. Kar Fırtınası Surge" className="rounded-xl mt-1" required />
               </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <Label htmlFor="startDate">Start Date (Optional)</Label>
-                  <Input
-                    id="startDate"
-                    type="datetime-local"
-                    value={formData.startDate}
-                    onChange={(e) => setFormData({ ...formData, startDate: e.target.value })}
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="endDate">End Date (Optional)</Label>
-                  <Input
-                    id="endDate"
-                    type="datetime-local"
-                    value={formData.endDate}
-                    onChange={(e) => setFormData({ ...formData, endDate: e.target.value })}
-                  />
-                </div>
+              <div>
+                <Label htmlFor="multiplier">Çarpan (0.5 - 5.0)</Label>
+                <Input id="multiplier" type="number" step="0.1" min="0.5" max="5.0" value={formData.multiplier} onChange={(e) => setFormData({ ...formData, multiplier: e.target.value })} className="rounded-xl mt-1" required />
+                <p className="text-xs text-gray-500 mt-1">1.0 = değişiklik yok, 1.5 = +%50, 2.0 = +%100</p>
               </div>
-
-              <div className="flex items-center space-x-2">
-                <Switch
-                  id="isActive"
-                  checked={formData.isActive}
-                  onCheckedChange={(checked) => setFormData({ ...formData, isActive: checked })}
-                />
-                <Label htmlFor="isActive">Activate immediately</Label>
+            </div>
+            <div>
+              <Label htmlFor="reason">Neden</Label>
+              <Textarea id="reason" value={formData.reason} onChange={(e) => setFormData({ ...formData, reason: e.target.value })} placeholder="ör. Yoğun kar yağışı, sınırlı kurye mevcudiyeti" className="rounded-xl mt-1" required />
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <Label htmlFor="startDate">Başlangıç Tarihi (İsteğe Bağlı)</Label>
+                <Input id="startDate" type="datetime-local" value={formData.startDate} onChange={(e) => setFormData({ ...formData, startDate: e.target.value })} className="rounded-xl mt-1" />
               </div>
-
-              <div className="flex gap-2">
-                <Button type="submit" disabled={createMutation.isPending}>
-                  {createMutation.isPending ? "Creating..." : "Create Surge"}
-                </Button>
-                <Button type="button" variant="outline" onClick={() => setShowCreateForm(false)}>
-                  Cancel
-                </Button>
+              <div>
+                <Label htmlFor="endDate">Bitiş Tarihi (İsteğe Bağlı)</Label>
+                <Input id="endDate" type="datetime-local" value={formData.endDate} onChange={(e) => setFormData({ ...formData, endDate: e.target.value })} className="rounded-xl mt-1" />
               </div>
-            </form>
-          </CardContent>
-        </Card>
+            </div>
+            <div className="flex items-center space-x-2">
+              <Switch id="isActive" checked={formData.isActive} onCheckedChange={(checked) => setFormData({ ...formData, isActive: checked })} />
+              <Label htmlFor="isActive">Hemen etkinleştir</Label>
+            </div>
+            <div className="flex gap-2">
+              <Button type="submit" disabled={createMutation.isPending} className="bg-orange-500 hover:bg-orange-600">
+                {createMutation.isPending ? "Oluşturuluyor..." : "Surge Oluştur"}
+              </Button>
+              <Button type="button" variant="outline" onClick={() => setShowCreateForm(false)}>İptal</Button>
+            </div>
+          </form>
+        </div>
       )}
 
-      {/* Surge Configurations List */}
-      <div className="grid gap-4">
-        <h2 className="text-xl font-semibold">All Surge Configurations</h2>
+      {/* Surge Yapılandırma Listesi */}
+      <div className="space-y-4">
+        <h2 className="text-lg font-semibold text-gray-800">Tüm Surge Yapılandırmaları</h2>
         {surgeConfigs && surgeConfigs.length > 0 ? (
-          surgeConfigs.map((config) => (
-            <Card key={config.id} className={config.isActive ? "border-green-500" : ""}>
-              <CardHeader>
+          <div className="space-y-3">
+            {surgeConfigs.map((config) => (
+              <div key={config.id} className={`bg-white rounded-2xl border p-4 ${config.isActive ? "border-green-300 ring-1 ring-green-100" : "border-gray-100"}`}>
                 <div className="flex items-center justify-between">
-                  <div>
-                    <CardTitle className="flex items-center gap-2">
-                      {config.name}
-                      <span className={`text-sm font-normal px-2 py-1 rounded ${
-                        config.isActive ? "bg-green-100 text-green-700" : "bg-gray-100 text-gray-600"
-                      }`}>
-                        {config.isActive ? "Active" : "Inactive"}
-                      </span>
-                      <span className="text-sm font-normal px-2 py-1 rounded bg-orange-100 text-orange-700">
-                        {formatMultiplier(config.multiplier)}
-                      </span>
-                    </CardTitle>
-                    <CardDescription className="mt-2">{config.reason}</CardDescription>
+                  <div className="flex items-center gap-3">
+                    <div className={`w-9 h-9 rounded-xl flex items-center justify-center ${config.isActive ? "bg-green-50" : "bg-gray-50"}`}>
+                      <TrendingUp className={`h-5 w-5 ${config.isActive ? "text-green-600" : "text-gray-400"}`} />
+                    </div>
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <p className="font-semibold text-gray-800">{config.name}</p>
+                        <span className={`text-[11px] font-semibold px-2 py-0.5 rounded-xl border ${config.isActive ? "bg-green-50 text-green-700 border-green-200" : "bg-gray-50 text-gray-500 border-gray-200"}`}>
+                          {config.isActive ? "Aktif" : "Pasif"}
+                        </span>
+                        <span className="text-[11px] font-semibold px-2 py-0.5 rounded-xl bg-orange-50 text-orange-700 border border-orange-200">
+                          {formatMultiplier(config.multiplier)}
+                        </span>
+                      </div>
+                      <p className="text-sm text-gray-500 mt-0.5">{config.reason}</p>
+                      {(config.startDate || config.endDate) && (
+                        <div className="flex gap-3 mt-1 text-xs text-gray-400">
+                          {config.startDate && <span>Başlangıç: {new Date(config.startDate).toLocaleString("tr-TR")}</span>}
+                          {config.endDate && <span>Bitiş: {new Date(config.endDate).toLocaleString("tr-TR")}</span>}
+                        </div>
+                      )}
+                    </div>
                   </div>
                   <div className="flex gap-2">
-                    <Button
-                      variant={config.isActive ? "destructive" : "default"}
-                      size="sm"
-                      onClick={() => handleToggle(config.id, !config.isActive)}
-                      disabled={toggleMutation.isPending}
-                    >
-                      {config.isActive ? (
-                        <>
-                          <PowerOff className="h-4 w-4 mr-1" />
-                          Deactivate
-                        </>
-                      ) : (
-                        <>
-                          <Power className="h-4 w-4 mr-1" />
-                          Activate
-                        </>
-                      )}
+                    <Button variant={config.isActive ? "destructive" : "default"} size="sm" onClick={() => handleToggle(config.id, !config.isActive)} disabled={toggleMutation.isPending} className={!config.isActive ? "bg-orange-500 hover:bg-orange-600" : ""}>
+                      {config.isActive ? (<><PowerOff className="h-4 w-4 mr-1" /> Devre Dışı</>) : (<><Power className="h-4 w-4 mr-1" /> Etkinleştir</>)}
                     </Button>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => handleDelete(config.id)}
-                      disabled={deleteMutation.isPending}
-                    >
+                    <Button variant="outline" size="sm" onClick={() => handleDelete(config.id)} disabled={deleteMutation.isPending} className="text-red-500 hover:text-red-600 hover:bg-red-50">
                       <Trash2 className="h-4 w-4" />
                     </Button>
                   </div>
                 </div>
-              </CardHeader>
-              {(config.startDate || config.endDate) && (
-                <CardContent>
-                  <div className="text-sm text-gray-600">
-                    {config.startDate && (
-                      <p>Start: {new Date(config.startDate).toLocaleString()}</p>
-                    )}
-                    {config.endDate && (
-                      <p>End: {new Date(config.endDate).toLocaleString()}</p>
-                    )}
-                  </div>
-                </CardContent>
-              )}
-            </Card>
-          ))
+              </div>
+            ))}
+          </div>
         ) : (
-          <Card>
-            <CardContent className="py-8 text-center text-gray-500">
-              No surge configurations yet. Create one to get started.
-            </CardContent>
-          </Card>
+          <div className="bg-white rounded-2xl border border-gray-100 py-12 text-center">
+            <div className="w-12 h-12 rounded-2xl bg-gray-50 flex items-center justify-center mx-auto mb-3">
+              <TrendingUp className="h-6 w-6 text-gray-400" />
+            </div>
+            <p className="text-sm font-medium text-gray-700">Henüz surge yapılandırması yok</p>
+            <p className="text-xs text-gray-500 mt-1">Başlamak için yeni bir tane oluşturun.</p>
+          </div>
         )}
       </div>
     </div>

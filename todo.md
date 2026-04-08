@@ -344,3 +344,29 @@
 ## Home Sayfa Hatası - useLanguage LanguageProvider (08.04.2026)
 - [x] useSeoFromDatabase hook'u useLanguage yerine useTranslation kullanıyor — LanguageProvider dışında da çalışır
 - [x] HMR/error recovery sırasında provider sıralama sorunu artık oluşmaz
+
+## Admin Paneli Kapsamlı Yenileme - 2. Tur (09.04.2026)
+- [x] Admin paneli padding/layout düzeltmeleri - tüm sayfalar tutarlı p-4 lg:p-6 space-y-5 max-w-[1400px]
+- [x] CourierRatings sayfası DashboardLayout kaldırıldı - panel dışına taşma sorunu düzeltildi
+- [x] Bildirim izni popup admin panelinde gösterilmiyor - PushNotificationPrompt'a pathname kontrolü eklendi
+- [x] SurgePricing komple Türkçeye çevrildi
+- [x] Tüm admin sayfalarında İngilizce metinler Türkçeye çevrildi (sed toplu düzeltme)
+- [x] Tutarlı başlık stili: text-3xl font-bold tracking-tight tüm sayfalarda
+- [x] Tutarlı Card stili: rounded-xl tüm sayfalarda
+- [x] Businesses.tsx status enum düzeltildi (pending/approved/rejected → active/inactive/suspended)
+- [x] Logo yazısı Poppins fontu ile güzelleştirildi (Header + Footer)
+- [x] Google Fonts Poppins eklendi (index.html)
+
+## SEO Inline Script Çok Dilli Yapma (09.04.2026)
+- [x] index.html inline SEO script'i çok dilli yapıldı - ?lang= parametresine göre doğru dilde title/description
+- [x] Area sayfaları çok dilli title (Türkçe: "Aerodrom'da Ekspres Teslimat | FastlyGo Üsküp")
+- [x] Kategori sayfaları çok dilli title
+- [x] 10+ statik sayfa çok dilli title/description
+- [x] AreaPage.tsx loading sırasında SEOHead title="" ile suppress - server-side title korunuyor
+- [x] CategoryPage.tsx loading sırasında SEOHead title="" ile suppress - server-side title korunuyor
+
+## vite.ts Server-Side SEO Çok Dilli Fallback (09.04.2026)
+- [x] fallbackSeo objesi çok dilli yapıldı (en/tr/mk/sq)
+- [x] /categories/* redirect kaldırıldı - kategoriler artık gerçek sayfa olarak sunuluyor
+- [x] TypeScript hata: 0
+- [x] Tüm 63 test geçiyor

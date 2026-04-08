@@ -207,7 +207,7 @@ export function AdminCategories() {
 
                   {/* Status */}
                   <button onClick={() => toggleMutation.mutate({ id: cat.id, active: !cat.active })}
-                    className={`px-2.5 py-1 rounded-lg text-[11px] font-semibold border transition-all flex items-center gap-1.5 ${
+                    className={`px-2.5 py-1 rounded-xl text-[11px] font-semibold border transition-all flex items-center gap-1.5 ${
                       cat.active ? "bg-emerald-50 border-emerald-200 text-emerald-700 hover:bg-emerald-100" : "bg-gray-50 border-gray-200 text-gray-500 hover:bg-gray-100"
                     }`}>
                     <div className={`w-1.5 h-1.5 rounded-full ${cat.active ? "bg-emerald-400" : "bg-gray-400"}`} />
@@ -216,10 +216,10 @@ export function AdminCategories() {
 
                   {/* Actions */}
                   <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                    <button onClick={() => handleEdit(cat)} className="w-8 h-8 rounded-lg flex items-center justify-center text-gray-400 hover:text-blue-600 hover:bg-blue-50 transition-colors">
+                    <button onClick={() => handleEdit(cat)} className="w-8 h-8 rounded-xl flex items-center justify-center text-gray-400 hover:text-blue-600 hover:bg-blue-50 transition-colors">
                       <Edit className="h-3.5 w-3.5" />
                     </button>
-                    <button onClick={() => setDeleteConfirmId(cat.id)} className="w-8 h-8 rounded-lg flex items-center justify-center text-gray-400 hover:text-red-600 hover:bg-red-50 transition-colors">
+                    <button onClick={() => setDeleteConfirmId(cat.id)} className="w-8 h-8 rounded-xl flex items-center justify-center text-gray-400 hover:text-red-600 hover:bg-red-50 transition-colors">
                       <Trash2 className="h-3.5 w-3.5" />
                     </button>
                   </div>
@@ -272,7 +272,7 @@ export function AdminCategories() {
                   <p className="text-sm font-semibold text-gray-900">Çok Dilli İçerik</p>
                   <TabsList className="h-8 bg-gray-100 rounded-xl p-1">
                     {LANGS.map(({ code, flag }) => (
-                      <TabsTrigger key={code} value={code} className="text-[11px] px-2.5 h-6 rounded-lg gap-1.5 data-[state=active]:bg-white data-[state=active]:shadow-sm">
+                      <TabsTrigger key={code} value={code} className="text-[11px] px-2.5 h-6 rounded-xl gap-1.5 data-[state=active]:bg-white data-[state=active]:shadow-sm">
                         {flag} {code.toUpperCase()}
                         <LangCompleteness data={formData.seoMeta[code] || emptyLang} />
                       </TabsTrigger>

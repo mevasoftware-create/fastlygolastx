@@ -146,7 +146,7 @@ export default function AdminHome() {
               <ArrowUpRight className="h-4 w-4 text-gray-300 group-hover:text-gray-500 transition-colors" />
             </div>
             <p className="text-2xl lg:text-3xl font-bold text-gray-900 tracking-tight">
-              {statsLoading ? <span className="inline-block w-12 h-7 bg-gray-100 rounded-lg animate-pulse" /> : card.value.toLocaleString("tr-TR")}
+              {statsLoading ? <span className="inline-block w-12 h-7 bg-gray-100 rounded-xl animate-pulse" /> : card.value.toLocaleString("tr-TR")}
             </p>
             <p className="text-sm text-gray-500 mt-1">{card.label}</p>
             <p className="text-xs text-gray-400 mt-0.5">{card.sub}</p>
@@ -167,7 +167,7 @@ export default function AdminHome() {
             <div className="relative">
               <div className="flex items-center justify-between mb-3">
                 <p className="text-sm font-medium text-white/80">{card.label}</p>
-                <div className="w-8 h-8 rounded-lg bg-white/10 flex items-center justify-center">
+                <div className="w-8 h-8 rounded-xl bg-white/10 flex items-center justify-center">
                   <card.icon className="h-4 w-4 text-white/80" />
                 </div>
               </div>
@@ -335,7 +335,7 @@ export default function AdminHome() {
                         </div>
                       </td>
                       <td className="px-4 py-3.5">
-                        <span className={`inline-flex items-center px-2.5 py-1 rounded-lg text-[11px] font-semibold border ${s.bg} ${s.color}`}>
+                        <span className={`inline-flex items-center px-2.5 py-1 rounded-xl text-[11px] font-semibold border ${s.bg} ${s.color}`}>
                           {s.label}
                         </span>
                       </td>

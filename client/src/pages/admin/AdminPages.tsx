@@ -130,7 +130,7 @@ export function AdminPages() {
   };
 
   return (
-    <div className="space-y-6 py-6">
+    <div className="p-4 lg:p-6 space-y-5 max-w-[1400px] mx-auto">
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
@@ -258,7 +258,7 @@ export function AdminPages() {
             <DialogDescription>Tüm dillerde içerik girin. Başlık ve açıklama SEO için kritiktir.</DialogDescription>
           </DialogHeader>
           <form onSubmit={handleSubmit} className="space-y-5">
-            <div className="grid grid-cols-3 gap-4 p-4 bg-gray-50 rounded-lg">
+            <div className="grid grid-cols-3 gap-4 p-4 bg-gray-50 rounded-xl">
               <div className="col-span-2">
                 <Label className="text-xs font-semibold text-gray-600 uppercase tracking-wide">Slug (URL) *</Label>
                 <Input value={formData.slug} onChange={e => setFormData({ ...formData, slug: e.target.value.toLowerCase().replace(/\s+/g, "-") })} placeholder="about" className="mt-1" required />
@@ -292,7 +292,7 @@ export function AdminPages() {
                 </TabsList>
               </div>
               {LANGS.map(({ code, label }) => (
-                <TabsContent key={code} value={code} className="space-y-3 border rounded-lg p-4">
+                <TabsContent key={code} value={code} className="space-y-3 border rounded-xl p-4">
                   <div className="text-sm font-medium text-gray-700 mb-3">{label} İçeriği</div>
                   <div>
                     <Label className="text-xs text-gray-500">Sayfa Başlığı (SEO Title) *</Label>

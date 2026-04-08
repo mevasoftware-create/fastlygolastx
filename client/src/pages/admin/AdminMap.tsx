@@ -399,7 +399,7 @@ export default function AdminMap() {
                 <button
                   key={f.value}
                   onClick={() => setFilterStatus(f.value)}
-                  className={`flex-1 py-1.5 text-[10px] font-bold rounded-lg transition-all ${
+                  className={`flex-1 py-1.5 text-[10px] font-bold rounded-xl transition-all ${
                     filterStatus === f.value
                       ? "bg-orange-500 text-white shadow-sm"
                       : "bg-white text-gray-600 hover:bg-gray-100 border border-gray-200"

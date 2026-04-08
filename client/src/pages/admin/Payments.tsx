@@ -25,7 +25,7 @@ const STATUS_CFG: Record<string, { label: string; color: string; bg: string; dot
 function StatusBadge({ status }: { status: string }) {
   const cfg = STATUS_CFG[status] || { label: status, color: "text-gray-700", bg: "bg-gray-50 border-gray-200", dotColor: "bg-gray-400" };
   return (
-    <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] font-semibold border ${cfg.bg} ${cfg.color}`}>
+    <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-[11px] font-semibold border ${cfg.bg} ${cfg.color}`}>
       <div className={`w-1.5 h-1.5 rounded-full ${cfg.dotColor}`} />{cfg.label}
     </span>
   );
@@ -110,7 +110,7 @@ export function PaymentsPage() {
         <div className="flex items-center bg-gray-100 rounded-xl p-1 w-fit">
           {[{k: "all", l: "Tümü"}, {k: "pending", l: "Beklemede"}, {k: "approved", l: "Onaylandı"}, {k: "paid", l: "Ödendi"}, {k: "rejected", l: "Reddedildi"}].map(({k, l}) => (
             <button key={k} onClick={() => { setFilterStatus(k); setPage(1); }}
-              className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${filterStatus === k ? "bg-white shadow-sm text-gray-900" : "text-gray-500 hover:text-gray-700"}`}>{l}</button>
+              className={`px-3 py-1.5 rounded-xl text-xs font-medium transition-all ${filterStatus === k ? "bg-white shadow-sm text-gray-900" : "text-gray-500 hover:text-gray-700"}`}>{l}</button>
           ))}
         </div>
       </div>
@@ -139,7 +139,7 @@ export function PaymentsPage() {
                     <tr key={r.id} className="border-b border-gray-50 last:border-0 hover:bg-gray-50/50 transition-colors group">
                       <td className="px-5 py-3.5">
                         <div className="flex items-center gap-3">
-                          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-violet-400 to-violet-600 flex items-center justify-center text-white text-[10px] font-bold shadow-sm">K{r.courierId}</div>
+                          <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-violet-400 to-violet-600 flex items-center justify-center text-white text-[10px] font-bold shadow-sm">K{r.courierId}</div>
                           <span className="font-medium text-gray-900 text-sm">Kurye #{r.courierId}</span>
                         </div>
                       </td>
@@ -152,12 +152,12 @@ export function PaymentsPage() {
                           {r.status === "pending" && (
                             <>
                               <button onClick={() => { setSelectedRequest(r); setNotes(""); setRejectionReason(""); }}
-                                className="h-7 px-2.5 text-[11px] font-semibold text-emerald-700 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 rounded-lg flex items-center gap-1 transition-colors">
+                                className="h-7 px-2.5 text-[11px] font-semibold text-emerald-700 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 rounded-xl flex items-center gap-1 transition-colors">
                                 <CheckCircle className="h-3 w-3" />İşle
                               </button>
                             </>
                           )}
-                          <button onClick={() => setSelectedRequest(r)} className="w-7 h-7 rounded-lg flex items-center justify-center text-gray-400 hover:text-blue-600 hover:bg-blue-50 transition-colors opacity-0 group-hover:opacity-100">
+                          <button onClick={() => setSelectedRequest(r)} className="w-7 h-7 rounded-xl flex items-center justify-center text-gray-400 hover:text-blue-600 hover:bg-blue-50 transition-colors opacity-0 group-hover:opacity-100">
                             <Eye className="h-3.5 w-3.5" />
                           </button>
                         </div>
@@ -171,12 +171,12 @@ export function PaymentsPage() {
               <div className="flex items-center justify-between px-5 py-3.5 border-t border-gray-100">
                 <p className="text-xs text-gray-500">{filtered.length} sonuçtan {(page-1)*ITEMS_PER_PAGE+1}-{Math.min(page*ITEMS_PER_PAGE, filtered.length)} gösteriliyor</p>
                 <div className="flex items-center gap-1">
-                  <button onClick={() => setPage(Math.max(1, page-1))} disabled={page === 1} className="w-8 h-8 rounded-lg flex items-center justify-center text-gray-400 hover:text-gray-600 hover:bg-gray-100 disabled:opacity-30"><ChevronLeft className="h-4 w-4" /></button>
+                  <button onClick={() => setPage(Math.max(1, page-1))} disabled={page === 1} className="w-8 h-8 rounded-xl flex items-center justify-center text-gray-400 hover:text-gray-600 hover:bg-gray-100 disabled:opacity-30"><ChevronLeft className="h-4 w-4" /></button>
                   {[...Array(Math.min(totalPages, 5))].map((_, i) => {
                     const p = i + 1;
-                    return <button key={p} onClick={() => setPage(p)} className={`w-8 h-8 rounded-lg text-xs font-medium transition-colors ${p === page ? "bg-orange-500 text-white" : "text-gray-500 hover:bg-gray-100"}`}>{p}</button>;
+                    return <button key={p} onClick={() => setPage(p)} className={`w-8 h-8 rounded-xl text-xs font-medium transition-colors ${p === page ? "bg-orange-500 text-white" : "text-gray-500 hover:bg-gray-100"}`}>{p}</button>;
                   })}
-                  <button onClick={() => setPage(Math.min(totalPages, page+1))} disabled={page === totalPages} className="w-8 h-8 rounded-lg flex items-center justify-center text-gray-400 hover:text-gray-600 hover:bg-gray-100 disabled:opacity-30"><ChevronRight className="h-4 w-4" /></button>
+                  <button onClick={() => setPage(Math.min(totalPages, page+1))} disabled={page === totalPages} className="w-8 h-8 rounded-xl flex items-center justify-center text-gray-400 hover:text-gray-600 hover:bg-gray-100 disabled:opacity-30"><ChevronRight className="h-4 w-4" /></button>
                 </div>
               </div>
             )}

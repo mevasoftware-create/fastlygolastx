@@ -16,20 +16,19 @@ import {
   DialogHeader, DialogTitle,
 } from "@/components/ui/dialog";
 
-type StatusFilter = "all" | "pending" | "approved" | "rejected" | "suspended";
+type StatusFilter = "all" | "active" | "inactive" | "suspended";
 const ITEMS_PER_PAGE = 15;
 
 const STATUS_CFG: Record<string, { label: string; color: string; bg: string; dotColor: string }> = {
-  pending:   { label: "Beklemede",     color: "text-amber-700",   bg: "bg-amber-50 border-amber-200",     dotColor: "bg-amber-400" },
-  approved:  { label: "Onaylı",        color: "text-emerald-700", bg: "bg-emerald-50 border-emerald-200", dotColor: "bg-emerald-400" },
-  rejected:  { label: "Reddedildi",    color: "text-red-700",     bg: "bg-red-50 border-red-200",         dotColor: "bg-red-400" },
-  suspended: { label: "Askıya Alındı", color: "text-gray-700",    bg: "bg-gray-50 border-gray-200",       dotColor: "bg-gray-400" },
+  active:    { label: "Aktif",          color: "text-emerald-700", bg: "bg-emerald-50 border-emerald-200", dotColor: "bg-emerald-400" },
+  inactive:  { label: "Pasif",          color: "text-amber-700",   bg: "bg-amber-50 border-amber-200",     dotColor: "bg-amber-400" },
+  suspended: { label: "Askıya Alındı", color: "text-red-700",     bg: "bg-red-50 border-red-200",         dotColor: "bg-red-400" },
 };
 
 function StatusBadge({ status }: { status: string }) {
   const cfg = STATUS_CFG[status] || { label: status, color: "text-gray-700", bg: "bg-gray-50 border-gray-200", dotColor: "bg-gray-400" };
   return (
-    <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] font-semibold border ${cfg.bg} ${cfg.color}`}>
+    <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-[11px] font-semibold border ${cfg.bg} ${cfg.color}`}>
       <div className={`w-1.5 h-1.5 rounded-full ${cfg.dotColor}`} />
       {cfg.label}
     </span>
@@ -66,9 +65,9 @@ export default function Businesses() {
 
   const counts = useMemo(() => ({
     all: businesses?.length ?? 0,
-    pending: businesses?.filter((b: any) => b.status === "pending").length ?? 0,
-    approved: businesses?.filter((b: any) => b.status === "approved").length ?? 0,
-    rejected: businesses?.filter((b: any) => b.status === "rejected").length ?? 0,
+    active: businesses?.filter((b: any) => b.status === "active").length ?? 0,
+    inactive: businesses?.filter((b: any) => b.status === "inactive").length ?? 0,
+    suspended: businesses?.filter((b: any) => b.status === "suspended").length ?? 0,
   }), [businesses]);
 
   const handleApprove = async (businessId: number, businessName: string) => {
@@ -100,9 +99,9 @@ export default function Businesses() {
 
   const stats = useMemo(() => [
     { label: "Toplam", value: counts.all, color: "text-gray-600", bg: "bg-gray-50", ring: "ring-gray-100", icon: Building2 },
-    { label: "Onaylı", value: counts.approved, color: "text-emerald-600", bg: "bg-emerald-50", ring: "ring-emerald-100", icon: CheckCircle },
-    { label: "Beklemede", value: counts.pending, color: "text-amber-600", bg: "bg-amber-50", ring: "ring-amber-100", icon: Clock },
-    { label: "Reddedildi", value: counts.rejected, color: "text-red-600", bg: "bg-red-50", ring: "ring-red-100", icon: XCircle },
+    { label: "Aktif", value: counts.active, color: "text-emerald-600", bg: "bg-emerald-50", ring: "ring-emerald-100", icon: CheckCircle },
+    { label: "Pasif", value: counts.inactive, color: "text-amber-600", bg: "bg-amber-50", ring: "ring-amber-100", icon: Clock },
+    { label: "Askıya Alındı", value: counts.suspended, color: "text-red-600", bg: "bg-red-50", ring: "ring-red-100", icon: XCircle },
   ], [counts]);
 
   return (
@@ -119,7 +118,7 @@ export default function Businesses() {
 
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         {stats.map((s) => (
-          <button key={s.label} onClick={() => { setStatusFilter(s.label === "Toplam" ? "all" : s.label === "Onaylı" ? "approved" : s.label === "Beklemede" ? "pending" : "rejected"); setPage(1); }}
+          <button key={s.label} onClick={() => { setStatusFilter(s.label === "Toplam" ? "all" : s.label === "Aktif" ? "active" : s.label === "Pasif" ? "inactive" : "suspended"); setPage(1); }}
             className={`${s.bg} rounded-2xl p-3.5 flex items-center gap-3 ring-1 ${s.ring} hover:ring-2 transition-all text-left`}>
             <div className="w-9 h-9 rounded-xl bg-white flex items-center justify-center shadow-sm flex-shrink-0"><s.icon className={`h-4 w-4 ${s.color}`} /></div>
             <div><p className={`text-xl font-bold ${s.color}`}>{s.value}</p><p className="text-[11px] text-gray-500">{s.label}</p></div>
@@ -127,12 +126,12 @@ export default function Businesses() {
         ))}
       </div>
 
-      {counts.pending > 0 && (
+      {counts.inactive > 0 && (
         <div className="bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200/60 rounded-2xl p-4 flex items-center gap-3">
           <div className="w-10 h-10 rounded-xl bg-amber-100 flex items-center justify-center flex-shrink-0"><AlertCircle className="h-5 w-5 text-amber-600" /></div>
           <div>
-            <p className="font-semibold text-amber-900 text-sm">{counts.pending} işletme onay bekliyor</p>
-            <p className="text-xs text-amber-600 mt-0.5">Aşağıdaki tablodan onaylayabilir veya reddedebilirsiniz</p>
+            <p className="font-semibold text-amber-900 text-sm">{counts.inactive} pasif işletme mevcut</p>
+            <p className="text-xs text-amber-600 mt-0.5">Aşağıdaki tablodan aktifleştirebilir veya askıya alabilirsiniz</p>
           </div>
         </div>
       )}
@@ -143,10 +142,10 @@ export default function Businesses() {
           <Input placeholder="İşletme adı, kişi veya adres ara..." value={searchTerm} onChange={(e) => { setSearchTerm(e.target.value); setPage(1); }} className="pl-10 h-10 text-sm border-gray-200 rounded-xl" />
         </div>
         <div className="flex items-center bg-gray-100 rounded-xl p-1">
-          {(["all", "pending", "approved", "rejected"] as StatusFilter[]).map((s) => (
+          {(["all", "active", "inactive", "suspended"] as StatusFilter[]).map((s) => (
             <button key={s} onClick={() => { setStatusFilter(s); setPage(1); }}
-              className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${statusFilter === s ? "bg-white shadow-sm text-gray-900" : "text-gray-500 hover:text-gray-700"}`}>
-              {s === "all" ? "Tümü" : s === "pending" ? "Beklemede" : s === "approved" ? "Onaylı" : "Reddedildi"}
+              className={`px-3 py-1.5 rounded-xl text-xs font-medium transition-all ${statusFilter === s ? "bg-white shadow-sm text-gray-900" : "text-gray-500 hover:text-gray-700"}`}>
+              {s === "all" ? "Tümü" : s === "active" ? "Aktif" : s === "inactive" ? "Pasif" : "Askıya Alındı"}
             </button>
           ))}
         </div>
@@ -157,8 +156,8 @@ export default function Businesses() {
           <div className="space-y-0">{[...Array(5)].map((_, i) => (
             <div key={i} className="flex items-center gap-4 px-5 py-4 border-b border-gray-50">
               <div className="w-9 h-9 rounded-xl bg-gray-100 animate-pulse" />
-              <div className="flex-1 h-4 bg-gray-100 rounded-lg animate-pulse" />
-              <div className="w-20 h-6 bg-gray-100 rounded-lg animate-pulse" />
+              <div className="flex-1 h-4 bg-gray-100 rounded-xl animate-pulse" />
+              <div className="w-20 h-6 bg-gray-100 rounded-xl animate-pulse" />
             </div>
           ))}</div>
         ) : !filtered.length ? (
@@ -202,37 +201,37 @@ export default function Businesses() {
                           {b.rating ? (b.rating / 10).toFixed(1) : "5.0"}
                         </span>
                       </td>
-                      <td className="px-5 py-3.5"><StatusBadge status={b.status || "pending"} /></td>
+                      <td className="px-5 py-3.5"><StatusBadge status={b.status || "inactive"} /></td>
                       <td className="px-5 py-3.5 text-right">
                         <div className="flex items-center justify-end gap-1">
-                          {b.status === "pending" && (
+                          {b.status === "inactive" && (
                             <>
                               <button onClick={() => handleApprove(b.id, b.businessName)} disabled={approveMutation.isPending}
-                                className="h-7 px-2.5 text-[11px] font-semibold text-emerald-700 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 rounded-lg flex items-center gap-1 transition-colors">
-                                <CheckCircle className="h-3 w-3" />Onayla
+                                className="h-7 px-2.5 text-[11px] font-semibold text-emerald-700 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 rounded-xl flex items-center gap-1 transition-colors">
+                                <CheckCircle className="h-3 w-3" />Aktifleştir
                               </button>
                               <button onClick={() => { setRejectingId(b.id); setRejectReason(""); }}
-                                className="h-7 px-2.5 text-[11px] font-semibold text-red-700 bg-red-50 hover:bg-red-100 border border-red-200 rounded-lg flex items-center gap-1 transition-colors">
-                                <XCircle className="h-3 w-3" />Reddet
+                                className="h-7 px-2.5 text-[11px] font-semibold text-red-700 bg-red-50 hover:bg-red-100 border border-red-200 rounded-xl flex items-center gap-1 transition-colors">
+                                <Ban className="h-3 w-3" />Askıya Al
                               </button>
                             </>
                           )}
-                          {b.status === "approved" && (
+                          {b.status === "active" && (
                             <button onClick={() => { setRejectingId(b.id); setRejectReason(""); }}
-                              className="h-7 px-2.5 text-[11px] font-semibold text-amber-700 bg-amber-50 hover:bg-amber-100 border border-amber-200 rounded-lg flex items-center gap-1 transition-colors opacity-0 group-hover:opacity-100">
+                              className="h-7 px-2.5 text-[11px] font-semibold text-amber-700 bg-amber-50 hover:bg-amber-100 border border-amber-200 rounded-xl flex items-center gap-1 transition-colors opacity-0 group-hover:opacity-100">
                               <Ban className="h-3 w-3" />Askıya Al
                             </button>
                           )}
-                          {b.status === "rejected" && (
+                          {b.status === "suspended" && (
                             <button onClick={() => handleApprove(b.id, b.businessName)}
-                              className="h-7 px-2.5 text-[11px] font-semibold text-emerald-700 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 rounded-lg flex items-center gap-1 transition-colors opacity-0 group-hover:opacity-100">
-                              <CheckCircle className="h-3 w-3" />Onayla
+                              className="h-7 px-2.5 text-[11px] font-semibold text-emerald-700 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 rounded-xl flex items-center gap-1 transition-colors opacity-0 group-hover:opacity-100">
+                              <CheckCircle className="h-3 w-3" />Aktifleştir
                             </button>
                           )}
-                          <button onClick={() => setSelectedBusiness(b)} className="w-7 h-7 rounded-lg flex items-center justify-center text-gray-400 hover:text-blue-600 hover:bg-blue-50 transition-colors opacity-0 group-hover:opacity-100">
+                          <button onClick={() => setSelectedBusiness(b)} className="w-7 h-7 rounded-xl flex items-center justify-center text-gray-400 hover:text-blue-600 hover:bg-blue-50 transition-colors opacity-0 group-hover:opacity-100">
                             <Eye className="h-3.5 w-3.5" />
                           </button>
-                          <button onClick={() => setDeletingId(b.id)} className="w-7 h-7 rounded-lg flex items-center justify-center text-gray-400 hover:text-red-600 hover:bg-red-50 transition-colors opacity-0 group-hover:opacity-100">
+                          <button onClick={() => setDeletingId(b.id)} className="w-7 h-7 rounded-xl flex items-center justify-center text-gray-400 hover:text-red-600 hover:bg-red-50 transition-colors opacity-0 group-hover:opacity-100">
                             <Trash2 className="h-3.5 w-3.5" />
                           </button>
                         </div>
@@ -246,12 +245,12 @@ export default function Businesses() {
               <div className="flex items-center justify-between px-5 py-3.5 border-t border-gray-100">
                 <p className="text-xs text-gray-500">{filtered.length} sonuçtan {(page-1)*ITEMS_PER_PAGE+1}-{Math.min(page*ITEMS_PER_PAGE, filtered.length)} gösteriliyor</p>
                 <div className="flex items-center gap-1">
-                  <button onClick={() => setPage(Math.max(1, page-1))} disabled={page === 1} className="w-8 h-8 rounded-lg flex items-center justify-center text-gray-400 hover:text-gray-600 hover:bg-gray-100 disabled:opacity-30"><ChevronLeft className="h-4 w-4" /></button>
+                  <button onClick={() => setPage(Math.max(1, page-1))} disabled={page === 1} className="w-8 h-8 rounded-xl flex items-center justify-center text-gray-400 hover:text-gray-600 hover:bg-gray-100 disabled:opacity-30"><ChevronLeft className="h-4 w-4" /></button>
                   {[...Array(Math.min(totalPages, 5))].map((_, i) => {
                     const p = i + 1;
-                    return <button key={p} onClick={() => setPage(p)} className={`w-8 h-8 rounded-lg text-xs font-medium transition-colors ${p === page ? "bg-orange-500 text-white" : "text-gray-500 hover:bg-gray-100"}`}>{p}</button>;
+                    return <button key={p} onClick={() => setPage(p)} className={`w-8 h-8 rounded-xl text-xs font-medium transition-colors ${p === page ? "bg-orange-500 text-white" : "text-gray-500 hover:bg-gray-100"}`}>{p}</button>;
                   })}
-                  <button onClick={() => setPage(Math.min(totalPages, page+1))} disabled={page === totalPages} className="w-8 h-8 rounded-lg flex items-center justify-center text-gray-400 hover:text-gray-600 hover:bg-gray-100 disabled:opacity-30"><ChevronRight className="h-4 w-4" /></button>
+                  <button onClick={() => setPage(Math.min(totalPages, page+1))} disabled={page === totalPages} className="w-8 h-8 rounded-xl flex items-center justify-center text-gray-400 hover:text-gray-600 hover:bg-gray-100 disabled:opacity-30"><ChevronRight className="h-4 w-4" /></button>
                 </div>
               </div>
             )}
@@ -309,13 +308,13 @@ export default function Businesses() {
                   <p className="text-sm text-gray-700">{selectedBusiness.description}</p>
                 </div>
               )}
-              {selectedBusiness.status === "pending" && (
+              {selectedBusiness.status !== "active" && (
                 <div className="flex gap-2 pt-2">
                   <Button className="flex-1 bg-emerald-600 hover:bg-emerald-700 rounded-xl gap-1.5" onClick={() => { handleApprove(selectedBusiness.id, selectedBusiness.businessName); setSelectedBusiness(null); }}>
-                    <CheckCircle className="h-4 w-4" />Onayla
+                    <CheckCircle className="h-4 w-4" />Aktifleştir
                   </Button>
                   <Button variant="outline" className="flex-1 border-red-200 text-red-600 hover:bg-red-50 rounded-xl gap-1.5" onClick={() => { setRejectingId(selectedBusiness.id); setSelectedBusiness(null); }}>
-                    <XCircle className="h-4 w-4" />Reddet
+                    <Ban className="h-4 w-4" />Askıya Al
                   </Button>
                 </div>
               )}
@@ -328,17 +327,17 @@ export default function Businesses() {
       <Dialog open={!!rejectingId} onOpenChange={(open) => !open && setRejectingId(null)}>
         <DialogContent className="rounded-2xl">
           <DialogHeader>
-            <DialogTitle>İşletmeyi Reddet</DialogTitle>
-            <DialogDescription>Bu işletmenin başvurusunu reddetmek istediğinizden emin misiniz?</DialogDescription>
+            <DialogTitle>İşletmeyi Askıya Al</DialogTitle>
+            <DialogDescription>Bu işletmeyi askıya almak istediğinizden emin misiniz?</DialogDescription>
           </DialogHeader>
           <div className="space-y-3">
-            <Label className="text-sm font-medium">Red Nedeni (isteğe bağlı)</Label>
-            <Textarea placeholder="Red nedenini belirtin..." value={rejectReason} onChange={(e) => setRejectReason(e.target.value)} rows={3} className="rounded-xl" />
+            <Label className="text-sm font-medium">Askıya Alma Nedeni (isteğe bağlı)</Label>
+            <Textarea placeholder="Askıya alma nedenini belirtin..." value={rejectReason} onChange={(e) => setRejectReason(e.target.value)} rows={3} className="rounded-xl" />
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setRejectingId(null)} className="rounded-xl">İptal</Button>
             <Button variant="destructive" onClick={handleReject} disabled={rejectMutation.isPending} className="rounded-xl">
-              {rejectMutation.isPending ? "Reddediliyor..." : "Reddet"}
+              {rejectMutation.isPending ? "Askıya alınıyor..." : "Askıya Al"}
             </Button>
           </DialogFooter>
         </DialogContent>

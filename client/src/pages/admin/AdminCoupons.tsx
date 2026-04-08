@@ -128,10 +128,10 @@ export function AdminCoupons() {
   );
 
   const StatusBadge = ({ coupon }: { coupon: any }) => {
-    if (isExpired(coupon)) return <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] font-semibold border bg-gray-50 text-gray-600 border-gray-200">Süresi Dolmuş</span>;
-    if (isLimitReached(coupon)) return <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] font-semibold border bg-amber-50 text-amber-700 border-amber-200">Limit Doldu</span>;
-    if (coupon.isActive) return <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] font-semibold border bg-emerald-50 text-emerald-700 border-emerald-200">Aktif</span>;
-    return <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] font-semibold border bg-gray-100 text-gray-500 border-gray-200">Pasif</span>;
+    if (isExpired(coupon)) return <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-[11px] font-semibold border bg-gray-50 text-gray-600 border-gray-200">Süresi Dolmuş</span>;
+    if (isLimitReached(coupon)) return <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-[11px] font-semibold border bg-amber-50 text-amber-700 border-amber-200">Limit Doldu</span>;
+    if (coupon.isActive) return <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-[11px] font-semibold border bg-emerald-50 text-emerald-700 border-emerald-200">Aktif</span>;
+    return <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-[11px] font-semibold border bg-gray-100 text-gray-500 border-gray-200">Pasif</span>;
   };
 
   return (
@@ -217,8 +217,8 @@ export function AdminCoupons() {
                             <div>{new Date(c.validUntil).toLocaleDateString("tr-TR")}</div>
                         </div>
                         <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                            <Button variant="outline" size="icon" onClick={() => handleEdit(c)} className="h-8 w-8 rounded-lg"><Edit className="w-4 h-4" /></Button>
-                            <Button variant="outline" size="icon" onClick={() => setDeleteId(c.id)} className="h-8 w-8 rounded-lg border-red-100 text-red-500 hover:bg-red-50 hover:text-red-600"><Trash2 className="w-4 h-4" /></Button>
+                            <Button variant="outline" size="icon" onClick={() => handleEdit(c)} className="h-8 w-8 rounded-xl"><Edit className="w-4 h-4" /></Button>
+                            <Button variant="outline" size="icon" onClick={() => setDeleteId(c.id)} className="h-8 w-8 rounded-xl border-red-100 text-red-500 hover:bg-red-50 hover:text-red-600"><Trash2 className="w-4 h-4" /></Button>
                         </div>
                     </div>
                 </div>

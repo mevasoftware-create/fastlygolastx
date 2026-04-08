@@ -3,21 +3,21 @@ import { Bell, BellOff, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useWebPush } from "@/hooks/useWebPush";
 import { useAuth } from "@/_core/hooks/useAuth";
+import { useLocation } from "wouter";
 
 const DISMISSED_KEY = "push_prompt_dismissed";
 
 export function PushNotificationPrompt() {
   const { user } = useAuth();
+  const [location] = useLocation();
   const { permissionState, isSubscribed, isLoading, subscribe } = useWebPush();
   const [dismissed, setDismissed] = useState(false);
   const [visible, setVisible] = useState(false);
 
+  const isAdmin = location.startsWith('/admin');
+
   useEffect(() => {
-    // Show prompt only if:
-    // 1. User is logged in
-    // 2. Permission not yet granted or denied
-    // 3. Not already subscribed
-    // 4. Not dismissed in this session
+    if (isAdmin) return;
     const wasDismissed = sessionStorage.getItem(DISMISSED_KEY) === "1";
     if (
       user &&
@@ -25,11 +25,13 @@ export function PushNotificationPrompt() {
       !isSubscribed &&
       !wasDismissed
     ) {
-      // Show after 3 seconds
       const timer = setTimeout(() => setVisible(true), 3000);
       return () => clearTimeout(timer);
     }
-  }, [user, permissionState, isSubscribed]);
+  }, [user, permissionState, isSubscribed, isAdmin]);
+
+  // Admin panelinde bildirim izni popup'ını gösterme
+  if (isAdmin) return null;
 
   const handleDismiss = () => {
     sessionStorage.setItem(DISMISSED_KEY, "1");

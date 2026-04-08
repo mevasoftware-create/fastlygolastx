@@ -27,7 +27,7 @@ const ITEMS_PER_PAGE = 15;
 function StatusBadge({ status }: { status: string }) {
   const cfg = STATUS_CONFIG[status] || { label: status, color: "text-gray-700", bg: "bg-gray-50 border-gray-200", dotColor: "bg-gray-400" };
   return (
-    <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] font-semibold border ${cfg.bg} ${cfg.color}`}>
+    <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-[11px] font-semibold border ${cfg.bg} ${cfg.color}`}>
       <div className={`w-1.5 h-1.5 rounded-full ${cfg.dotColor}`} />
       {cfg.label}
     </span>
@@ -155,8 +155,8 @@ export function CouriersPage() {
             {[...Array(5)].map((_, i) => (
               <div key={i} className="flex items-center gap-4 px-5 py-4 border-b border-gray-50">
                 <div className="w-9 h-9 rounded-xl bg-gray-100 animate-pulse" />
-                <div className="flex-1 h-4 bg-gray-100 rounded-lg animate-pulse" />
-                <div className="w-20 h-6 bg-gray-100 rounded-lg animate-pulse" />
+                <div className="flex-1 h-4 bg-gray-100 rounded-xl animate-pulse" />
+                <div className="w-20 h-6 bg-gray-100 rounded-xl animate-pulse" />
               </div>
             ))}
           </div>
@@ -205,7 +205,7 @@ export function CouriersPage() {
                       </td>
                       <td className="px-5 py-3.5"><StatusBadge status={c.status} /></td>
                       <td className="px-5 py-3.5">
-                        <span className={`inline-flex items-center gap-1.5 px-2 py-1 rounded-lg text-[11px] font-medium ${c.isOnline ? "bg-blue-50 text-blue-700" : "bg-gray-50 text-gray-500"}`}>
+                        <span className={`inline-flex items-center gap-1.5 px-2 py-1 rounded-xl text-[11px] font-medium ${c.isOnline ? "bg-blue-50 text-blue-700" : "bg-gray-50 text-gray-500"}`}>
                           {c.isOnline ? <Wifi className="h-3 w-3" /> : <WifiOff className="h-3 w-3" />}
                           {c.isOnline ? "Çevrimiçi" : "Çevrimdışı"}
                         </span>
@@ -218,33 +218,33 @@ export function CouriersPage() {
                           {c.status === "pending" && (
                             <>
                               <button onClick={() => approveMutation.mutate({ courierId: c.id })} disabled={approveMutation.isPending}
-                                className="h-7 px-2.5 text-[11px] font-semibold text-emerald-700 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 rounded-lg flex items-center gap-1 transition-colors">
+                                className="h-7 px-2.5 text-[11px] font-semibold text-emerald-700 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 rounded-xl flex items-center gap-1 transition-colors">
                                 <CheckCircle2 className="h-3 w-3" />Onayla
                               </button>
                               <button onClick={() => rejectMutation.mutate({ courierId: c.id })} disabled={rejectMutation.isPending}
-                                className="h-7 px-2.5 text-[11px] font-semibold text-red-700 bg-red-50 hover:bg-red-100 border border-red-200 rounded-lg flex items-center gap-1 transition-colors">
+                                className="h-7 px-2.5 text-[11px] font-semibold text-red-700 bg-red-50 hover:bg-red-100 border border-red-200 rounded-xl flex items-center gap-1 transition-colors">
                                 <XCircle className="h-3 w-3" />Reddet
                               </button>
                             </>
                           )}
                           {c.status === "active" && (
                             <button onClick={() => rejectMutation.mutate({ courierId: c.id })} disabled={rejectMutation.isPending}
-                              className="h-7 px-2.5 text-[11px] font-semibold text-amber-700 bg-amber-50 hover:bg-amber-100 border border-amber-200 rounded-lg flex items-center gap-1 transition-colors opacity-0 group-hover:opacity-100">
+                              className="h-7 px-2.5 text-[11px] font-semibold text-amber-700 bg-amber-50 hover:bg-amber-100 border border-amber-200 rounded-xl flex items-center gap-1 transition-colors opacity-0 group-hover:opacity-100">
                               <XCircle className="h-3 w-3" />Askıya Al
                             </button>
                           )}
                           {c.status === "inactive" && (
                             <button onClick={() => approveMutation.mutate({ courierId: c.id })} disabled={approveMutation.isPending}
-                              className="h-7 px-2.5 text-[11px] font-semibold text-emerald-700 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 rounded-lg flex items-center gap-1 transition-colors opacity-0 group-hover:opacity-100">
+                              className="h-7 px-2.5 text-[11px] font-semibold text-emerald-700 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 rounded-xl flex items-center gap-1 transition-colors opacity-0 group-hover:opacity-100">
                               <CheckCircle2 className="h-3 w-3" />Onayla
                             </button>
                           )}
                           <button onClick={() => { setEditingCourier(c); setEditApprovalStatus(c.status); }}
-                            className="w-7 h-7 rounded-lg flex items-center justify-center text-gray-400 hover:text-orange-600 hover:bg-orange-50 transition-colors opacity-0 group-hover:opacity-100">
+                            className="w-7 h-7 rounded-xl flex items-center justify-center text-gray-400 hover:text-orange-600 hover:bg-orange-50 transition-colors opacity-0 group-hover:opacity-100">
                             <Edit className="h-3.5 w-3.5" />
                           </button>
                           <button onClick={() => setDeletingId(c.id)}
-                            className="w-7 h-7 rounded-lg flex items-center justify-center text-gray-400 hover:text-red-600 hover:bg-red-50 transition-colors opacity-0 group-hover:opacity-100">
+                            className="w-7 h-7 rounded-xl flex items-center justify-center text-gray-400 hover:text-red-600 hover:bg-red-50 transition-colors opacity-0 group-hover:opacity-100">
                             <Trash2 className="h-3.5 w-3.5" />
                           </button>
                         </div>
@@ -258,12 +258,12 @@ export function CouriersPage() {
               <div className="flex items-center justify-between px-5 py-3.5 border-t border-gray-100">
                 <p className="text-xs text-gray-500">{filtered.length} sonuçtan {(page-1)*ITEMS_PER_PAGE+1}-{Math.min(page*ITEMS_PER_PAGE, filtered.length)} gösteriliyor</p>
                 <div className="flex items-center gap-1">
-                  <button onClick={() => setPage(Math.max(1, page-1))} disabled={page === 1} className="w-8 h-8 rounded-lg flex items-center justify-center text-gray-400 hover:text-gray-600 hover:bg-gray-100 disabled:opacity-30 transition-colors"><ChevronLeft className="h-4 w-4" /></button>
+                  <button onClick={() => setPage(Math.max(1, page-1))} disabled={page === 1} className="w-8 h-8 rounded-xl flex items-center justify-center text-gray-400 hover:text-gray-600 hover:bg-gray-100 disabled:opacity-30 transition-colors"><ChevronLeft className="h-4 w-4" /></button>
                   {[...Array(Math.min(totalPages, 5))].map((_, i) => {
                     const p = i + 1;
-                    return <button key={p} onClick={() => setPage(p)} className={`w-8 h-8 rounded-lg text-xs font-medium transition-colors ${p === page ? "bg-orange-500 text-white" : "text-gray-500 hover:bg-gray-100"}`}>{p}</button>;
+                    return <button key={p} onClick={() => setPage(p)} className={`w-8 h-8 rounded-xl text-xs font-medium transition-colors ${p === page ? "bg-orange-500 text-white" : "text-gray-500 hover:bg-gray-100"}`}>{p}</button>;
                   })}
-                  <button onClick={() => setPage(Math.min(totalPages, page+1))} disabled={page === totalPages} className="w-8 h-8 rounded-lg flex items-center justify-center text-gray-400 hover:text-gray-600 hover:bg-gray-100 disabled:opacity-30 transition-colors"><ChevronRight className="h-4 w-4" /></button>
+                  <button onClick={() => setPage(Math.min(totalPages, page+1))} disabled={page === totalPages} className="w-8 h-8 rounded-xl flex items-center justify-center text-gray-400 hover:text-gray-600 hover:bg-gray-100 disabled:opacity-30 transition-colors"><ChevronRight className="h-4 w-4" /></button>
                 </div>
               </div>
             )}
@@ -290,11 +290,11 @@ export function CouriersPage() {
               </div>
               <div className="flex gap-2">
                 <StatusBadge status={selectedCourier.status} />
-                <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] font-medium ${selectedCourier.isOnline ? "bg-blue-50 text-blue-700" : "bg-gray-50 text-gray-500"}`}>
+                <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-[11px] font-medium ${selectedCourier.isOnline ? "bg-blue-50 text-blue-700" : "bg-gray-50 text-gray-500"}`}>
                   {selectedCourier.isOnline ? <Wifi className="h-3 w-3" /> : <WifiOff className="h-3 w-3" />}
                   {selectedCourier.isOnline ? "Çevrimiçi" : "Çevrimdışı"}
                 </span>
-                {selectedCourier.isDemo && <span className="text-[11px] bg-purple-50 text-purple-600 border border-purple-200 px-2.5 py-1 rounded-lg font-medium">Demo</span>}
+                {selectedCourier.isDemo && <span className="text-[11px] bg-purple-50 text-purple-600 border border-purple-200 px-2.5 py-1 rounded-xl font-medium">Demo</span>}
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div className="bg-gray-50 rounded-xl p-3.5 ring-1 ring-gray-100">

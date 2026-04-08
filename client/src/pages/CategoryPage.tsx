@@ -434,7 +434,19 @@ export default function CategoryPage() {
 
   // Don't render content until data is loaded
   if (isLoading || !category) {
-    return null; // Return null during loading to prevent double SEOHead render
+    return (
+      <>
+        <meta name="prerender-status-code" content="200" />
+        {/* During loading, suppress client-side title to preserve server-side injected title */}
+        <SEOHead 
+          title=""
+          description=""
+          keywords=""
+          canonical={currentUrl}
+          noindex={false}
+        />
+      </>
+    );
   }
 
   // Get static config only for features/icons (not for content)

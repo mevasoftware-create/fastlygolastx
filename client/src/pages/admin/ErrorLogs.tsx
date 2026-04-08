@@ -30,7 +30,7 @@ const SRC_CFG: Record<string, { label: string; color: string; bg: string }> = {
 function SeverityBadge({ severity }: { severity: string }) {
   const cfg = SEV_CFG[severity] || { label: severity, color: "text-gray-700", bg: "bg-gray-50 border-gray-200", dotColor: "bg-gray-400" };
   return (
-    <span className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded-lg text-[10px] font-semibold border ${cfg.bg} ${cfg.color}`}>
+    <span className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded-xl text-[10px] font-semibold border ${cfg.bg} ${cfg.color}`}>
       <div className={`w-1.5 h-1.5 rounded-full ${cfg.dotColor}`} />{cfg.label}
     </span>
   );
@@ -38,7 +38,7 @@ function SeverityBadge({ severity }: { severity: string }) {
 
 function SourceBadge({ source }: { source: string }) {
   const cfg = SRC_CFG[source] || { label: source, color: "text-gray-700", bg: "bg-gray-50 border-gray-200" };
-  return <span className={`inline-flex items-center px-2 py-0.5 rounded-lg text-[10px] font-semibold border ${cfg.bg} ${cfg.color}`}>{cfg.label}</span>;
+  return <span className={`inline-flex items-center px-2 py-0.5 rounded-xl text-[10px] font-semibold border ${cfg.bg} ${cfg.color}`}>{cfg.label}</span>;
 }
 
 function MetadataDisplay({ metadata }: { metadata: unknown }): ReactElement {
@@ -115,19 +115,19 @@ export default function ErrorLogs() {
             <div className="flex items-center bg-gray-100 rounded-xl p-1">
               {[{k: undefined, l: "Tümü"}, {k: "critical", l: "Kritik"}, {k: "high", l: "Yüksek"}, {k: "medium", l: "Orta"}, {k: "low", l: "Düşük"}].map(({k, l}) => (
                 <button key={l} onClick={() => { setFilters({...filters, severity: k}); setPage(1); }}
-                  className={`px-2.5 py-1.5 rounded-lg text-[11px] font-medium transition-all ${filters.severity === k ? "bg-white shadow-sm text-gray-900" : "text-gray-500 hover:text-gray-700"}`}>{l}</button>
+                  className={`px-2.5 py-1.5 rounded-xl text-[11px] font-medium transition-all ${filters.severity === k ? "bg-white shadow-sm text-gray-900" : "text-gray-500 hover:text-gray-700"}`}>{l}</button>
               ))}
             </div>
             <div className="flex items-center bg-gray-100 rounded-xl p-1">
               {[{k: undefined, l: "Tümü"}, {k: "frontend", l: "Frontend"}, {k: "backend", l: "Backend"}, {k: "api", l: "API"}].map(({k, l}) => (
                 <button key={l} onClick={() => { setFilters({...filters, source: k}); setPage(1); }}
-                  className={`px-2.5 py-1.5 rounded-lg text-[11px] font-medium transition-all ${filters.source === k ? "bg-white shadow-sm text-gray-900" : "text-gray-500 hover:text-gray-700"}`}>{l}</button>
+                  className={`px-2.5 py-1.5 rounded-xl text-[11px] font-medium transition-all ${filters.source === k ? "bg-white shadow-sm text-gray-900" : "text-gray-500 hover:text-gray-700"}`}>{l}</button>
               ))}
             </div>
             <div className="flex items-center bg-gray-100 rounded-xl p-1">
               {[{k: undefined, l: "Tümü"}, {k: false, l: "Açık"}, {k: true, l: "Çözüldü"}].map(({k, l}: any) => (
                 <button key={l} onClick={() => { setFilters({...filters, resolved: k}); setPage(1); }}
-                  className={`px-2.5 py-1.5 rounded-lg text-[11px] font-medium transition-all ${filters.resolved === k ? "bg-white shadow-sm text-gray-900" : "text-gray-500 hover:text-gray-700"}`}>{l}</button>
+                  className={`px-2.5 py-1.5 rounded-xl text-[11px] font-medium transition-all ${filters.resolved === k ? "bg-white shadow-sm text-gray-900" : "text-gray-500 hover:text-gray-700"}`}>{l}</button>
               ))}
             </div>
           </div>
@@ -143,8 +143,8 @@ export default function ErrorLogs() {
         {isLoading ? (
           <div className="space-y-0">{[...Array(5)].map((_, i) => (
             <div key={i} className="flex items-center gap-4 px-5 py-4 border-b border-gray-50">
-              <div className="w-8 h-8 rounded-lg bg-gray-100 animate-pulse" />
-              <div className="flex-1 h-4 bg-gray-100 rounded-lg animate-pulse" />
+              <div className="w-8 h-8 rounded-xl bg-gray-100 animate-pulse" />
+              <div className="flex-1 h-4 bg-gray-100 rounded-xl animate-pulse" />
             </div>
           ))}</div>
         ) : !logs.length ? (
@@ -167,7 +167,7 @@ export default function ErrorLogs() {
                     <div className="flex items-center gap-2 mb-1 flex-wrap">
                       <SeverityBadge severity={error.severity} />
                       <SourceBadge source={error.source} />
-                      {error.resolved && <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg text-[10px] font-semibold border bg-emerald-50 border-emerald-200 text-emerald-700"><CheckCircle className="h-2.5 w-2.5" />Çözüldü</span>}
+                      {error.resolved && <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-xl text-[10px] font-semibold border bg-emerald-50 border-emerald-200 text-emerald-700"><CheckCircle className="h-2.5 w-2.5" />Çözüldü</span>}
                       {error.statusCode && <span className="text-[10px] font-mono text-gray-400 bg-gray-100 px-1.5 py-0.5 rounded">{error.statusCode}</span>}
                     </div>
                     <p className="font-medium text-gray-900 text-sm truncate">{error.errorType}</p>
@@ -185,12 +185,12 @@ export default function ErrorLogs() {
               <div className="flex items-center justify-between px-5 py-3.5 border-t border-gray-100">
                 <p className="text-xs text-gray-500">{logs.length} sonuçtan {(page-1)*ITEMS_PER_PAGE+1}-{Math.min(page*ITEMS_PER_PAGE, logs.length)} gösteriliyor</p>
                 <div className="flex items-center gap-1">
-                  <button onClick={() => setPage(Math.max(1, page-1))} disabled={page === 1} className="w-8 h-8 rounded-lg flex items-center justify-center text-gray-400 hover:text-gray-600 hover:bg-gray-100 disabled:opacity-30"><ChevronLeft className="h-4 w-4" /></button>
+                  <button onClick={() => setPage(Math.max(1, page-1))} disabled={page === 1} className="w-8 h-8 rounded-xl flex items-center justify-center text-gray-400 hover:text-gray-600 hover:bg-gray-100 disabled:opacity-30"><ChevronLeft className="h-4 w-4" /></button>
                   {[...Array(Math.min(totalPages, 5))].map((_, i) => {
                     const p = i + 1;
-                    return <button key={p} onClick={() => setPage(p)} className={`w-8 h-8 rounded-lg text-xs font-medium transition-colors ${p === page ? "bg-orange-500 text-white" : "text-gray-500 hover:bg-gray-100"}`}>{p}</button>;
+                    return <button key={p} onClick={() => setPage(p)} className={`w-8 h-8 rounded-xl text-xs font-medium transition-colors ${p === page ? "bg-orange-500 text-white" : "text-gray-500 hover:bg-gray-100"}`}>{p}</button>;
                   })}
-                  <button onClick={() => setPage(Math.min(totalPages, page+1))} disabled={page === totalPages} className="w-8 h-8 rounded-lg flex items-center justify-center text-gray-400 hover:text-gray-600 hover:bg-gray-100 disabled:opacity-30"><ChevronRight className="h-4 w-4" /></button>
+                  <button onClick={() => setPage(Math.min(totalPages, page+1))} disabled={page === totalPages} className="w-8 h-8 rounded-xl flex items-center justify-center text-gray-400 hover:text-gray-600 hover:bg-gray-100 disabled:opacity-30"><ChevronRight className="h-4 w-4" /></button>
                 </div>
               </div>
             )}
@@ -209,7 +209,7 @@ export default function ErrorLogs() {
               <div className="flex items-center gap-2 flex-wrap">
                 <SeverityBadge severity={selectedError.severity} />
                 <SourceBadge source={selectedError.source} />
-                {selectedError.resolved && <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg text-[10px] font-semibold border bg-emerald-50 border-emerald-200 text-emerald-700"><CheckCircle className="h-2.5 w-2.5" />Çözüldü</span>}
+                {selectedError.resolved && <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-xl text-[10px] font-semibold border bg-emerald-50 border-emerald-200 text-emerald-700"><CheckCircle className="h-2.5 w-2.5" />Çözüldü</span>}
               </div>
 
               <div className="bg-gray-50 rounded-xl p-3.5 ring-1 ring-gray-100">

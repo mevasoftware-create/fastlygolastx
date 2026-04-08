@@ -18,6 +18,11 @@
     <!-- Web App Manifest for PWA -->
     <link rel="manifest" href="/manifest.json" />
     
+    <!-- Google Fonts - Poppins -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700;800;900&display=swap" rel="stylesheet" />
+    
     <!-- Theme Color for browser chrome -->
     <meta name="theme-color" content="#FF6B00" />
     
@@ -52,25 +57,36 @@
     <script>
     (function(){
       var B='https://fastlygo.mk',I='https://fastlygo.mk/og-image.e6740bbc.jpg',p=location.pathname.replace(/\/$/,'');
+      // Detect language from URL param or browser
+      var lp=new URLSearchParams(location.search).get('lang');
+      var lang=lp||(navigator.language||'').slice(0,2);
+      if(['tr','mk','sq'].indexOf(lang)===-1)lang='en';
       var S={
-        '/':{t:'FastlyGo - Food Delivery, Courier & Cargo Service in Skopje',d:'Fast courier & delivery service in Skopje. Food, cargo, package delivery in 15 minutes. Real-time tracking, affordable prices. Order now!',k:'food delivery, courier service, Skopje, fast delivery, cargo delivery, Macedonia'},
-        '/how-it-works':{t:'How It Works - FastlyGo Delivery Process | Skopje',d:'Learn how FastlyGo delivery works. Simple 4-step process: Order, courier accepts, real-time tracking, delivery in 15 minutes.',k:'delivery process, how to order, courier tracking, fast delivery'},
-        '/about-us':{t:'About FastlyGo - Courier & Delivery Service in Skopje',d:'FastlyGo is a professional courier and delivery service in Skopje, Macedonia. 53+ active couriers, 15-minute delivery.',k:'about fastlygo, courier company, delivery service, Skopje'},
-        '/services':{t:'Our Services - FastlyGo Delivery Categories | Skopje',d:'Explore FastlyGo delivery services: food, grocery, pharmacy, cargo, document delivery and more in Skopje.',k:'delivery services, food delivery, grocery delivery, pharmacy delivery'},
-        '/areas':{t:'Delivery Areas - FastlyGo Coverage in Skopje',d:'Check FastlyGo delivery coverage areas in Skopje and surrounding regions. Fast delivery to 38+ neighborhoods.',k:'delivery areas, coverage, Skopje neighborhoods, delivery zones'},
-        '/new-order':{t:'Call a Courier in Skopje - Fast Delivery Service | FastlyGo',d:'Place your delivery order with FastlyGo. Enter pickup and delivery addresses, choose package size, get instant delivery.',k:'order delivery, call courier, fast delivery, Skopje'},
-        '/courier/register':{t:'Become a Courier - Earn Money with FastlyGo',d:'Join FastlyGo as a courier driver. Flexible hours, competitive pay, instant payouts. Register now and start earning.',k:'courier registration, driver signup, delivery driver, earn money'},
-        '/business/register':{t:'Business Partnership - FastlyGo Delivery Solutions',d:'Partner with FastlyGo for your business deliveries. Restaurant, market, pharmacy integration.',k:'business registration, partner program, restaurant delivery'},
-        '/privacy-policy':{t:'Privacy Policy | FastlyGo',d:'FastlyGo privacy policy. Learn how we collect, use, and protect your personal data.',k:'privacy policy, data protection'},
-        '/terms-of-service':{t:'Terms of Service | FastlyGo',d:'FastlyGo terms of service. Read our terms and conditions for using the delivery platform.',k:'terms of service, terms and conditions'}
+        '/':{en:{t:'FastlyGo - Food Delivery, Courier & Cargo Service in Skopje',d:'Fast courier & delivery service in Skopje. Food, cargo, package delivery in 15 minutes.',k:'food delivery, courier service, Skopje'},tr:{t:'FastlyGo - \u00dcsk\u00fcp Yemek Teslimat, Kurye ve Kargo Hizmetleri',d:'\u00dcsk\u00fcp\'te h\u0131zl\u0131 kurye ve teslimat hizmeti. Yemek, kargo, paket teslimat\u0131 15 dakikada.',k:'yemek teslimat, kurye, \u00dcsk\u00fcp'},mk:{t:'FastlyGo - \u0414\u043e\u0441\u0442\u0430\u0432\u0430 \u043d\u0430 \u0425\u0440\u0430\u043d\u0430, \u041a\u0443\u0440\u0438\u0440\u0441\u043a\u0438 \u0423\u0441\u043b\u0443\u0433\u0438 \u0432\u043e \u0421\u043a\u043e\u043f\u0458\u0435',d:'\u0411\u0440\u0437\u0430 \u043a\u0443\u0440\u0438\u0440\u0441\u043a\u0430 \u0443\u0441\u043b\u0443\u0433\u0430 \u0432\u043e \u0421\u043a\u043e\u043f\u0458\u0435.',k:'\u0434\u043e\u0441\u0442\u0430\u0432\u0430, \u043a\u0443\u0440\u0438\u0440, \u0421\u043a\u043e\u043f\u0458\u0435'},sq:{t:'FastlyGo - Dor\u00ebzim Ushqimi, Sh\u00ebrbime Korrier\u00eb n\u00eb Shkup',d:'Sh\u00ebrbim i shpejt\u00eb korrieri n\u00eb Shkup.',k:'dor\u00ebzim, korrier, Shkup'}},
+        '/how-it-works':{en:{t:'How It Works - FastlyGo | Skopje',d:'Learn how FastlyGo delivery works.',k:'delivery process'},tr:{t:'Nas\u0131l \u00c7al\u0131\u015f\u0131r - FastlyGo | \u00dcsk\u00fcp',d:'FastlyGo teslimat s\u00fcrecini \u00f6\u011frenin.',k:'teslimat s\u00fcreci'},mk:{t:'\u041a\u0430\u043a\u043e \u0424\u0443\u043d\u043a\u0446\u0438\u043e\u043d\u0438\u0440\u0430 - FastlyGo',d:'\u041d\u0430\u0443\u0447\u0435\u0442\u0435 \u043a\u0430\u043a\u043e \u0444\u0443\u043d\u043a\u0446\u0438\u043e\u043d\u0438\u0440\u0430.',k:'\u043f\u0440\u043e\u0446\u0435\u0441'},sq:{t:'Si Funksionon - FastlyGo',d:'M\u00ebsoni si funksionon.',k:'procesi'}},
+        '/about-us':{en:{t:'About FastlyGo - Courier Service in Skopje',d:'Professional courier service in Skopje.',k:'about fastlygo'},tr:{t:'Hakk\u0131m\u0131zda - FastlyGo \u00dcsk\u00fcp Kurye',d:'\u00dcsk\u00fcp\'te profesyonel kurye hizmeti.',k:'hakk\u0131m\u0131zda'},mk:{t:'\u0417\u0430 \u041d\u0430\u0441 - FastlyGo',d:'\u041f\u0440\u043e\u0444\u0435\u0441\u0438\u043e\u043d\u0430\u043b\u043d\u0430 \u043a\u0443\u0440\u0438\u0440\u0441\u043a\u0430 \u0443\u0441\u043b\u0443\u0433\u0430.',k:'\u0437\u0430 \u043d\u0430\u0441'},sq:{t:'Rreth Nesh - FastlyGo',d:'Sh\u00ebrbim profesional korrieri.',k:'rreth nesh'}},
+        '/services':{en:{t:'Our Services - FastlyGo | Skopje',d:'Explore FastlyGo delivery services.',k:'delivery services'},tr:{t:'Hizmetlerimiz - FastlyGo | \u00dcsk\u00fcp',d:'FastlyGo teslimat hizmetlerini ke\u015ffedin.',k:'hizmetler'},mk:{t:'\u041d\u0430\u0448\u0438 \u0423\u0441\u043b\u0443\u0433\u0438 - FastlyGo',d:'\u0418\u0441\u0442\u0440\u0430\u0436\u0435\u0442\u0435 \u0433\u0438 \u0443\u0441\u043b\u0443\u0433\u0438\u0442\u0435.',k:'\u0443\u0441\u043b\u0443\u0433\u0438'},sq:{t:'Sh\u00ebrbimet Tona - FastlyGo',d:'Eksploroni sh\u00ebrbimet.',k:'sh\u00ebrbimet'}},
+        '/areas':{en:{t:'Delivery Areas - FastlyGo | Skopje',d:'Check delivery coverage areas.',k:'delivery areas'},tr:{t:'Teslimat B\u00f6lgeleri - FastlyGo | \u00dcsk\u00fcp',d:'Teslimat b\u00f6lgelerini kontrol edin.',k:'b\u00f6lgeler'},mk:{t:'\u041e\u0431\u043b\u0430\u0441\u0442\u0438 \u043d\u0430 \u0414\u043e\u0441\u0442\u0430\u0432\u0430 - FastlyGo',d:'\u041f\u0440\u043e\u0432\u0435\u0440\u0435\u0442\u0435 \u0433\u0438 \u043e\u0431\u043b\u0430\u0441\u0442\u0438\u0442\u0435.',k:'\u043e\u0431\u043b\u0430\u0441\u0442\u0438'},sq:{t:'Zonat e Dor\u00ebzimit - FastlyGo',d:'Kontrolloni zonat.',k:'zona'}},
+        '/new-order':{en:{t:'Order Now - FastlyGo | Skopje',d:'Place your delivery order.',k:'order delivery'},tr:{t:'Hemen Sipari\u015f Ver - FastlyGo | \u00dcsk\u00fcp',d:'Teslimat sipari\u015finizi verin.',k:'sipari\u015f'},mk:{t:'\u041d\u0430\u0440\u0430\u0447\u0430\u0458 \u0421\u0435\u0433\u0430 - FastlyGo',d:'\u041d\u0430\u043f\u0440\u0430\u0432\u0435\u0442\u0435 \u043d\u0430\u0440\u0430\u0447\u043a\u0430.',k:'\u043d\u0430\u0440\u0430\u0447\u043a\u0430'},sq:{t:'Porosit Tani - FastlyGo',d:'B\u00ebni porosi.',k:'porosi'}},
+        '/courier/register':{en:{t:'Become a Courier - FastlyGo',d:'Join as a courier driver.',k:'courier registration'},tr:{t:'Kurye Ol - FastlyGo',d:'Kurye olarak kat\u0131l\u0131n.',k:'kurye kay\u0131t'},mk:{t:'\u0421\u0442\u0430\u043d\u0438 \u041a\u0443\u0440\u0438\u0440 - FastlyGo',d:'\u041f\u0440\u0438\u0434\u0440\u0443\u0436\u0435\u0442\u0435 \u0441\u0435.',k:'\u0440\u0435\u0433\u0438\u0441\u0442\u0440\u0430\u0446\u0438\u0458\u0430'},sq:{t:'B\u00ebhu Korrier - FastlyGo',d:'Bashkohuni si korrier.',k:'regjistrim'}},
+        '/business/register':{en:{t:'Business Partnership - FastlyGo',d:'Partner with FastlyGo.',k:'business registration'},tr:{t:'\u0130\u015fletme Kayd\u0131 - FastlyGo',d:'FastlyGo ile ortak olun.',k:'i\u015fletme kay\u0131t'},mk:{t:'\u0420\u0435\u0433\u0438\u0441\u0442\u0440\u0430\u0446\u0438\u0458\u0430 \u043d\u0430 \u0411\u0438\u0437\u043d\u0438\u0441 - FastlyGo',d:'\u041f\u0430\u0440\u0442\u043d\u0435\u0440\u0438\u0440\u0430\u0458\u0442\u0435.',k:'\u0431\u0438\u0437\u043d\u0438\u0441'},sq:{t:'Regjistrimi i Biznesit - FastlyGo',d:'Partnerizohu.',k:'biznes'}},
+        '/privacy-policy':{en:{t:'Privacy Policy | FastlyGo',d:'Privacy policy.',k:'privacy'},tr:{t:'Gizlilik Politikas\u0131 | FastlyGo',d:'Gizlilik politikas\u0131.',k:'gizlilik'},mk:{t:'\u041f\u043e\u043b\u0438\u0442\u0438\u043a\u0430 \u043d\u0430 \u041f\u0440\u0438\u0432\u0430\u0442\u043d\u043e\u0441\u0442 | FastlyGo',d:'\u041f\u043e\u043b\u0438\u0442\u0438\u043a\u0430.',k:'\u043f\u0440\u0438\u0432\u0430\u0442\u043d\u043e\u0441\u0442'},sq:{t:'Politika e Privat\u00ebsis\u00eb | FastlyGo',d:'Politika.',k:'privat\u00ebsi'}},
+        '/terms-of-service':{en:{t:'Terms of Service | FastlyGo',d:'Terms of service.',k:'terms'},tr:{t:'Hizmet Ko\u015fullar\u0131 | FastlyGo',d:'Hizmet ko\u015fullar\u0131.',k:'ko\u015fullar'},mk:{t:'\u0423\u0441\u043b\u043e\u0432\u0438 \u043d\u0430 \u0423\u043f\u043e\u0442\u0440\u0435\u0431\u0430 | FastlyGo',d:'\u0423\u0441\u043b\u043e\u0432\u0438.',k:'\u0443\u0441\u043b\u043e\u0432\u0438'},sq:{t:'Kushtet e Sh\u00ebrbimit | FastlyGo',d:'Kushtet.',k:'kushte'}}
       };
-      // Area pages
+      // Area pages - multi-language
       if(p.indexOf('/areas/')===0){
         var slug=p.split('/areas/')[1];
         var name=slug.replace(/-/g,' ').replace(/\b\w/g,function(c){return c.toUpperCase();});
-        S[p]={t:'Delivery in '+name+' | FastlyGo',d:'Fast delivery service in '+name+'. Food, grocery, pharmacy & package delivery. 15-min courier with GPS tracking.',k:name+' delivery, courier, FastlyGo'};
+        S[p]={en:{t:'Delivery in '+name+' | FastlyGo',d:'Fast delivery in '+name+'.',k:name+' delivery'},tr:{t:name+"'da Ekspres Teslimat | FastlyGo \u00dcsk\u00fcp",d:name+' b\u00f6lgesinde h\u0131zl\u0131 teslimat.',k:name+' teslimat'},mk:{t:'\u0414\u043e\u0441\u0442\u0430\u0432\u0430 \u0432\u043e '+name+' | FastlyGo',d:'\u0411\u0440\u0437\u0430 \u0434\u043e\u0441\u0442\u0430\u0432\u0430 \u0432\u043e '+name+'.',k:name+' \u0434\u043e\u0441\u0442\u0430\u0432\u0430'},sq:{t:'Dor\u00ebzim n\u00eb '+name+' | FastlyGo',d:'Dor\u00ebzim i shpejt\u00eb n\u00eb '+name+'.',k:name+' dor\u00ebzim'}};
       }
-      var d=S[p]||S['/'];
+      // Category pages - multi-language
+      if(p.indexOf('/categories/')===0){
+        var cslug=p.split('/categories/')[1];
+        var cname=cslug.replace(/-/g,' ').replace(/\b\w/g,function(c){return c.toUpperCase();});
+        S[p]={en:{t:cname+' - FastlyGo | Skopje',d:cname+' service in Skopje.',k:cname},tr:{t:cname+' - FastlyGo | \u00dcsk\u00fcp',d:cname+' hizmeti.',k:cname},mk:{t:cname+' - FastlyGo | \u0421\u043a\u043e\u043f\u0458\u0435',d:cname+' \u0443\u0441\u043b\u0443\u0433\u0430.',k:cname},sq:{t:cname+' - FastlyGo | Shkup',d:cname+' sh\u00ebrbim.',k:cname}};
+      }
+      var pageData=S[p]||S['/'];
+      var d=pageData[lang]||pageData.en||pageData;
       // Set title
       document.title=d.t;
       // Helper: set or create meta

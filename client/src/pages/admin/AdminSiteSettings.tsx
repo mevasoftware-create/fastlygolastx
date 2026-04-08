@@ -134,12 +134,12 @@ export function AdminSiteSettings() {
         <div className="space-y-4">
           <div className="bg-gray-100 rounded-xl p-1 flex items-center gap-1 w-full overflow-x-auto">
             {Object.entries(SETTING_GROUPS).map(([key, group]) => (
-              <button key={key} onClick={() => setActiveTab(key)} className={`px-3 py-1.5 rounded-lg text-[11px] font-semibold flex items-center gap-1.5 whitespace-nowrap transition-colors ${activeTab === key ? 'bg-white text-gray-800 shadow-sm' : 'text-gray-500 hover:bg-white/50'}`}>
+              <button key={key} onClick={() => setActiveTab(key)} className={`px-3 py-1.5 rounded-xl text-[11px] font-semibold flex items-center gap-1.5 whitespace-nowrap transition-colors ${activeTab === key ? 'bg-white text-gray-800 shadow-sm' : 'text-gray-500 hover:bg-white/50'}`}>
                 <group.icon className="w-3.5 h-3.5" /> {group.label}
               </button>
             ))}
             {customSettings.length > 0 && (
-              <button onClick={() => setActiveTab('custom')} className={`px-3 py-1.5 rounded-lg text-[11px] font-semibold flex items-center gap-1.5 whitespace-nowrap transition-colors ${activeTab === 'custom' ? 'bg-white text-gray-800 shadow-sm' : 'text-gray-500 hover:bg-white/50'}`}>
+              <button onClick={() => setActiveTab('custom')} className={`px-3 py-1.5 rounded-xl text-[11px] font-semibold flex items-center gap-1.5 whitespace-nowrap transition-colors ${activeTab === 'custom' ? 'bg-white text-gray-800 shadow-sm' : 'text-gray-500 hover:bg-white/50'}`}>
                 <Globe className="w-3.5 h-3.5" /> Özel ({customSettings.length})
               </button>
             )}

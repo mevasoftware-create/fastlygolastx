@@ -90,8 +90,8 @@ export function AdminUsersPage() {
             {[...Array(5)].map((_, i) => (
               <div key={i} className="flex items-center gap-4 px-5 py-4 border-b border-gray-50">
                 <div className="w-9 h-9 rounded-full bg-gray-100 animate-pulse" />
-                <div className="flex-1 h-4 bg-gray-100 rounded-lg animate-pulse" />
-                <div className="w-24 h-4 bg-gray-100 rounded-lg animate-pulse" />
+                <div className="flex-1 h-4 bg-gray-100 rounded-xl animate-pulse" />
+                <div className="w-24 h-4 bg-gray-100 rounded-xl animate-pulse" />
               </div>
             ))}
           </div>
@@ -128,7 +128,7 @@ export function AdminUsersPage() {
                           <span className="flex items-center gap-1.5 text-xs text-gray-500"><Mail className="h-3 w-3" />{u.email}</span>
                         </td>
                         <td className="px-5 py-3.5">
-                          <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] font-semibold border ${role.bg} ${role.color}`}>
+                          <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-[11px] font-semibold border ${role.bg} ${role.color}`}>
                             {u.role === "admin" && <ShieldCheck className="h-3 w-3" />}
                             {role.label}
                           </span>
@@ -137,7 +137,7 @@ export function AdminUsersPage() {
                           <span className="text-xs text-gray-500">{new Date(u.createdAt).toLocaleDateString("tr-TR", { day: "numeric", month: "short", year: "numeric" })}</span>
                         </td>
                         <td className="px-5 py-3.5 text-right">
-                          <button onClick={() => setDeletingId(u.id)} className="w-7 h-7 rounded-lg flex items-center justify-center text-gray-400 hover:text-red-600 hover:bg-red-50 transition-colors opacity-0 group-hover:opacity-100">
+                          <button onClick={() => setDeletingId(u.id)} className="w-7 h-7 rounded-xl flex items-center justify-center text-gray-400 hover:text-red-600 hover:bg-red-50 transition-colors opacity-0 group-hover:opacity-100">
                             <Trash2 className="h-3.5 w-3.5" />
                           </button>
                         </td>
@@ -151,12 +151,12 @@ export function AdminUsersPage() {
               <div className="flex items-center justify-between px-5 py-3.5 border-t border-gray-100">
                 <p className="text-xs text-gray-500">{filtered.length} sonuçtan {(page-1)*ITEMS_PER_PAGE+1}-{Math.min(page*ITEMS_PER_PAGE, filtered.length)} gösteriliyor</p>
                 <div className="flex items-center gap-1">
-                  <button onClick={() => setPage(Math.max(1, page-1))} disabled={page === 1} className="w-8 h-8 rounded-lg flex items-center justify-center text-gray-400 hover:text-gray-600 hover:bg-gray-100 disabled:opacity-30 transition-colors"><ChevronLeft className="h-4 w-4" /></button>
+                  <button onClick={() => setPage(Math.max(1, page-1))} disabled={page === 1} className="w-8 h-8 rounded-xl flex items-center justify-center text-gray-400 hover:text-gray-600 hover:bg-gray-100 disabled:opacity-30 transition-colors"><ChevronLeft className="h-4 w-4" /></button>
                   {[...Array(Math.min(totalPages, 5))].map((_, i) => {
                     const p = i + 1;
-                    return <button key={p} onClick={() => setPage(p)} className={`w-8 h-8 rounded-lg text-xs font-medium transition-colors ${p === page ? "bg-orange-500 text-white" : "text-gray-500 hover:bg-gray-100"}`}>{p}</button>;
+                    return <button key={p} onClick={() => setPage(p)} className={`w-8 h-8 rounded-xl text-xs font-medium transition-colors ${p === page ? "bg-orange-500 text-white" : "text-gray-500 hover:bg-gray-100"}`}>{p}</button>;
                   })}
-                  <button onClick={() => setPage(Math.min(totalPages, page+1))} disabled={page === totalPages} className="w-8 h-8 rounded-lg flex items-center justify-center text-gray-400 hover:text-gray-600 hover:bg-gray-100 disabled:opacity-30 transition-colors"><ChevronRight className="h-4 w-4" /></button>
+                  <button onClick={() => setPage(Math.min(totalPages, page+1))} disabled={page === totalPages} className="w-8 h-8 rounded-xl flex items-center justify-center text-gray-400 hover:text-gray-600 hover:bg-gray-100 disabled:opacity-30 transition-colors"><ChevronRight className="h-4 w-4" /></button>
                 </div>
               </div>
             )}
