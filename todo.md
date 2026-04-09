@@ -370,3 +370,7 @@
 - [x] /categories/* redirect kaldırıldı - kategoriler artık gerçek sayfa olarak sunuluyor
 - [x] TypeScript hata: 0
 - [x] Tüm 63 test geçiyor
+
+## Sitemap Kategori URL Düzeltmesi (09.04.2026)
+- [x] Sitemap'teki /services#slug anchor link'leri /categories/slug gerçek sayfa URL'lerine dönüştür
+- [x] Hreflang alternate URL'lerini de /categories/slug formatına güncelle
