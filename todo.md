@@ -374,3 +374,19 @@
 ## Sitemap Kategori URL Düzeltmesi (09.04.2026)
 - [x] Sitemap'teki /services#slug anchor link'leri /categories/slug gerçek sayfa URL'lerine dönüştür
 - [x] Hreflang alternate URL'lerini de /categories/slug formatına güncelle
+
+## 404 Yönlendirme ve INP Düzeltmesi (09.04.2026)
+- [ ] AreaPage - geçersiz slug için 404'e yönlendir (boş beyaz sayfa yerine)
+- [ ] CategoryPage - geçersiz slug için 404'e yönlendir (boş beyaz sayfa yerine)
+- [x] INP performans optimizasyonu (215ms → 200ms altına düşür)
+
+## INP Performans Optimizasyonu (09.04.2026)
+- [x] Header scroll event listener'a passive flag ve rAF throttle eklendi
+- [x] Header bileşenini useCallback/useMemo ile optimize et (handleLogout, categoryItems, languages)
+- [x] transition-all → spesifik transition property'lere dönüştürüldü (Home.tsx 15 yer, ScrollToTop)
+- [x] AdminDashboard Socket.IO dependency [user] → [userId, userRole] düzeltildi + reconnection limitleri
+- [x] SocketContext.tsx reconnection limitleri eklendi (5 deneme, 2s delay, 10s max)
+- [x] CategoryPage, AreaPage, Areas, Login, Register lazy load'a taşındı (index.js 661KB→512KB)
+- [x] Header'da useMemo (categoryItems, languages, currentLanguage) ve useCallback (handleLogout, closeMobileMenu)
+- [x] CSS will-change + content-visibility + contain hint'leri eklendi (header, dropdown, footer, sections)
+- [x] startTransition ile scroll-to-top route change sarıldı

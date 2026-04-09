@@ -1,6 +1,6 @@
 import { Route, Switch, useLocation } from "wouter";
 import { useAuth } from "@/_core/hooks/useAuth";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import AdminDashboardLayout from "@/components/AdminDashboardLayout";
 import AdminHome from "./AdminHome";
 import { AdminUsersPage as AdminUsers } from "./AdminUsers";
@@ -53,12 +53,22 @@ export default function AdminDashboard() {
   }, [user, loading, setLocation]);
 
   // Socket.IO connection for real-time updates
+  // Use user?.id as dependency to prevent reconnect loop when user object reference changes
+  const userIdRef = useRef<number | null>(null);
+  const userId = user?.id ?? null;
+  const userRole = user?.role ?? null;
+
   useEffect(() => {
-    if (!user || user.role !== "admin") return;
+    if (!userId || userRole !== "admin") return;
+    // Prevent duplicate connections for same user
+    if (userIdRef.current === userId && socket) return;
+    userIdRef.current = userId;
 
     const newSocket = io({
       path: "/socket.io",
       withCredentials: true,
+      reconnectionAttempts: 5,
+      reconnectionDelay: 2000,
     });
 
     newSocket.on("connect", () => {
@@ -66,9 +76,11 @@ export default function AdminDashboard() {
       toast.success("Canlı takip aktif");
     });
 
-    newSocket.on("disconnect", () => {
-      console.log("[Admin] Disconnected from Socket.IO");
-      toast.info("Canlı takip bağlantısı kesildi");
+    newSocket.on("disconnect", (reason) => {
+      console.log("[Admin] Disconnected from Socket.IO:", reason);
+      if (reason !== "io client disconnect") {
+        toast.info("Canlı takip bağlantısı kesildi");
+      }
     });
 
     // Listen for order status updates
@@ -88,9 +100,9 @@ export default function AdminDashboard() {
 
     return () => {
       newSocket.close();
+      userIdRef.current = null;
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user]);
+  }, [userId, userRole]);
 
   if (loading) {
     return (

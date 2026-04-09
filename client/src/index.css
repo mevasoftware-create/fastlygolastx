@@ -605,3 +605,41 @@
   animation: gradient 3s ease infinite;
   background-size: 200% 200%;
 }
+
+/* INP Performance Optimizations */
+/* Reduce layout thrashing for fixed header */
+header[class*="fixed"] {
+  will-change: background-color, box-shadow;
+  contain: layout style;
+}
+
+/* Optimize dropdown menus - prevent layout recalculation */
+[data-radix-popper-content-wrapper] {
+  will-change: transform, opacity;
+}
+
+/* Content sections below the fold - skip rendering until visible */
+main > section:not(:first-child) {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 500px;
+}
+
+/* Optimize footer rendering */
+footer {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 400px;
+}
+
+/* Reduce paint area for hover effects */
+.hover\:scale-105:hover,
+.hover\:scale-110:hover,
+.hover\:-translate-y-1:hover,
+.hover\:-translate-y-0\.5:hover {
+  will-change: transform;
+}
+
+/* Optimize scroll-to-top button */
+.fixed.bottom-8 {
+  will-change: opacity;
+  contain: layout style paint;
+}

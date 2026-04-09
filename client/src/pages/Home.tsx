@@ -100,13 +100,13 @@ export default function Home() {
               {/* CTA Buttons */}
               <div className="flex flex-wrap gap-4">
                 <Link href="/new-order">
-                  <Button size="lg" className="btn-primary text-white font-bold px-12 h-14 text-lg shadow-2xl hover:shadow-orange-500/50 hover:scale-105 transition-all duration-300 rounded-2xl group">
+                  <Button size="lg" className="btn-primary text-white font-bold px-12 h-14 text-lg shadow-2xl hover:shadow-orange-500/50 hover:scale-105 transition-[transform,box-shadow] duration-300 rounded-2xl group">
                     <Zap className="mr-2 h-6 w-6 group-hover:rotate-12 transition-transform" />
                     {t('tryNow')}
                   </Button>
                 </Link>
                 <a href="#download-app">
-                  <Button size="lg" variant="outline" className="font-bold px-12 h-14 text-lg border-2 border-orange-500 text-orange-600 hover:bg-orange-50 hover:scale-105 rounded-2xl transition-all duration-300 group">
+                  <Button size="lg" variant="outline" className="font-bold px-12 h-14 text-lg border-2 border-orange-500 text-orange-600 hover:bg-orange-50 hover:scale-105 rounded-2xl transition-[transform,box-shadow] duration-300 group">
                     <Smartphone className="mr-2 h-6 w-6 group-hover:scale-110 transition-transform" />
                     {t('downloadAppButton')}
                   </Button>
@@ -115,19 +115,19 @@ export default function Home() {
               
               {/* Stats Cards */}
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4 pt-4">
-                <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-4 border-2 border-orange-100 hover:border-orange-300 transition-all hover:scale-105">
+                <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-4 border-2 border-orange-100 hover:border-orange-300 transition-[transform,border-color] hover:scale-105">
                   <div className="text-3xl font-bold text-orange-600">{stats?.activeCouriers || 50}+</div>
                   <div className="text-sm text-gray-600 font-medium mt-1">{t('activeCouriers')}</div>
                 </div>
-                <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-4 border-2 border-amber-100 hover:border-amber-300 transition-all hover:scale-105">
+                <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-4 border-2 border-amber-100 hover:border-amber-300 transition-[transform,border-color] hover:scale-105">
                   <div className="text-3xl font-bold text-amber-600">{stats?.completedOrders || '20K'}+</div>
                   <div className="text-sm text-gray-600 font-medium mt-1">{t('deliveriesCompleted')}</div>
                 </div>
-                <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-4 border-2 border-green-100 hover:border-green-300 transition-all hover:scale-105">
+                <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-4 border-2 border-green-100 hover:border-green-300 transition-[transform,border-color] hover:scale-105">
                   <div className="text-3xl font-bold text-green-600">15</div>
                   <div className="text-sm text-gray-600 font-medium mt-1">Minute</div>
                 </div>
-                <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-4 border-2 border-blue-100 hover:border-blue-300 transition-all hover:scale-105">
+                <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-4 border-2 border-blue-100 hover:border-blue-300 transition-[transform,border-color] hover:scale-105">
                   <div className="text-3xl font-bold text-blue-600">4.9</div>
                   <div className="text-sm text-gray-600 font-medium mt-1">{t('averageRating')}</div>
                 </div>
@@ -214,7 +214,7 @@ export default function Home() {
                 ].map((benefit, index) => {
                   const IconComponent = benefit.icon;
                   return (
-                    <div key={index} className="flex items-center gap-3 p-3 sm:p-4 rounded-xl bg-white/90 backdrop-blur-sm border border-orange-100/50 shadow-sm hover:shadow-lg transition-all duration-300 hover:-translate-y-1 group">
+                    <div key={index} className="flex items-center gap-3 p-3 sm:p-4 rounded-xl bg-white/90 backdrop-blur-sm border border-orange-100/50 shadow-sm hover:shadow-lg transition-[transform,box-shadow] duration-300 hover:-translate-y-1 group">
                       <div className={`w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-gradient-to-br ${benefit.color} flex items-center justify-center shadow-md group-hover:scale-110 transition-transform duration-300 flex-shrink-0`}>
                         <IconComponent className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
                       </div>
@@ -226,7 +226,7 @@ export default function Home() {
 
               <div className="pt-4">
                 <Link href="/courier/register">
-                  <Button size="lg" className="h-14 px-8 text-base font-semibold rounded-2xl bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white shadow-xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-0.5">
+                  <Button size="lg" className="h-14 px-8 text-base font-semibold rounded-2xl bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white shadow-xl hover:shadow-2xl transition-[transform,box-shadow] duration-300 hover:-translate-y-0.5">
                     {t('courierApplication')}
                     <ArrowRight className="ml-2 h-5 w-5" />
                   </Button>
@@ -270,7 +270,7 @@ export default function Home() {
                 ].map((benefit, index) => {
                   const IconComponent = benefit.icon;
                   return (
-                    <div key={index} className="flex items-center gap-3 p-3 sm:p-4 rounded-xl bg-white/90 backdrop-blur-sm border border-blue-100/50 shadow-sm hover:shadow-lg transition-all duration-300 hover:-translate-y-1 group">
+                    <div key={index} className="flex items-center gap-3 p-3 sm:p-4 rounded-xl bg-white/90 backdrop-blur-sm border border-blue-100/50 shadow-sm hover:shadow-lg transition-[transform,box-shadow] duration-300 hover:-translate-y-1 group">
                       <div className={`w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-gradient-to-br ${benefit.color} flex items-center justify-center shadow-md group-hover:scale-110 transition-transform duration-300 flex-shrink-0`}>
                         <IconComponent className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
                       </div>
@@ -282,7 +282,7 @@ export default function Home() {
 
               <div className="pt-4">
                 <Link href="/business/register">
-                  <Button size="lg" className="h-14 px-8 text-base font-semibold rounded-2xl bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white shadow-xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-0.5">
+                  <Button size="lg" className="h-14 px-8 text-base font-semibold rounded-2xl bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white shadow-xl hover:shadow-2xl transition-[transform,box-shadow] duration-300 hover:-translate-y-0.5">
                     {t('businessRegistration')}
                     <ArrowRight className="ml-2 h-5 w-5" />
                   </Button>
@@ -376,7 +376,7 @@ export default function Home() {
                 ].map((testimonial, index) => (
                   <div
                     key={index}
-                    className="flex-shrink-0 w-[340px] bg-white rounded-3xl p-7 border border-orange-100 hover:border-orange-200 transition-all duration-500 group"
+                    className="flex-shrink-0 w-[340px] bg-white rounded-3xl p-7 border border-orange-100 hover:border-orange-200 transition-[transform,border-color,box-shadow] duration-500 group"
                     style={{ boxShadow: '0 2px 20px rgba(255,107,53,0.07), 0 1px 4px rgba(0,0,0,0.04)' }}
                   >
                     {/* Stars + quote icon */}
@@ -397,7 +397,7 @@ export default function Home() {
                       <img
                         src={testimonial.img}
                         alt={testimonial.name}
-                        className="w-11 h-11 rounded-full object-cover ring-2 ring-orange-100 group-hover:ring-orange-300 transition-all"
+                        className="w-11 h-11 rounded-full object-cover ring-2 ring-orange-100 group-hover:ring-orange-300 transition-[box-shadow]"
                         loading="lazy"
                       />
                       <div>
@@ -476,7 +476,7 @@ export default function Home() {
                   href="https://fastlygo.mk" 
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="group flex items-center gap-3 px-6 py-3.5 bg-gray-900 hover:bg-gray-800 text-white rounded-2xl transition-all shadow-lg hover:shadow-xl hover:scale-105 duration-300"
+                  className="group flex items-center gap-3 px-6 py-3.5 bg-gray-900 hover:bg-gray-800 text-white rounded-2xl transition-[transform,box-shadow] shadow-lg hover:shadow-xl hover:scale-105 duration-300"
                 >
                   <Apple className="h-7 w-7" />
                   <div className="text-left">
@@ -488,7 +488,7 @@ export default function Home() {
                   href="https://fastlygo.mk" 
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="group flex items-center gap-3 px-6 py-3.5 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white rounded-2xl transition-all shadow-lg hover:shadow-xl hover:scale-105 duration-300"
+                  className="group flex items-center gap-3 px-6 py-3.5 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white rounded-2xl transition-[transform,box-shadow] shadow-lg hover:shadow-xl hover:scale-105 duration-300"
                 >
                   <Smartphone className="h-7 w-7" />
                   <div className="text-left">
@@ -529,7 +529,7 @@ export default function Home() {
             {t('orderNowDesc')}
           </p>
           <Link href="/new-order">
-            <Button size="lg" className="bg-white text-orange-600 hover:bg-orange-50 font-semibold px-8 h-12 text-base shadow-xl hover:shadow-2xl transition-all rounded-xl">
+            <Button size="lg" className="bg-white text-orange-600 hover:bg-orange-50 font-semibold px-8 h-12 text-base shadow-xl hover:shadow-2xl transition-[transform,box-shadow] rounded-xl">
               <Package className="mr-2 h-5 w-5" />
               {t('callCourierNow')}
             </Button>

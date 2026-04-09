@@ -193,12 +193,15 @@ export default function AreaPage() {
   // Call all hooks BEFORE any conditional returns (React Rules of Hooks)
   const seoData = useSeoFromDatabase(area?.seoMeta || '{}');
 
-  // Redirect to 404 if area not found - DISABLED FOR GOOGLE INDEXING TEST
-  // useEffect(() => {
-  //   if (!isLoading && !area) {
-  //     setLocation('/404');
-  //   }
-  // }, [isLoading, area, setLocation]);
+  // Redirect to 404 if area not found
+  useEffect(() => {
+    if (!isLoading && !area && !error) {
+      setLocation('/404');
+    }
+    if (error) {
+      setLocation('/404');
+    }
+  }, [isLoading, area, error, setLocation]);
 
   // Prepare SEO data BEFORE conditional return (for Google bot)
   // Add lang parameter to canonical URL if language is not English
@@ -211,12 +214,10 @@ export default function AreaPage() {
   const finalDescription = seoData.description || content.description || '';
 
   // Don't render content until data is loaded
-  if (isLoading || !area) {
+  if (isLoading) {
     return (
       <>
         <meta name="prerender-status-code" content="200" />
-        {/* During loading, render SEOHead with empty title to suppress client-side title
-            This preserves the server-side injected title until data arrives */}
         <SEOHead 
           title=""
           description=""
@@ -226,6 +227,11 @@ export default function AreaPage() {
         />
       </>
     );
+  }
+
+  // If area not found, show nothing (useEffect will redirect to 404)
+  if (!area) {
+    return null;
   }
 
   // Get static config only for features/icons (not for content)

@@ -11,7 +11,7 @@ import {
 import { getLoginUrl } from "@/const";
 import { trpc } from "@/lib/trpc";
 import { LogOut, User, Package, Bike, Building2, LayoutDashboard, Globe, Menu, X, Bell, History, ChevronDown } from "lucide-react";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback, useRef, useMemo } from "react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useLocation } from "wouter";
 import { t } from "@/lib/i18n";
@@ -22,19 +22,27 @@ export default function Header() {
   const [, setLocation] = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const scrolledRef = useRef(false);
   
   // Fetch categories and areas from database
-  const { data: categories = [] } = trpc.categories.list.useQuery();
-  const { data: areas = [] } = trpc.areas.list.useQuery();
+  const { data: categories = [] } = trpc.categories.list.useQuery(undefined, {
+    staleTime: 1000 * 60 * 30, // 30 min cache - categories rarely change
+    refetchOnWindowFocus: false,
+  });
+  const { data: areas = [] } = trpc.areas.list.useQuery(undefined, {
+    staleTime: 1000 * 60 * 30,
+    refetchOnWindowFocus: false,
+  });
 
-  // Notifications
+  // Notifications - only fetch when authenticated
   const { data: notifUnreadCount = 0 } = trpc.notifications.unreadCount.useQuery(undefined, {
     enabled: isAuthenticated,
     refetchInterval: 30000,
+    staleTime: 1000 * 15,
   });
   const { data: recentNotifications = [] } = trpc.notifications.list.useQuery(
     { limit: 5, offset: 0, unreadOnly: false },
-    { enabled: isAuthenticated }
+    { enabled: isAuthenticated, staleTime: 1000 * 30 }
   );
   const notifUtils = trpc.useUtils();
   const markAllAsReadMutation = trpc.notifications.markAllAsRead.useMutation({
@@ -50,36 +58,54 @@ export default function Header() {
     },
   });
   
-  // Check if user is courier or business
+  // Check if user is courier or business - only when authenticated
   const { data: courierProfile } = trpc.courier.getProfile.useQuery(undefined, {
     enabled: isAuthenticated,
+    staleTime: 1000 * 60 * 10,
+    refetchOnWindowFocus: false,
   });
   const { data: businessProfile } = trpc.restaurant.getProfile.useQuery(undefined, {
     enabled: isAuthenticated,
+    staleTime: 1000 * 60 * 10,
+    refetchOnWindowFocus: false,
   });
   
   const isCourier = !!courierProfile;
   const isBusiness = !!businessProfile;
 
-  // Handle scroll effect
+  // Handle scroll effect with passive listener and throttle via rAF
   useEffect(() => {
+    let ticking = false;
     const handleScroll = () => {
-      setScrolled(window.scrollY > 20);
+      if (!ticking) {
+        ticking = true;
+        requestAnimationFrame(() => {
+          const isScrolled = window.scrollY > 20;
+          if (scrolledRef.current !== isScrolled) {
+            scrolledRef.current = isScrolled;
+            setScrolled(isScrolled);
+          }
+          ticking = false;
+        });
+      }
     };
-    window.addEventListener('scroll', handleScroll);
+    window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  const languages = [
+  const languages = useMemo(() => [
     { code: 'en', name: 'English', flag: '🇬🇧' },
     { code: 'tr', name: 'Türkçe', flag: '🇹🇷' },
     { code: 'mk', name: 'Македонски', flag: '🇲🇰' },
     { code: 'sq', name: 'Albanian', flag: '🇦🇱' },
-  ];
+  ], []);
 
-  const currentLanguage = languages.find(lang => lang.code === language) || languages[0];
+  const currentLanguage = useMemo(
+    () => languages.find(lang => lang.code === language) || languages[0],
+    [language, languages]
+  );
 
-  const handleLogout = async () => {
+  const handleLogout = useCallback(async () => {
     try {
       console.log('Logout started...');
       await logout();
@@ -98,15 +124,41 @@ export default function Header() {
         window.location.href = "/";
       }, 100);
     }
-  };
+  }, [logout]);
+
+  const handleMobileMenuToggle = useCallback(() => {
+    setMobileMenuOpen(prev => !prev);
+  }, []);
+
+  const closeMobileMenu = useCallback(() => {
+    setMobileMenuOpen(false);
+  }, []);
+
+  // Memoize category items to prevent re-parsing on every render
+  const categoryItems = useMemo(() => {
+    return categories.map((category) => {
+      let shortName: Record<string, string> = {};
+      try {
+        if (category.shortName) {
+          shortName = typeof category.shortName === 'string'
+            ? JSON.parse(category.shortName)
+            : (category.shortName as Record<string, string>);
+        }
+      } catch (e) {
+        console.error('Failed to parse shortName for category:', category.slug, e);
+      }
+      const title = shortName[language] || shortName['en'] || category.slug;
+      return { id: category.id, slug: category.slug, title };
+    });
+  }, [categories, language]);
 
   return (
     <>
-    <header className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+    <header className={`fixed top-0 left-0 right-0 z-50 transition-colors transition-shadow duration-300 ${
       scrolled 
         ? 'bg-white/95 backdrop-blur-md shadow-md border-b border-gray-200/50' 
         : 'bg-white/80 backdrop-blur-sm shadow-sm'
-    }`}>
+    }`} style={{ willChange: 'background-color, box-shadow' }}>
       <div className="container">
         <div className="flex items-center justify-between h-16 md:h-18">
           {/* Logo */}
@@ -125,10 +177,10 @@ export default function Header() {
           <nav className="hidden lg:flex items-center gap-1">
             <NavLink href="/about-us">{t('aboutUs')}</NavLink>
             <NavLink href="/how-it-works">{t('howItWorks')}</NavLink>
-            {/* Services Dropdown - Categories ve Services birleştirildi */}
+            {/* Services Dropdown */}
             <DropdownMenu modal={false}>
               <DropdownMenuTrigger asChild>
-                <button className="flex items-center gap-1 px-4 py-2 rounded-xl text-muted-foreground hover:text-foreground hover:bg-accent/50 transition-all font-medium text-sm">
+                <button className="flex items-center gap-1 px-4 py-2 rounded-xl text-muted-foreground hover:text-foreground hover:bg-accent/50 transition-colors font-medium text-sm">
                   {t('services')}
                   <ChevronDown className="w-4 h-4 opacity-50" />
                 </button>
@@ -141,28 +193,15 @@ export default function Header() {
                   <span className="text-sm">{t('services')}</span>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
-                {categories.map((category) => {
-                  let shortName: Record<string, string> = {};
-                  try {
-                    if (category.shortName) {
-                      shortName = typeof category.shortName === 'string'
-                        ? JSON.parse(category.shortName)
-                        : (category.shortName as Record<string, string>);
-                    }
-                  } catch (e) {
-                    console.error('Failed to parse shortName for category:', category.slug, e);
-                  }
-                  const title = shortName[language] || shortName['en'] || category.slug;
-                  return (
-                    <DropdownMenuItem 
-                      key={category.id} 
-                      onClick={() => setLocation(`/categories/${category.slug}`)}
-                      className="cursor-pointer hover:bg-accent/50 rounded-lg transition-colors"
-                    >
-                      <span className="text-sm">{title}</span>
-                    </DropdownMenuItem>
-                  );
-                })}
+                {categoryItems.map((item) => (
+                  <DropdownMenuItem 
+                    key={item.id} 
+                    onClick={() => setLocation(`/categories/${item.slug}`)}
+                    className="cursor-pointer hover:bg-accent/50 rounded-lg transition-colors"
+                  >
+                    <span className="text-sm">{item.title}</span>
+                  </DropdownMenuItem>
+                ))}
                </DropdownMenuContent>
             </DropdownMenu>
             
@@ -291,7 +330,7 @@ export default function Header() {
             {/* Mobile Menu Button */}
             <button
               className="p-2.5 rounded-xl hover:bg-accent/50 transition-colors"
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              onClick={handleMobileMenuToggle}
             >
               {mobileMenuOpen ? (
                 <X className="h-6 w-6 text-foreground" />
@@ -430,9 +469,7 @@ export default function Header() {
                   
                   <DropdownMenuSeparator />
                   <DropdownMenuItem 
-                    onClick={(e) => {
-                      handleLogout();
-                    }}
+                    onClick={handleLogout}
                     className="text-red-600 cursor-pointer hover:bg-red-50 rounded-lg"
                   >
                     <span>{t('logout')}</span>
@@ -472,63 +509,50 @@ export default function Header() {
         {mobileMenuOpen && (
           <div className="lg:hidden border-t border-border/50 py-4 animate-in slide-in-from-top-2 duration-200">
             <nav className="flex flex-col space-y-1">
-              <MobileNavLink href="/" onClick={() => setMobileMenuOpen(false)}>
+              <MobileNavLink href="/" onClick={closeMobileMenu}>
                 {t('home')}
               </MobileNavLink>
-              <MobileNavLink href="/how-it-works" onClick={() => setMobileMenuOpen(false)}>
+              <MobileNavLink href="/how-it-works" onClick={closeMobileMenu}>
                 {t('howItWorks')}
               </MobileNavLink>
-              <MobileNavLink href="/about-us" onClick={() => setMobileMenuOpen(false)}>
+              <MobileNavLink href="/about-us" onClick={closeMobileMenu}>
                 {t('aboutUs')}
               </MobileNavLink>
 
-              {/* Services & Categories Section - Birleştirildi */}
+              {/* Services & Categories Section */}
               <div className="px-2 py-2">
                 <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2 px-2">
                   {t('services')}
                 </div>
                 <MobileNavLink 
                   href="/services" 
-                  onClick={() => setMobileMenuOpen(false)}
+                  onClick={closeMobileMenu}
                 >
                   {t('services')}
                 </MobileNavLink>
-                {categories.map((category) => {
-                  let shortName: Record<string, string> = {};
-                  try {
-                    if (category.shortName) {
-                      shortName = typeof category.shortName === 'string'
-                        ? JSON.parse(category.shortName)
-                        : (category.shortName as Record<string, string>);
-                    }
-                  } catch (e) {
-                    console.error('Failed to parse shortName for category:', category.slug, e);
-                  }
-                  const title = shortName[language] || shortName['en'] || category.slug;
-                  return (
-                    <MobileNavLink 
-                      key={category.id} 
-                      href={`/categories/${category.slug}`}
-                      onClick={() => setMobileMenuOpen(false)}
-                    >
-                      {title}
-                    </MobileNavLink>
-                  );
-                })}
+                {categoryItems.map((item) => (
+                  <MobileNavLink 
+                    key={item.id} 
+                    href={`/categories/${item.slug}`}
+                    onClick={closeMobileMenu}
+                  >
+                    {item.title}
+                  </MobileNavLink>
+                ))}
               </div>
 
               {isAuthenticated && (
                 <>
-                  <MobileNavLink href="/my-orders" onClick={() => setMobileMenuOpen(false)} icon={<Package className="h-4 w-4" />}>
+                  <MobileNavLink href="/my-orders" onClick={closeMobileMenu} icon={<Package className="h-4 w-4" />}>
                     {t('myOrders')}
                   </MobileNavLink>
                   {isCourier && (
-                    <MobileNavLink href="/courier" onClick={() => setMobileMenuOpen(false)} icon={<Bike className="h-4 w-4" />}>
+                    <MobileNavLink href="/courier" onClick={closeMobileMenu} icon={<Bike className="h-4 w-4" />}>
                       {t('courierPanel')}
                     </MobileNavLink>
                   )}
                   {isBusiness && (
-                    <MobileNavLink href="/business" onClick={() => setMobileMenuOpen(false)} icon={<Building2 className="h-4 w-4" />}>
+                    <MobileNavLink href="/business" onClick={closeMobileMenu} icon={<Building2 className="h-4 w-4" />}>
                       {t('businessPanel')}
                     </MobileNavLink>
                   )}
@@ -536,15 +560,12 @@ export default function Header() {
                   <a 
                     href="/new-order" 
                     className="mx-2 mt-2 px-6 py-3 rounded-xl btn-primary text-white font-semibold shadow-md text-center"
-                    onClick={() => setMobileMenuOpen(false)}
+                    onClick={closeMobileMenu}
                   >
                     {t('callCourierNow')}
                   </a>
                 </>
               )}
-
-              
-
 
             </nav>
           </div>
@@ -562,7 +583,7 @@ function NavLink({ href, children, icon }: { href: string; children: React.React
   return (
     <a 
       href={href} 
-      className="flex items-center gap-2 px-4 py-2 rounded-xl text-muted-foreground hover:text-foreground hover:bg-accent/50 transition-all font-medium text-sm"
+      className="flex items-center gap-2 px-4 py-2 rounded-xl text-muted-foreground hover:text-foreground hover:bg-accent/50 transition-colors font-medium text-sm"
     >
       {icon}
       {children}
@@ -575,7 +596,7 @@ function MobileNavLink({ href, children, onClick, icon }: { href: string; childr
   return (
     <a 
       href={href} 
-      className="flex items-center gap-2 px-4 py-3 rounded-xl text-foreground hover:text-orange-600 hover:bg-accent/50 transition-all font-medium"
+      className="flex items-center gap-2 px-4 py-3 rounded-xl text-foreground hover:text-orange-600 hover:bg-accent/50 transition-colors font-medium"
       onClick={onClick}
     >
       {icon}

@@ -363,8 +363,15 @@ export function serveStatic(app: Express) {
       const seoData = await getSeoForUrl(url, acceptLang).catch(() => null);
       const _pathname = url.split("?")[0];
       const _language = detectLanguageFromUrl(url, acceptLang);
+      
+      // Check if this is a dynamic route with no matching data - return 404 status
+      const isAreaPage = _pathname.match(/^\/areas\/([^/?]+)$/);
+      const isCategoryPage = _pathname.match(/^\/categories\/([^/?]+)$/);
+      const isDynamicNotFound = (isAreaPage || isCategoryPage) && !seoData;
+      const statusCode = isDynamicNotFound ? 404 : 200;
+      
       html = injectSeoIntoHtml(html, seoData?.title || "", seoData?.description || "", _pathname, _language);
-      res.status(200).set({ "Content-Type": "text/html", "X-SEO-Injected": "true" }).end(html);
+      res.status(statusCode).set({ "Content-Type": "text/html", "X-SEO-Injected": "true" }).end(html);
     });
   };
 

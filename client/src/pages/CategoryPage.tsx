@@ -417,12 +417,15 @@ export default function CategoryPage() {
   // seoMeta comes as a JS object from tRPC (superjson), no JSON.parse needed
   const seoData = useSeoFromDatabase(category?.seoMeta || {});
 
-  // Redirect to 404 if category not found - DISABLED FOR GOOGLE INDEXING TEST
-  // useEffect(() => {
-  //   if (!isLoading && !category) {
-  //     setLocation('/404');
-  //   }
-  // }, [isLoading, category, setLocation]);
+  // Redirect to 404 if category not found
+  useEffect(() => {
+    if (!isLoading && !category && !error) {
+      setLocation('/404');
+    }
+    if (error) {
+      setLocation('/404');
+    }
+  }, [isLoading, category, error, setLocation]);
 
   // Prepare SEO data BEFORE conditional return (for Google bot)
   const currentUrl = `${BASE_URL}/categories/${slug}`;
@@ -433,11 +436,10 @@ export default function CategoryPage() {
   const finalDescription = seoData.description || content.description || '';
 
   // Don't render content until data is loaded
-  if (isLoading || !category) {
+  if (isLoading) {
     return (
       <>
         <meta name="prerender-status-code" content="200" />
-        {/* During loading, suppress client-side title to preserve server-side injected title */}
         <SEOHead 
           title=""
           description=""
@@ -447,6 +449,11 @@ export default function CategoryPage() {
         />
       </>
     );
+  }
+
+  // If category not found, show nothing (useEffect will redirect to 404)
+  if (!category) {
+    return null;
   }
 
   // Get static config only for features/icons (not for content)
