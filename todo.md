@@ -416,3 +416,15 @@
 - [x] HowItWorks sayfasına FAQPage şeması eklendi (6 soru: hız, takip, bölgeler, sipariş, ödeme, teslimat kanıtı)
 - [x] Services sayfasına FAQPage şeması eklendi (6 soru: teslimat türleri, restoran, eczane, işletme, paket boyutu, fiyat)
 - [x] şemalar curl ile doğrulandı - HowItWorks (3 şema: HowTo+FAQPage+Breadcrumb), Services (3 şema: Service+FAQPage+Breadcrumb)
+
+## Tüm JSON-LD Şemalarına Çok Dilli Destek (17.04.2026)
+
+- [x] vite.ts'e 4 dilli (EN/TR/MK/SQ) SCHEMA_I18N sözlüğü oluşturuldu
+- [x] LocalBusiness şeması çok dilli yapıldı (lbDescription 4 dil)
+- [x] Organization şeması çok dilli yapıldı (orgDescription, orgAreaServed 4 dil)
+- [x] HowTo şeması çok dilli yapıldı (howToName, howToDesc, 4 adım × 4 dil)
+- [x] Service şeması çok dilli yapıldı (serviceName, serviceDesc, serviceType 4 dil)
+- [x] FAQPage/HowItWorks şeması çok dilli yapıldı (6 soru × 4 dil)
+- [x] FAQPage/Services şeması çok dilli yapıldı (6 soru × 4 dil)
+- [x] BreadcrumbList'ler çok dilli yapıldı (bcHome, bcServices, bcAreas vb. 4 dil) + breadcrumb() helper fonksiyonu
+- [x] Dil bazlı doğrulama tamamlandı: TR (Nasıl Çalışır/Ana Sayfa), MK (Доставни Услуги/Почетна), SQ (Rreth Nesh/Kryefaqja) doğrulandı

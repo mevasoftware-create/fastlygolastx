@@ -85,15 +85,238 @@ const BASE_URL = "https://fastlygo.mk";
 const OG_IMAGE = "https://fastlygo.mk/og-image.e6740bbc.jpg";
 
 /**
+ * Multi-language i18n dictionary for JSON-LD schemas.
+ * Supports: en (English), tr (Turkish), mk (Macedonian), sq (Albanian)
+ */
+const SCHEMA_I18N: Record<string, {
+  // LocalBusiness / Organization
+  lbDescription: string;
+  orgDescription: string;
+  orgAreaServed: string;
+  // BreadcrumbList labels
+  bcHome: string;
+  bcAboutUs: string;
+  bcHowItWorks: string;
+  bcServices: string;
+  bcAreas: string;
+  bcDeliveryAreas: string;
+  bcOrder: string;
+  bcOrderNow: string;
+  bcBecomeACourier: string;
+  bcBusinessReg: string;
+  // HowTo
+  howToName: string;
+  howToDesc: string;
+  step1Name: string; step1Text: string;
+  step2Name: string; step2Text: string;
+  step3Name: string; step3Text: string;
+  step4Name: string; step4Text: string;
+  // Services schema
+  serviceName: string;
+  serviceDesc: string;
+  serviceType: string;
+  // Order schema
+  orderName: string;
+  orderDesc: string;
+  // FAQ HowItWorks
+  hiw_q1: string; hiw_a1: string;
+  hiw_q2: string; hiw_a2: string;
+  hiw_q3: string; hiw_a3: string;
+  hiw_q4: string; hiw_a4: string;
+  hiw_q5: string; hiw_a5: string;
+  hiw_q6: string; hiw_a6: string;
+  // FAQ Services
+  svc_q1: string; svc_a1: string;
+  svc_q2: string; svc_a2: string;
+  svc_q3: string; svc_a3: string;
+  svc_q4: string; svc_a4: string;
+  svc_q5: string; svc_a5: string;
+  svc_q6: string; svc_a6: string;
+}> = {
+  en: {
+    lbDescription: "Fast courier & delivery service in Skopje, Macedonia. Food, cargo, package delivery in 15 minutes with real-time tracking.",
+    orgDescription: "Professional courier and delivery service in Skopje, Macedonia.",
+    orgAreaServed: "Skopje, Macedonia",
+    bcHome: "Home", bcAboutUs: "About Us", bcHowItWorks: "How It Works",
+    bcServices: "Services", bcAreas: "Areas", bcDeliveryAreas: "Delivery Areas",
+    bcOrder: "Order", bcOrderNow: "Order Now", bcBecomeACourier: "Become a Courier", bcBusinessReg: "Business Registration",
+    howToName: "How FastlyGo Delivery Works",
+    howToDesc: "FastlyGo delivery in 4 simple steps",
+    step1Name: "Place Your Order", step1Text: "Open the app or website, enter pickup and delivery addresses, choose your package size.",
+    step2Name: "Courier Assigned", step2Text: "Our smart algorithm instantly matches you with the nearest available professional courier.",
+    step3Name: "Live Tracking", step3Text: "Watch your courier move on a live map. Get live ETA updates and push notifications.",
+    step4Name: "Delivered!", step4Text: "Your package arrives safely. Receive photo proof of delivery and a digital confirmation.",
+    serviceName: "FastlyGo Delivery Services",
+    serviceDesc: "Food, grocery, pharmacy, cargo and document delivery in Skopje",
+    serviceType: "Courier and Delivery",
+    orderName: "Order a Courier - FastlyGo", orderDesc: "Place a delivery order with FastlyGo. Fast courier service in Skopje.",
+    hiw_q1: "How fast is FastlyGo delivery in Skopje?",
+    hiw_a1: "FastlyGo delivers in as little as 15 minutes within Skopje. Our smart dispatch system assigns the nearest available courier immediately after you place your order.",
+    hiw_q2: "How do I track my order in real time?",
+    hiw_a2: "Once your courier is assigned, you can watch them move on a live map directly in the FastlyGo app or website. You will also receive push notifications with live ETA updates.",
+    hiw_q3: "What areas does FastlyGo cover in Skopje?",
+    hiw_a3: "FastlyGo covers 38+ neighborhoods across Skopje, including Centar, Karpos, Aerodrom, Kisela Voda, Gazi Baba, Butel, and many more.",
+    hiw_q4: "How do I place a delivery order with FastlyGo?",
+    hiw_a4: "Simply open the FastlyGo website or app, enter your pickup and delivery addresses, select your package size and vehicle type, then confirm your order. A courier will be assigned within seconds.",
+    hiw_q5: "What payment methods does FastlyGo accept?",
+    hiw_a5: "FastlyGo accepts both cash on delivery and credit/debit card payments. You can choose your preferred payment method when placing your order.",
+    hiw_q6: "Can I get proof of delivery?",
+    hiw_a6: "Yes. After every successful delivery, FastlyGo provides a digital confirmation and photo proof of delivery directly in the app.",
+    svc_q1: "What types of deliveries does FastlyGo handle?",
+    svc_a1: "FastlyGo handles food from restaurants, groceries from supermarkets, medicines from pharmacies, documents, flowers, gifts, and general cargo packages across Skopje.",
+    svc_q2: "Can FastlyGo deliver food from any restaurant in Skopje?",
+    svc_a2: "Yes. FastlyGo couriers can pick up food from any restaurant, cafe, or fast food outlet in Skopje — not just partner restaurants.",
+    svc_q3: "Does FastlyGo deliver medicines and pharmacy products?",
+    svc_a3: "Yes. FastlyGo offers pharmacy delivery in Skopje. Our couriers pick up medicines and health products from pharmacies and deliver them to your door within 15-30 minutes.",
+    svc_q4: "Can businesses use FastlyGo for regular deliveries?",
+    svc_a4: "Absolutely. FastlyGo offers a Business Partner Program for restaurants, shops, pharmacies, and other businesses that need regular courier services in Skopje.",
+    svc_q5: "What is the maximum package size FastlyGo can deliver?",
+    svc_a5: "FastlyGo supports three package sizes: Small (under 3 kg), Medium (3-10 kg), and Large (10+ kg). For large packages, a car courier is automatically assigned.",
+    svc_q6: "How much does a delivery cost with FastlyGo?",
+    svc_a6: "Delivery prices start from a competitive base rate and vary depending on distance, package size, and vehicle type. You can see the exact price before confirming your order.",
+  },
+  tr: {
+    lbDescription: "Üsküp, Makedonya'da hızlı kurye ve teslimat hizmeti. Yemek, kargo, paket teslimatı 15 dakikada gerçek zamanlı takiple.",
+    orgDescription: "Üsküp, Makedonya'da profesyonel kurye ve teslimat hizmeti.",
+    orgAreaServed: "Üsküp, Makedonya",
+    bcHome: "Ana Sayfa", bcAboutUs: "Hakkımızda", bcHowItWorks: "Nasıl Çalışır",
+    bcServices: "Hizmetler", bcAreas: "Bölgeler", bcDeliveryAreas: "Teslimat Bölgeleri",
+    bcOrder: "Sipariş", bcOrderNow: "Hemen Sipariş Ver", bcBecomeACourier: "Kurye Ol", bcBusinessReg: "İşletme Kaydı",
+    howToName: "FastlyGo Teslimatı Nasıl Çalışır",
+    howToDesc: "FastlyGo teslimatı 4 basit adımda",
+    step1Name: "Sipariş Ver", step1Text: "Uygulama veya web sitesini açın, alış ve teslimat adreslerini girin, paket boyutunu seçin.",
+    step2Name: "Kurye Atandı", step2Text: "Akıllı algoritmamız sizi anında en yakın müsait profesyonel kurye ile eşleştirir.",
+    step3Name: "Canlı Takip", step3Text: "Kuryenizi canlı harita üzerinde takip edin. Anlık ETA güncellemeleri ve bildirimler alın.",
+    step4Name: "Teslim Edildi!", step4Text: "Paketiniz güvenle ulaşır. Uygulama üzerinden fotoğraflı teslimat kanıtı alırsınız.",
+    serviceName: "FastlyGo Teslimat Hizmetleri",
+    serviceDesc: "Üsküp'te yemek, market, eczane, kargo ve evrak teslimatı",
+    serviceType: "Kurye ve Teslimat",
+    orderName: "Kurye Çağır - FastlyGo", orderDesc: "FastlyGo ile teslimat siparişi verin. Üsküp'te hızlı kurye hizmeti.",
+    hiw_q1: "FastlyGo Üsküp'te ne kadar hızlı teslimat yapar?",
+    hiw_a1: "FastlyGo, Üsküp içinde en az 15 dakikada teslimat yapar. Akıllı dağıtım sistemimiz, siparişinizi verdikten hemen sonra en yakın müsait kuryeyi atar.",
+    hiw_q2: "Siparişimi gerçek zamanlı nasıl takip ederim?",
+    hiw_a2: "Kurye atandıktan sonra FastlyGo uygulaması veya web sitesinde canlı harita üzerinde kuryenizi takip edebilirsiniz. Anlık ETA güncellemeleri içeren push bildirimleri de alırsınız.",
+    hiw_q3: "FastlyGo Üsküp'te hangi bölgeleri kapsıyor?",
+    hiw_a3: "FastlyGo, Centar, Karpoş, Aerodrom, Kisela Voda, Gazi Baba, Butel ve daha fazlası dahil Üsküp genelinde 38'den fazla mahalleyi kapsamaktadır.",
+    hiw_q4: "FastlyGo ile nasıl teslimat siparişi veririm?",
+    hiw_a4: "FastlyGo web sitesini veya uygulamasını açın, alış ve teslimat adreslerini girin, paket boyutunu ve araç tipini seçin, ardından siparişinizi onaylayın. Saniyeler içinde kurye atanır.",
+    hiw_q5: "FastlyGo hangi ödeme yöntemlerini kabul ediyor?",
+    hiw_a5: "FastlyGo hem kapıda nakit ödeme hem de kredi/banka kartı ödemesini kabul eder. Sipariş verirken tercih ettiğiniz ödeme yöntemini seçebilirsiniz.",
+    hiw_q6: "Teslimat kanıtı alabilir miyim?",
+    hiw_a6: "Evet. Her başarılı teslimatın ardından FastlyGo, uygulamada dijital onay ve fotoğraflı teslimat kanıtı sunar.",
+    svc_q1: "FastlyGo hangi tür teslimatları yapar?",
+    svc_a1: "FastlyGo; restoranlardan yemek, süpermarketlerden market alışverişi, eczanelerden ilaç, evrak, çiçek, hediye ve Üsküp genelinde genel kargo teslimatı yapar.",
+    svc_q2: "FastlyGo Üsküp'teki herhangi bir restorandan yemek teslim edebilir mi?",
+    svc_a2: "Evet. FastlyGo kuryeleri, yalnızca anlaşmalı restoranlardan değil, Üsküp'teki herhangi bir restoran, kafe veya fast food işletmesinden yemek alabilir.",
+    svc_q3: "FastlyGo ilaç ve eczane ürünleri teslim ediyor mu?",
+    svc_a3: "Evet. FastlyGo, Üsküp'te eczane teslimatı sunmaktadır. Kuryeleri eczanelerden ilaç ve sağlık ürünlerini alıp genellikle 15-30 dakika içinde kapınıza getirir.",
+    svc_q4: "İşletmeler FastlyGo'yu düzenli teslimatlar için kullanabilir mi?",
+    svc_a4: "Kesinlikle. FastlyGo, Üsküp'te düzenli kurye hizmetine ihtiyaç duyan restoranlar, mağazalar, eczaneler ve diğer işletmeler için İşletme Ortağı Programı sunar.",
+    svc_q5: "FastlyGo'nun teslim edebileceği maksimum paket boyutu nedir?",
+    svc_a5: "FastlyGo üç paket boyutunu destekler: Küçük (3 kg altı), Orta (3-10 kg) ve Büyük (10+ kg). Büyük paketler için otomatik olarak araçlı kurye atanır.",
+    svc_q6: "FastlyGo ile teslimat ne kadar tutar?",
+    svc_a6: "Teslimat fiyatları rekabetçi bir başlangıç ücretinden başlar ve mesafeye, paket boyutuna ve araç tipine göre değişir. Siparişinizi onaylamadan önce kesin fiyatı görebilirsiniz.",
+  },
+  mk: {
+    lbDescription: "Брза курирска и доставна услуга во Скопје, Македонија. Достава на храна, карго, пакети за 15 минути со следење во реално време.",
+    orgDescription: "Професионална курирска и доставна услуга во Скопје, Македонија.",
+    orgAreaServed: "Скопје, Македонија",
+    bcHome: "Почетна", bcAboutUs: "За Нас", bcHowItWorks: "Како Функционира",
+    bcServices: "Услуги", bcAreas: "Области", bcDeliveryAreas: "Области на Достава",
+    bcOrder: "Нарачка", bcOrderNow: "Нарачај Сега", bcBecomeACourier: "Стани Курир", bcBusinessReg: "Регистрација на Бизнис",
+    howToName: "Како Функционира Доставата на FastlyGo",
+    howToDesc: "Доставата на FastlyGo во 4 едноставни чекори",
+    step1Name: "Направи Нарачка", step1Text: "Отвори ја апликацијата или веб-страницата, внеси адреси за подигање и достава, избери ја големината на пакетот.",
+    step2Name: "Курирот е Доделен", step2Text: "Нашиот паметен алгоритам веднаш те поврзува со најблискиот достапен професионален курир.",
+    step3Name: "Следење во Живо", step3Text: "Следи го курирот на жива карта. Добивај ажурирања за ETA и push-известувања.",
+    step4Name: "Доставено!", step4Text: "Пакетот пристигнува безбедно. Добиваш фото-доказ за достава и дигитална потврда.",
+    serviceName: "Доставни Услуги на FastlyGo",
+    serviceDesc: "Достава на храна, маркет, аптека, карго и документи во Скопје",
+    serviceType: "Курир и Достава",
+    orderName: "Нарачај Курир - FastlyGo", orderDesc: "Направи нарачка за достава со FastlyGo. Брза курирска услуга во Скопје.",
+    hiw_q1: "Колку брзо доставува FastlyGo во Скопје?",
+    hiw_a1: "FastlyGo доставува за само 15 минути во Скопје. Нашиот паметен систем за распределба го доделува најблискиот достапен курир веднаш по нарачката.",
+    hiw_q2: "Како да ја следам нарачката во реално време?",
+    hiw_a2: "Откако ќе биде доделен курирот, можеш да го следиш на жива карта во апликацијата или веб-страницата на FastlyGo. Ќе добиваш и push-известувања со ажурирања за ETA.",
+    hiw_q3: "Кои области ги покрива FastlyGo во Скопје?",
+    hiw_a3: "FastlyGo покрива 38+ населби низ Скопје, вклучувајќи Центар, Карпош, Аеродром, Кисела Вода, Гази Баба, Бутел и многу повеќе.",
+    hiw_q4: "Како да направам нарачка за достава со FastlyGo?",
+    hiw_a4: "Отвори ја веб-страницата или апликацијата на FastlyGo, внеси адреси за подигање и достава, избери ја големината на пакетот и типот на возило, потоа потврди ја нарачката.",
+    hiw_q5: "Кои начини на плаќање ги прифаќа FastlyGo?",
+    hiw_a5: "FastlyGo прифаќа готовинско плаќање при достава и плаќање со кредитна/дебитна картичка. Можеш да го избереш саканиот начин при нарачката.",
+    hiw_q6: "Можам ли да добијам доказ за достава?",
+    hiw_a6: "Да. По секоја успешна достава, FastlyGo обезбедува дигитална потврда и фото-доказ за достава директно во апликацијата.",
+    svc_q1: "Какви видови достави врши FastlyGo?",
+    svc_a1: "FastlyGo врши достава на храна од ресторани, намирници од супермаркети, лекови од аптеки, документи, цвеќиња, подароци и општи карго-пакети низ Скопје.",
+    svc_q2: "Може ли FastlyGo да достави храна од кој било ресторан во Скопје?",
+    svc_a2: "Да. Куририте на FastlyGo можат да подигнат храна од кој било ресторан, кафе или брза храна во Скопје — не само од партнерски ресторани.",
+    svc_q3: "Дали FastlyGo доставува лекови и аптекарски производи?",
+    svc_a3: "Да. FastlyGo нуди достава од аптека во Скопје. Куририте подигаат лекови и здравствени производи и ги доставуваат до вратата во рок од 15-30 минути.",
+    svc_q4: "Можат ли бизнисите да го користат FastlyGo за редовни достави?",
+    svc_a4: "Апсолутно. FastlyGo нуди Програма за Деловни Партнери за ресторани, продавници, аптеки и други бизниси кои имаат потреба од редовни курирски услуги во Скопје.",
+    svc_q5: "Која е максималната големина на пакет што FastlyGo може да го достави?",
+    svc_a5: "FastlyGo поддржува три големини на пакети: Мал (под 3 кг), Среден (3-10 кг) и Голем (10+ кг). За големи пакети автоматски се доделува курир со автомобил.",
+    svc_q6: "Колку чини достава со FastlyGo?",
+    svc_a6: "Цените за достава почнуваат од конкурентна основна стапка и варираат во зависност од растојанието, големината на пакетот и типот на возило. Точната цена ја гледаш пред потврда на нарачката.",
+  },
+  sq: {
+    lbDescription: "Shërbim i shpejtë korrieri dhe dorëzimi në Shkup, Maqedoni. Dorëzim ushqimi, kargo, pako në 15 minuta me gjurmim në kohë reale.",
+    orgDescription: "Shërbim profesional korrieri dhe dorëzimi në Shkup, Maqedoni.",
+    orgAreaServed: "Shkup, Maqedoni",
+    bcHome: "Kryefaqja", bcAboutUs: "Rreth Nesh", bcHowItWorks: "Si Funksionon",
+    bcServices: "Shërbimet", bcAreas: "Zonat", bcDeliveryAreas: "Zonat e Dorëzimit",
+    bcOrder: "Porosi", bcOrderNow: "Porosit Tani", bcBecomeACourier: "Bëhu Korrier", bcBusinessReg: "Regjistrimi i Biznesit",
+    howToName: "Si Funksionon Dorëzimi i FastlyGo",
+    howToDesc: "Dorëzimi i FastlyGo në 4 hapa të thjeshtë",
+    step1Name: "Bëj Porosinë", step1Text: "Hap aplikacionin ose faqen e internetit, fut adresat e marrjes dhe dorëzimit, zgjidh madhësinë e paketës.",
+    step2Name: "Korrierin u Caktua", step2Text: "Algoritmi ynë i zgjuar të lidh menjëherë me korrierën profesionale më të afërt të disponueshme.",
+    step3Name: "Ndjekje në Kohë Reale", step3Text: "Shiko korrierën në hartë të drejtpërdrejtë. Merr përditësime ETA dhe njoftime push.",
+    step4Name: "Dorëzuar!", step4Text: "Paketa arrin në mënyrë të sigurt. Merr provë fotografike të dorëzimit dhe konfirmim dixhital.",
+    serviceName: "Shërbimet e Dorëzimit të FastlyGo",
+    serviceDesc: "Dorëzim ushqimi, market, farmaci, kargo dhe dokumentesh në Shkup",
+    serviceType: "Korrier dhe Dorëzim",
+    orderName: "Porosit Korrier - FastlyGo", orderDesc: "Bëj porosinë e dorëzimit me FastlyGo. Shërbim i shpejtë korrieri në Shkup.",
+    hiw_q1: "Sa shpejt dorëzon FastlyGo në Shkup?",
+    hiw_a1: "FastlyGo dorëzon brenda 15 minutave në Shkup. Sistemi ynë i zgjuar i shpërndarjes cakton korrierën më të afërt të disponueshme menjëherë pas porosisë.",
+    hiw_q2: "Si ta gjurmoj porosinë time në kohë reale?",
+    hiw_a2: "Pasi të caktohet korrieria, mund ta shikosh atë duke lëvizur në hartë të drejtpërdrejtë në aplikacionin ose faqen e FastlyGo. Do të marrësh gjithashtu njoftime push me përditësime ETA.",
+    hiw_q3: "Cilat zona mbulon FastlyGo në Shkup?",
+    hiw_a3: "FastlyGo mbulon 38+ lagje në të gjithë Shkupin, duke përfshirë Qendrën, Karposh, Aerodromin, Kisela Voda, Gazi Baba, Butel dhe shumë të tjera.",
+    hiw_q4: "Si të bëj një porosi dorëzimi me FastlyGo?",
+    hiw_a4: "Hap faqen e internetit ose aplikacionin e FastlyGo, fut adresat e marrjes dhe dorëzimit, zgjidh madhësinë e paketës dhe llojin e automjetit, pastaj konfirmo porosinë. Korrieria caktohet brenda sekondave.",
+    hiw_q5: "Cilat metoda pagese pranon FastlyGo?",
+    hiw_a5: "FastlyGo pranon pagesë me para në dorë dhe pagesë me kartë krediti/debiti. Mund të zgjedhësh metodën e preferuar të pagesës gjatë porosisë.",
+    hiw_q6: "A mund të marr provë dorëzimi?",
+    hiw_a6: "Po. Pas çdo dorëzimi të suksesshëm, FastlyGo ofron konfirmim dixhital dhe provë fotografike të dorëzimit direkt në aplikacion.",
+    svc_q1: "Çfarë llojesh dorëzimesh kryen FastlyGo?",
+    svc_a1: "FastlyGo kryen dorëzim ushqimi nga restorantet, ushqime nga supermarketet, ilaçe nga farmacitë, dokumente, lule, dhurata dhe pako kargo të përgjithshme në të gjithë Shkupin.",
+    svc_q2: "A mund të dorëzojë FastlyGo ushqim nga çdo restorant në Shkup?",
+    svc_a2: "Po. Korrierat e FastlyGo mund të marrin ushqim nga çdo restorant, kafe ose fast food në Shkup — jo vetëm nga restorantet partnere.",
+    svc_q3: "A dorëzon FastlyGo ilaçe dhe produkte farmaceutike?",
+    svc_a3: "Po. FastlyGo ofron dorëzim nga farmacia në Shkup. Korrierat marrin ilaçe dhe produkte shëndetësore dhe i dorëzojnë te dera juaj zakonisht brenda 15-30 minutave.",
+    svc_q4: "A mund të përdorin bizneset FastlyGo për dorëzime të rregullta?",
+    svc_a4: "Absolutisht. FastlyGo ofron Programin e Partnerëve të Biznesit për restorante, dyqane, farmaci dhe biznese të tjera që kanë nevojë për shërbime të rregullta korrieri në Shkup.",
+    svc_q5: "Cila është madhësia maksimale e paketës që mund të dorëzojë FastlyGo?",
+    svc_a5: "FastlyGo mbështet tre madhësi paketash: E vogël (nën 3 kg), Mesatare (3-10 kg) dhe E madhe (10+ kg). Për paketat e mëdha caktohet automatikisht korrier me makinë.",
+    svc_q6: "Sa kushton dorëzimi me FastlyGo?",
+    svc_a6: "Çmimet e dorëzimit fillojnë nga një tarifë bazë konkurruese dhe ndryshojnë sipas distancës, madhësisë së paketës dhe llojit të automjetit. Çmimin e saktë e sheh para konfirmimit të porosisë.",
+  },
+};
+
+/**
  * Returns JSON-LD structured data schemas for a given pathname.
  * These are injected server-side so Google bot sees them before JS runs.
+ * All text content is localized based on the `language` parameter.
  */
 function getJsonLdForPath(pathname: string, language: string, title: string, description: string): Record<string, unknown>[] {
+  const lang = (language && SCHEMA_I18N[language]) ? language : "en";
+  const t = SCHEMA_I18N[lang];
+
   const localBusinessBase = {
     "@context": "https://schema.org",
     "@type": "LocalBusiness",
     "name": "FastlyGo",
-    "description": "Fast courier & delivery service in Skopje, Macedonia. Food, cargo, package delivery in 15 minutes with real-time tracking.",
+    "description": t.lbDescription,
     "url": BASE_URL,
     "telephone": "+38978123456",
     "email": "info@fastlygo.mk",
@@ -132,9 +355,9 @@ function getJsonLdForPath(pathname: string, language: string, title: string, des
     "name": "FastlyGo",
     "url": BASE_URL,
     "logo": `${BASE_URL}/logo.png`,
-    "description": "Professional courier and delivery service in Skopje, Macedonia.",
+    "description": t.orgDescription,
     "foundingDate": "2023",
-    "areaServed": "Skopje, Macedonia",
+    "areaServed": t.orgAreaServed,
     "contactPoint": {
       "@type": "ContactPoint",
       "telephone": "+38978123456",
@@ -147,16 +370,28 @@ function getJsonLdForPath(pathname: string, language: string, title: string, des
     ]
   };
 
-  const breadcrumbHome = {
+  // Helper: build a BreadcrumbList
+  const breadcrumb = (...items: { name: string; url: string }[]) => ({
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",
-    "itemListElement": [{
+    "itemListElement": items.map((item, i) => ({
       "@type": "ListItem",
-      "position": 1,
-      "name": "Home",
-      "item": BASE_URL
-    }]
-  };
+      "position": i + 1,
+      "name": item.name,
+      "item": item.url
+    }))
+  });
+
+  // Helper: build a FAQPage schema from question/answer pairs
+  const faqPage = (pairs: { q: string; a: string }[]) => ({
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": pairs.map(({ q, a }) => ({
+      "@type": "Question",
+      "name": q,
+      "acceptedAnswer": { "@type": "Answer", "text": a }
+    }))
+  });
 
   // Home page
   if (pathname === "/") {
@@ -165,14 +400,10 @@ function getJsonLdForPath(pathname: string, language: string, title: string, des
 
   // About Us
   if (pathname === "/about-us") {
-    return [organizationSchema, {
-      "@context": "https://schema.org",
-      "@type": "BreadcrumbList",
-      "itemListElement": [
-        { "@type": "ListItem", "position": 1, "name": "Home", "item": BASE_URL },
-        { "@type": "ListItem", "position": 2, "name": "About Us", "item": `${BASE_URL}/about-us` }
-      ]
-    }];
+    return [organizationSchema, breadcrumb(
+      { name: t.bcHome, url: BASE_URL },
+      { name: t.bcAboutUs, url: `${BASE_URL}/about-us` }
+    )];
   }
 
   // How It Works
@@ -180,75 +411,27 @@ function getJsonLdForPath(pathname: string, language: string, title: string, des
     return [{
       "@context": "https://schema.org",
       "@type": "HowTo",
-      "name": title || "How FastlyGo Delivery Works",
-      "description": description || "FastlyGo delivery in 4 simple steps",
+      "name": title || t.howToName,
+      "description": description || t.howToDesc,
       "step": [
-        { "@type": "HowToStep", "position": 1, "name": "Place Your Order", "text": "Open the app or website, enter pickup and delivery addresses, choose your package size." },
-        { "@type": "HowToStep", "position": 2, "name": "Courier Assigned", "text": "Our smart algorithm instantly matches you with the nearest available professional courier." },
-        { "@type": "HowToStep", "position": 3, "name": "Live Tracking", "text": "Watch your courier move on a real-time map. Get live ETA updates and push notifications." },
-        { "@type": "HowToStep", "position": 4, "name": "Delivered!", "text": "Your package arrives safely. Receive photo proof of delivery and a digital confirmation." }
+        { "@type": "HowToStep", "position": 1, "name": t.step1Name, "text": t.step1Text },
+        { "@type": "HowToStep", "position": 2, "name": t.step2Name, "text": t.step2Text },
+        { "@type": "HowToStep", "position": 3, "name": t.step3Name, "text": t.step3Text },
+        { "@type": "HowToStep", "position": 4, "name": t.step4Name, "text": t.step4Text }
       ]
-    }, {
-      "@context": "https://schema.org",
-      "@type": "FAQPage",
-      "mainEntity": [
-        {
-          "@type": "Question",
-          "name": "How fast is FastlyGo delivery in Skopje?",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "FastlyGo delivers in as little as 15 minutes within Skopje. Our smart dispatch system assigns the nearest available courier immediately after you place your order, ensuring the fastest possible delivery time."
-          }
-        },
-        {
-          "@type": "Question",
-          "name": "How do I track my order in real time?",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "Once your courier is assigned, you can watch them move on a live map directly in the FastlyGo app or website. You will also receive push notifications with live ETA updates at every stage of the delivery."
-          }
-        },
-        {
-          "@type": "Question",
-          "name": "What areas does FastlyGo cover in Skopje?",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "FastlyGo covers 38+ neighborhoods across Skopje, including Centar, Karpos, Aerodrom, Kisela Voda, Gazi Baba, Butel, and many more. You can check full coverage on our Areas page."
-          }
-        },
-        {
-          "@type": "Question",
-          "name": "How do I place a delivery order with FastlyGo?",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "Simply open the FastlyGo website or app, enter your pickup and delivery addresses, select your package size and vehicle type, then confirm your order. A courier will be assigned within seconds."
-          }
-        },
-        {
-          "@type": "Question",
-          "name": "What payment methods does FastlyGo accept?",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "FastlyGo accepts both cash on delivery and credit/debit card payments. You can choose your preferred payment method when placing your order."
-          }
-        },
-        {
-          "@type": "Question",
-          "name": "Can I get proof of delivery?",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "Yes. After every successful delivery, FastlyGo provides a digital confirmation and photo proof of delivery directly in the app, so you always know your package arrived safely."
-          }
-        }
-      ]
-    }, {
-      "@context": "https://schema.org",
-      "@type": "BreadcrumbList",
-      "itemListElement": [
-        { "@type": "ListItem", "position": 1, "name": "Home", "item": BASE_URL },
-        { "@type": "ListItem", "position": 2, "name": "How It Works", "item": `${BASE_URL}/how-it-works` }
-      ]
-    }];
+    },
+    faqPage([
+      { q: t.hiw_q1, a: t.hiw_a1 },
+      { q: t.hiw_q2, a: t.hiw_a2 },
+      { q: t.hiw_q3, a: t.hiw_a3 },
+      { q: t.hiw_q4, a: t.hiw_a4 },
+      { q: t.hiw_q5, a: t.hiw_a5 },
+      { q: t.hiw_q6, a: t.hiw_a6 },
+    ]),
+    breadcrumb(
+      { name: t.bcHome, url: BASE_URL },
+      { name: t.bcHowItWorks, url: `${BASE_URL}/how-it-works` }
+    )];
   }
 
   // Services
@@ -256,84 +439,35 @@ function getJsonLdForPath(pathname: string, language: string, title: string, des
     return [{
       "@context": "https://schema.org",
       "@type": "Service",
-      "name": "FastlyGo Delivery Services",
-      "description": description || "Food, grocery, pharmacy, cargo and document delivery in Skopje",
+      "name": t.serviceName,
+      "description": description || t.serviceDesc,
       "provider": { "@type": "LocalBusiness", "name": "FastlyGo" },
       "areaServed": "Skopje",
-      "serviceType": "Courier and Delivery"
-    }, {
-      "@context": "https://schema.org",
-      "@type": "FAQPage",
-      "mainEntity": [
-        {
-          "@type": "Question",
-          "name": "What types of deliveries does FastlyGo handle?",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "FastlyGo handles a wide range of deliveries including food from restaurants, groceries from supermarkets, medicines from pharmacies, documents, flowers, gifts, and general cargo packages across Skopje."
-          }
-        },
-        {
-          "@type": "Question",
-          "name": "Can FastlyGo deliver food from any restaurant in Skopje?",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "Yes. FastlyGo couriers can pick up food from any restaurant, cafe, or fast food outlet in Skopje — not just partner restaurants. Simply enter the restaurant address as your pickup point and your home as the delivery address."
-          }
-        },
-        {
-          "@type": "Question",
-          "name": "Does FastlyGo deliver medicines and pharmacy products?",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "Yes. FastlyGo offers pharmacy delivery in Skopje. Our couriers can pick up medicines, vitamins, and health products from pharmacies and deliver them to your door, typically within 15-30 minutes."
-          }
-        },
-        {
-          "@type": "Question",
-          "name": "Can businesses use FastlyGo for regular deliveries?",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "Absolutely. FastlyGo offers a dedicated Business Partner Program for restaurants, shops, pharmacies, and other businesses that need regular or bulk courier services in Skopje. Register your business on our website to get started."
-          }
-        },
-        {
-          "@type": "Question",
-          "name": "What is the maximum package size FastlyGo can deliver?",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "FastlyGo supports three package sizes: Small (under 3 kg), Medium (3-10 kg), and Large (10+ kg). For large packages, a car courier is automatically assigned. Contact us for oversized or special cargo requirements."
-          }
-        },
-        {
-          "@type": "Question",
-          "name": "How much does a delivery cost with FastlyGo?",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "Delivery prices with FastlyGo start from a competitive base rate and vary depending on distance, package size, and vehicle type. You can see the exact price before confirming your order on the FastlyGo website or app."
-          }
-        }
-      ]
-    }, {
-      "@context": "https://schema.org",
-      "@type": "BreadcrumbList",
-      "itemListElement": [
-        { "@type": "ListItem", "position": 1, "name": "Home", "item": BASE_URL },
-        { "@type": "ListItem", "position": 2, "name": "Services", "item": `${BASE_URL}/services` }
-      ]
-    }];
+      "serviceType": t.serviceType
+    },
+    faqPage([
+      { q: t.svc_q1, a: t.svc_a1 },
+      { q: t.svc_q2, a: t.svc_a2 },
+      { q: t.svc_q3, a: t.svc_a3 },
+      { q: t.svc_q4, a: t.svc_a4 },
+      { q: t.svc_q5, a: t.svc_a5 },
+      { q: t.svc_q6, a: t.svc_a6 },
+    ]),
+    breadcrumb(
+      { name: t.bcHome, url: BASE_URL },
+      { name: t.bcServices, url: `${BASE_URL}/services` }
+    )];
   }
 
   // Areas list
   if (pathname === "/areas") {
-    return [{
-      "@context": "https://schema.org",
-      "@type": "BreadcrumbList",
-      "itemListElement": [
-        { "@type": "ListItem", "position": 1, "name": "Home", "item": BASE_URL },
-        { "@type": "ListItem", "position": 2, "name": "Delivery Areas", "item": `${BASE_URL}/areas` }
-      ]
-    }, localBusinessBase];
+    return [
+      breadcrumb(
+        { name: t.bcHome, url: BASE_URL },
+        { name: t.bcDeliveryAreas, url: `${BASE_URL}/areas` }
+      ),
+      localBusinessBase
+    ];
   }
 
   // Area detail page
@@ -354,15 +488,12 @@ function getJsonLdForPath(pathname: string, language: string, title: string, des
         "addressRegion": "Skopje",
         "addressCountry": "MK"
       }
-    }, {
-      "@context": "https://schema.org",
-      "@type": "BreadcrumbList",
-      "itemListElement": [
-        { "@type": "ListItem", "position": 1, "name": "Home", "item": BASE_URL },
-        { "@type": "ListItem", "position": 2, "name": "Areas", "item": `${BASE_URL}/areas` },
-        { "@type": "ListItem", "position": 3, "name": areaName, "item": `${BASE_URL}/areas/${slug}` }
-      ]
-    }];
+    },
+    breadcrumb(
+      { name: t.bcHome, url: BASE_URL },
+      { name: t.bcAreas, url: `${BASE_URL}/areas` },
+      { name: areaName, url: `${BASE_URL}/areas/${slug}` }
+    )];
   }
 
   // Category detail page
@@ -378,15 +509,12 @@ function getJsonLdForPath(pathname: string, language: string, title: string, des
       "provider": { "@type": "LocalBusiness", "name": "FastlyGo", "url": BASE_URL },
       "areaServed": "Skopje",
       "url": `${BASE_URL}/categories/${slug}`
-    }, {
-      "@context": "https://schema.org",
-      "@type": "BreadcrumbList",
-      "itemListElement": [
-        { "@type": "ListItem", "position": 1, "name": "Home", "item": BASE_URL },
-        { "@type": "ListItem", "position": 2, "name": "Services", "item": `${BASE_URL}/services` },
-        { "@type": "ListItem", "position": 3, "name": catName, "item": `${BASE_URL}/categories/${slug}` }
-      ]
-    }];
+    },
+    breadcrumb(
+      { name: t.bcHome, url: BASE_URL },
+      { name: t.bcServices, url: `${BASE_URL}/services` },
+      { name: catName, url: `${BASE_URL}/categories/${slug}` }
+    )];
   }
 
   // Order / new-order page
@@ -394,42 +522,31 @@ function getJsonLdForPath(pathname: string, language: string, title: string, des
     return [{
       "@context": "https://schema.org",
       "@type": "Service",
-      "name": "Order a Courier - FastlyGo",
-      "description": "Place a delivery order with FastlyGo. Fast courier service in Skopje.",
+      "name": t.orderName,
+      "description": t.orderDesc,
       "provider": { "@type": "LocalBusiness", "name": "FastlyGo", "url": BASE_URL },
       "areaServed": "Skopje"
-    }, {
-      "@context": "https://schema.org",
-      "@type": "BreadcrumbList",
-      "itemListElement": [
-        { "@type": "ListItem", "position": 1, "name": "Home", "item": BASE_URL },
-        { "@type": "ListItem", "position": 2, "name": "Order Now", "item": `${BASE_URL}/new-order` }
-      ]
-    }];
+    },
+    breadcrumb(
+      { name: t.bcHome, url: BASE_URL },
+      { name: t.bcOrderNow, url: `${BASE_URL}/new-order` }
+    )];
   }
 
   // Courier register
   if (pathname === "/courier/register") {
-    return [{
-      "@context": "https://schema.org",
-      "@type": "BreadcrumbList",
-      "itemListElement": [
-        { "@type": "ListItem", "position": 1, "name": "Home", "item": BASE_URL },
-        { "@type": "ListItem", "position": 2, "name": "Become a Courier", "item": `${BASE_URL}/courier/register` }
-      ]
-    }];
+    return [breadcrumb(
+      { name: t.bcHome, url: BASE_URL },
+      { name: t.bcBecomeACourier, url: `${BASE_URL}/courier/register` }
+    )];
   }
 
   // Business register
   if (pathname === "/business/register") {
-    return [{
-      "@context": "https://schema.org",
-      "@type": "BreadcrumbList",
-      "itemListElement": [
-        { "@type": "ListItem", "position": 1, "name": "Home", "item": BASE_URL },
-        { "@type": "ListItem", "position": 2, "name": "Business Registration", "item": `${BASE_URL}/business/register` }
-      ]
-    }];
+    return [breadcrumb(
+      { name: t.bcHome, url: BASE_URL },
+      { name: t.bcBusinessReg, url: `${BASE_URL}/business/register` }
+    )];
   }
 
   // Default: return LocalBusiness for all other pages
