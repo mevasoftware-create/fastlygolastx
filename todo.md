@@ -410,3 +410,9 @@
 - [x] CSP: Production'da Helmet ile aktif (development'da devre dışı)
 - [x] SecurityHeaders.com: Cloudflare önünde olduğundan başlıklar strip ediliyor - Cloudflare Transform Rules önerildi
 - [x] JSON-LD şemaları vite.ts'e getJsonLdForPath() fonksiyonu ile server-side enjekte edildi (tüm public sayfalar)
+
+## FAQPage Şeması (17.04.2026)
+
+- [x] HowItWorks sayfasına FAQPage şeması eklendi (6 soru: hız, takip, bölgeler, sipariş, ödeme, teslimat kanıtı)
+- [x] Services sayfasına FAQPage şeması eklendi (6 soru: teslimat türleri, restoran, eczane, işletme, paket boyutu, fiyat)
+- [x] şemalar curl ile doğrulandı - HowItWorks (3 şema: HowTo+FAQPage+Breadcrumb), Services (3 şema: Service+FAQPage+Breadcrumb)

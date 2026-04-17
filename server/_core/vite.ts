@@ -190,6 +190,59 @@ function getJsonLdForPath(pathname: string, language: string, title: string, des
       ]
     }, {
       "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "How fast is FastlyGo delivery in Skopje?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "FastlyGo delivers in as little as 15 minutes within Skopje. Our smart dispatch system assigns the nearest available courier immediately after you place your order, ensuring the fastest possible delivery time."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How do I track my order in real time?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Once your courier is assigned, you can watch them move on a live map directly in the FastlyGo app or website. You will also receive push notifications with live ETA updates at every stage of the delivery."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What areas does FastlyGo cover in Skopje?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "FastlyGo covers 38+ neighborhoods across Skopje, including Centar, Karpos, Aerodrom, Kisela Voda, Gazi Baba, Butel, and many more. You can check full coverage on our Areas page."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How do I place a delivery order with FastlyGo?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Simply open the FastlyGo website or app, enter your pickup and delivery addresses, select your package size and vehicle type, then confirm your order. A courier will be assigned within seconds."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What payment methods does FastlyGo accept?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "FastlyGo accepts both cash on delivery and credit/debit card payments. You can choose your preferred payment method when placing your order."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Can I get proof of delivery?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes. After every successful delivery, FastlyGo provides a digital confirmation and photo proof of delivery directly in the app, so you always know your package arrived safely."
+          }
+        }
+      ]
+    }, {
+      "@context": "https://schema.org",
       "@type": "BreadcrumbList",
       "itemListElement": [
         { "@type": "ListItem", "position": 1, "name": "Home", "item": BASE_URL },
@@ -208,6 +261,59 @@ function getJsonLdForPath(pathname: string, language: string, title: string, des
       "provider": { "@type": "LocalBusiness", "name": "FastlyGo" },
       "areaServed": "Skopje",
       "serviceType": "Courier and Delivery"
+    }, {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "What types of deliveries does FastlyGo handle?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "FastlyGo handles a wide range of deliveries including food from restaurants, groceries from supermarkets, medicines from pharmacies, documents, flowers, gifts, and general cargo packages across Skopje."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Can FastlyGo deliver food from any restaurant in Skopje?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes. FastlyGo couriers can pick up food from any restaurant, cafe, or fast food outlet in Skopje — not just partner restaurants. Simply enter the restaurant address as your pickup point and your home as the delivery address."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Does FastlyGo deliver medicines and pharmacy products?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes. FastlyGo offers pharmacy delivery in Skopje. Our couriers can pick up medicines, vitamins, and health products from pharmacies and deliver them to your door, typically within 15-30 minutes."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Can businesses use FastlyGo for regular deliveries?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Absolutely. FastlyGo offers a dedicated Business Partner Program for restaurants, shops, pharmacies, and other businesses that need regular or bulk courier services in Skopje. Register your business on our website to get started."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What is the maximum package size FastlyGo can deliver?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "FastlyGo supports three package sizes: Small (under 3 kg), Medium (3-10 kg), and Large (10+ kg). For large packages, a car courier is automatically assigned. Contact us for oversized or special cargo requirements."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How much does a delivery cost with FastlyGo?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Delivery prices with FastlyGo start from a competitive base rate and vary depending on distance, package size, and vehicle type. You can see the exact price before confirming your order on the FastlyGo website or app."
+          }
+        }
+      ]
     }, {
       "@context": "https://schema.org",
       "@type": "BreadcrumbList",
