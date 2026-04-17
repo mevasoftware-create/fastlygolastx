@@ -85,6 +85,252 @@ const BASE_URL = "https://fastlygo.mk";
 const OG_IMAGE = "https://fastlygo.mk/og-image.e6740bbc.jpg";
 
 /**
+ * Returns JSON-LD structured data schemas for a given pathname.
+ * These are injected server-side so Google bot sees them before JS runs.
+ */
+function getJsonLdForPath(pathname: string, language: string, title: string, description: string): Record<string, unknown>[] {
+  const localBusinessBase = {
+    "@context": "https://schema.org",
+    "@type": "LocalBusiness",
+    "name": "FastlyGo",
+    "description": "Fast courier & delivery service in Skopje, Macedonia. Food, cargo, package delivery in 15 minutes with real-time tracking.",
+    "url": BASE_URL,
+    "telephone": "+38978123456",
+    "email": "info@fastlygo.mk",
+    "image": OG_IMAGE,
+    "logo": `${BASE_URL}/logo.png`,
+    "priceRange": "€€",
+    "currenciesAccepted": "EUR, MKD",
+    "paymentAccepted": "Cash, Credit Card",
+    "openingHours": "Mo-Su 08:00-23:00",
+    "address": {
+      "@type": "PostalAddress",
+      "streetAddress": "Skopje",
+      "addressLocality": "Skopje",
+      "addressRegion": "Skopje",
+      "postalCode": "1000",
+      "addressCountry": "MK"
+    },
+    "geo": {
+      "@type": "GeoCoordinates",
+      "latitude": 41.9981,
+      "longitude": 21.4254
+    },
+    "sameAs": [
+      "https://www.facebook.com/fastlygo",
+      "https://www.instagram.com/fastlygo"
+    ],
+    "serviceArea": {
+      "@type": "City",
+      "name": "Skopje"
+    }
+  };
+
+  const organizationSchema = {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "name": "FastlyGo",
+    "url": BASE_URL,
+    "logo": `${BASE_URL}/logo.png`,
+    "description": "Professional courier and delivery service in Skopje, Macedonia.",
+    "foundingDate": "2023",
+    "areaServed": "Skopje, Macedonia",
+    "contactPoint": {
+      "@type": "ContactPoint",
+      "telephone": "+38978123456",
+      "contactType": "customer service",
+      "availableLanguage": ["English", "Macedonian", "Albanian", "Turkish"]
+    },
+    "sameAs": [
+      "https://www.facebook.com/fastlygo",
+      "https://www.instagram.com/fastlygo"
+    ]
+  };
+
+  const breadcrumbHome = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [{
+      "@type": "ListItem",
+      "position": 1,
+      "name": "Home",
+      "item": BASE_URL
+    }]
+  };
+
+  // Home page
+  if (pathname === "/") {
+    return [localBusinessBase, organizationSchema];
+  }
+
+  // About Us
+  if (pathname === "/about-us") {
+    return [organizationSchema, {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        { "@type": "ListItem", "position": 1, "name": "Home", "item": BASE_URL },
+        { "@type": "ListItem", "position": 2, "name": "About Us", "item": `${BASE_URL}/about-us` }
+      ]
+    }];
+  }
+
+  // How It Works
+  if (pathname === "/how-it-works") {
+    return [{
+      "@context": "https://schema.org",
+      "@type": "HowTo",
+      "name": title || "How FastlyGo Delivery Works",
+      "description": description || "FastlyGo delivery in 4 simple steps",
+      "step": [
+        { "@type": "HowToStep", "position": 1, "name": "Place Your Order", "text": "Open the app or website, enter pickup and delivery addresses, choose your package size." },
+        { "@type": "HowToStep", "position": 2, "name": "Courier Assigned", "text": "Our smart algorithm instantly matches you with the nearest available professional courier." },
+        { "@type": "HowToStep", "position": 3, "name": "Live Tracking", "text": "Watch your courier move on a real-time map. Get live ETA updates and push notifications." },
+        { "@type": "HowToStep", "position": 4, "name": "Delivered!", "text": "Your package arrives safely. Receive photo proof of delivery and a digital confirmation." }
+      ]
+    }, {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        { "@type": "ListItem", "position": 1, "name": "Home", "item": BASE_URL },
+        { "@type": "ListItem", "position": 2, "name": "How It Works", "item": `${BASE_URL}/how-it-works` }
+      ]
+    }];
+  }
+
+  // Services
+  if (pathname === "/services") {
+    return [{
+      "@context": "https://schema.org",
+      "@type": "Service",
+      "name": "FastlyGo Delivery Services",
+      "description": description || "Food, grocery, pharmacy, cargo and document delivery in Skopje",
+      "provider": { "@type": "LocalBusiness", "name": "FastlyGo" },
+      "areaServed": "Skopje",
+      "serviceType": "Courier and Delivery"
+    }, {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        { "@type": "ListItem", "position": 1, "name": "Home", "item": BASE_URL },
+        { "@type": "ListItem", "position": 2, "name": "Services", "item": `${BASE_URL}/services` }
+      ]
+    }];
+  }
+
+  // Areas list
+  if (pathname === "/areas") {
+    return [{
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        { "@type": "ListItem", "position": 1, "name": "Home", "item": BASE_URL },
+        { "@type": "ListItem", "position": 2, "name": "Delivery Areas", "item": `${BASE_URL}/areas` }
+      ]
+    }, localBusinessBase];
+  }
+
+  // Area detail page
+  const areaMatch = pathname.match(/^\/areas\/([^/?]+)$/);
+  if (areaMatch) {
+    const slug = areaMatch[1];
+    const areaName = slug.replace(/-/g, " ").replace(/\b\w/g, (c: string) => c.toUpperCase());
+    return [{
+      "@context": "https://schema.org",
+      "@type": "LocalBusiness",
+      "name": `FastlyGo - ${areaName}`,
+      "description": description || `FastlyGo delivery service in ${areaName}, Skopje`,
+      "url": `${BASE_URL}/areas/${slug}`,
+      "areaServed": areaName,
+      "address": {
+        "@type": "PostalAddress",
+        "addressLocality": areaName,
+        "addressRegion": "Skopje",
+        "addressCountry": "MK"
+      }
+    }, {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        { "@type": "ListItem", "position": 1, "name": "Home", "item": BASE_URL },
+        { "@type": "ListItem", "position": 2, "name": "Areas", "item": `${BASE_URL}/areas` },
+        { "@type": "ListItem", "position": 3, "name": areaName, "item": `${BASE_URL}/areas/${slug}` }
+      ]
+    }];
+  }
+
+  // Category detail page
+  const catMatch = pathname.match(/^\/categories\/([^/?]+)$/);
+  if (catMatch) {
+    const slug = catMatch[1];
+    const catName = slug.replace(/-/g, " ").replace(/\b\w/g, (c: string) => c.toUpperCase());
+    return [{
+      "@context": "https://schema.org",
+      "@type": "Service",
+      "name": title || `${catName} Delivery - FastlyGo`,
+      "description": description || `${catName} delivery service in Skopje by FastlyGo`,
+      "provider": { "@type": "LocalBusiness", "name": "FastlyGo", "url": BASE_URL },
+      "areaServed": "Skopje",
+      "url": `${BASE_URL}/categories/${slug}`
+    }, {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        { "@type": "ListItem", "position": 1, "name": "Home", "item": BASE_URL },
+        { "@type": "ListItem", "position": 2, "name": "Services", "item": `${BASE_URL}/services` },
+        { "@type": "ListItem", "position": 3, "name": catName, "item": `${BASE_URL}/categories/${slug}` }
+      ]
+    }];
+  }
+
+  // Order / new-order page
+  if (pathname === "/new-order" || pathname === "/order") {
+    return [{
+      "@context": "https://schema.org",
+      "@type": "Service",
+      "name": "Order a Courier - FastlyGo",
+      "description": "Place a delivery order with FastlyGo. Fast courier service in Skopje.",
+      "provider": { "@type": "LocalBusiness", "name": "FastlyGo", "url": BASE_URL },
+      "areaServed": "Skopje"
+    }, {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        { "@type": "ListItem", "position": 1, "name": "Home", "item": BASE_URL },
+        { "@type": "ListItem", "position": 2, "name": "Order Now", "item": `${BASE_URL}/new-order` }
+      ]
+    }];
+  }
+
+  // Courier register
+  if (pathname === "/courier/register") {
+    return [{
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        { "@type": "ListItem", "position": 1, "name": "Home", "item": BASE_URL },
+        { "@type": "ListItem", "position": 2, "name": "Become a Courier", "item": `${BASE_URL}/courier/register` }
+      ]
+    }];
+  }
+
+  // Business register
+  if (pathname === "/business/register") {
+    return [{
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        { "@type": "ListItem", "position": 1, "name": "Home", "item": BASE_URL },
+        { "@type": "ListItem", "position": 2, "name": "Business Registration", "item": `${BASE_URL}/business/register` }
+      ]
+    }];
+  }
+
+  // Default: return LocalBusiness for all other pages
+  return [localBusinessBase];
+}
+
+/**
  * Server-side SEO injection:
  * Injects correct title, description, canonical, hreflang, og:*, twitter:* tags
  * into static HTML so Google bot sees correct content before JS executes.
@@ -194,6 +440,12 @@ function injectSeoIntoHtml(
   // Current page URL (with lang param if non-English)
   const currentUrl = language !== "en" ? `${BASE_URL}${pathname}?lang=${language}` : canonicalUrl;
 
+  // Build JSON-LD structured data for this page
+  const jsonLdSchemas = getJsonLdForPath(pathname, language, safeTitle, safeDesc);
+  const jsonLdBlock = jsonLdSchemas.length > 0
+    ? jsonLdSchemas.map(schema => `  <script type="application/ld+json">${JSON.stringify(schema)}</script>`).join("\n")
+    : "";
+
   // Build the full SEO block to inject before </head>
   const seoBlock = `
   <!-- Server-side SEO injection -->
@@ -217,7 +469,8 @@ function injectSeoIntoHtml(
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="${safeTitle}" />
   <meta name="twitter:description" content="${safeDesc}" />
-  <meta name="twitter:image" content="${OG_IMAGE}" />`;
+  <meta name="twitter:image" content="${OG_IMAGE}" />
+${jsonLdBlock}`;
 
   // Remove any existing Manus-injected or duplicate og/twitter/canonical/hreflang tags
   html = html

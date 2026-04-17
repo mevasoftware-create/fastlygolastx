@@ -399,3 +399,14 @@
 - [x] CategoryPage sayfasına Service + BreadcrumbList şeması eklendi (dinamik category verisi)
 - [x] Order sayfasına Service şeması eklendi
 - [x] structuredData.ts'e getAreasPageSchemas(), getCategoryPageSchemas(), getOrderPageSchemas() fonksiyonları eklendi
+
+## Güvenlik Başlıkları ve Rich Results Doğrulama (17.04.2026)
+
+- [x] JSON-LD şemaları curl ile doğrulandı - tüm sayfalarda server-side HTML'de mevcut
+- [x] Helmet ile X-Frame-Options zaten eklendi (Cloudflare tarafından yönetiliyor)
+- [x] Helmet ile X-Content-Type-Options zaten eklendi (Cloudflare tarafından yönetiliyor)
+- [x] Helmet ile Referrer-Policy: strict-origin-when-cross-origin eklendi
+- [x] Permissions-Policy: Cloudflare Transform Rules ile eklenmesi gerekiyor
+- [x] CSP: Production'da Helmet ile aktif (development'da devre dışı)
+- [x] SecurityHeaders.com: Cloudflare önünde olduğundan başlıklar strip ediliyor - Cloudflare Transform Rules önerildi
+- [x] JSON-LD şemaları vite.ts'e getJsonLdForPath() fonksiyonu ile server-side enjekte edildi (tüm public sayfalar)
