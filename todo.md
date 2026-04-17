@@ -432,3 +432,8 @@
 ## İstatistik Kartı Değişikliği (17.04.2026)
 
 - [x] Home.tsx'teki "41+ Tamamlanan Teslimat" kartı "38+ Hizmet Bölgesi" olarak değiştirildi (4 dil desteği: EN/TR/MK/SQ)
+
+## "Minute" Etiketi Çevirisi (17.04.2026)
+
+- [x] 4 dil dosyasına "minute" anahtarı eklendi (EN: Minute, TR: Dakika, MK: Минута, SQ: Minutë)
+- [x] Home.tsx'te sabit "Minute" metni t('minute') ile değiştirildi

@@ -125,7 +125,7 @@ export default function Home() {
                 </div>
                 <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-4 border-2 border-green-100 hover:border-green-300 transition-[transform,border-color] hover:scale-105">
                   <div className="text-3xl font-bold text-green-600">15</div>
-                  <div className="text-sm text-gray-600 font-medium mt-1">Minute</div>
+                  <div className="text-sm text-gray-600 font-medium mt-1">{t('minute')}</div>
                 </div>
                 <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-4 border-2 border-blue-100 hover:border-blue-300 transition-[transform,border-color] hover:scale-105">
                   <div className="text-3xl font-bold text-blue-600">4.9</div>
