@@ -390,3 +390,12 @@
 - [x] Header'da useMemo (categoryItems, languages, currentLanguage) ve useCallback (handleLogout, closeMobileMenu)
 - [x] CSS will-change + content-visibility + contain hint'leri eklendi (header, dropdown, footer, sections)
 - [x] startTransition ile scroll-to-top route change sarıldı
+
+## JSON-LD Yapısal Veri Eksiklikleri (17.04.2026)
+
+- [x] HowItWorks sayfasına getHowItWorksSchemas() bağlandı
+- [x] Services sayfasına getServicesSchemas() bağlandı
+- [x] Areas sayfasına BreadcrumbList + ItemList şeması eklendi (dinamik areas listesi)
+- [x] CategoryPage sayfasına Service + BreadcrumbList şeması eklendi (dinamik category verisi)
+- [x] Order sayfasına Service şeması eklendi
+- [x] structuredData.ts'e getAreasPageSchemas(), getCategoryPageSchemas(), getOrderPageSchemas() fonksiyonları eklendi

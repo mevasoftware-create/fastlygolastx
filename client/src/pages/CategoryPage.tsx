@@ -1,6 +1,7 @@
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import SEOHead from '@/components/SEOHead';
+import { getCategoryPageSchemas } from '@/lib/structuredData';
 import { Clock, MapPin, Star, ArrowRight, CheckCircle, Zap, Shield, Package, Truck, Utensils, Timer, ThumbsUp, Pill, ShoppingBag, Briefcase, FileText, Gift } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useLocation, useParams } from 'wouter';
@@ -487,6 +488,7 @@ export default function CategoryPage() {
         description={finalDescription}
         keywords={seoData.keywords}
         canonical={currentUrl}
+        structuredData={getCategoryPageSchemas(slug, finalTitle || slug, finalDescription || `FastlyGo ${slug} delivery service in Skopje`)}
       />
 
       <div className="min-h-screen flex flex-col bg-gradient-to-b from-orange-50/50 via-white to-orange-50/30">

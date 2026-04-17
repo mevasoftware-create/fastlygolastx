@@ -2,6 +2,7 @@ import { Clock, MapPin, Shield, Zap, ArrowRight, CheckCircle, Star, Search, X, T
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import SEOHead from "@/components/SEOHead";
+import { getServicesSchemas } from "@/lib/structuredData";
 import { useLocation } from "wouter";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { trpc } from "@/lib/trpc";
@@ -298,6 +299,7 @@ export default function Services() {
         title={isSeoLoading ? "" : dbSeo.title}
         description={isSeoLoading ? "" : dbSeo.description}
         keywords={isSeoLoading ? "" : dbSeo.keywords}
+        structuredData={getServicesSchemas()}
       />
       <Header />
 

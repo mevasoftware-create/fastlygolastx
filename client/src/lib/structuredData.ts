@@ -301,3 +301,129 @@ export const getServicesSchemas = (): StructuredDataSchema[] => [
     250
   )
 ];
+
+/**
+ * Areas Page Schema - ItemList of delivery areas
+ */
+export const getAreasPageSchemas = (
+  areas?: Array<{ slug: string; lat?: number | null; lng?: number | null; seoMeta?: any }>
+): StructuredDataSchema[] => {
+  const schemas: StructuredDataSchema[] = [
+    getBreadcrumbSchema([
+      { position: 1, name: "Home", item: "https://fastlygo.mk" },
+      { position: 2, name: "Delivery Areas", item: "https://fastlygo.mk/areas" }
+    ])
+  ];
+
+  if (areas && areas.length > 0) {
+    const itemListSchema: StructuredDataSchema = {
+      "@context": "https://schema.org",
+      "@type": "ItemList",
+      "name": "FastlyGo Delivery Areas in Skopje",
+      "description": "All delivery areas covered by FastlyGo courier service in Skopje and North Macedonia.",
+      "url": "https://fastlygo.mk/areas",
+      "numberOfItems": areas.length,
+      "itemListElement": areas.map((area, index) => {
+        const meta = area.seoMeta?.en || {};
+        const areaName = meta.heading || meta.badge || area.slug.replace(/-/g, ' ').replace(/\b\w/g, (c: string) => c.toUpperCase());
+        return {
+          "@type": "ListItem",
+          "position": index + 1,
+          "name": areaName,
+          "url": `https://fastlygo.mk/areas/${area.slug}`
+        };
+      })
+    };
+    schemas.push(itemListSchema);
+  }
+
+  return schemas;
+};
+
+/**
+ * Category Page Schema - Service schema for a specific delivery category
+ */
+export const getCategoryPageSchemas = (
+  slug: string,
+  categoryName: string,
+  description: string
+): StructuredDataSchema[] => [
+  {
+    "@context": "https://schema.org",
+    "@type": "Service",
+    "name": categoryName,
+    "description": description,
+    "url": `https://fastlygo.mk/categories/${slug}`,
+    "provider": {
+      "@type": "LocalBusiness",
+      "name": "FastlyGo",
+      "url": "https://fastlygo.mk",
+      "telephone": "+389 71 246 766",
+      "address": {
+        "@type": "PostalAddress",
+        "addressLocality": "Skopje",
+        "addressCountry": "MK"
+      }
+    },
+    "areaServed": {
+      "@type": "City",
+      "name": "Skopje"
+    },
+    "serviceType": "Courier Delivery",
+    "offers": {
+      "@type": "Offer",
+      "priceCurrency": "EUR",
+      "price": "4.00",
+      "availability": "https://schema.org/InStock"
+    },
+    "aggregateRating": {
+      "@type": "AggregateRating",
+      "ratingValue": "4.8",
+      "reviewCount": "250"
+    }
+  },
+  getBreadcrumbSchema([
+    { position: 1, name: "Home", item: "https://fastlygo.mk" },
+    { position: 2, name: "Services", item: "https://fastlygo.mk/services" },
+    { position: 3, name: categoryName, item: `https://fastlygo.mk/categories/${slug}` }
+  ])
+];
+
+/**
+ * Order Page Schema - Service offering for placing a new order
+ */
+export const getOrderPageSchemas = (): StructuredDataSchema[] => [
+  {
+    "@context": "https://schema.org",
+    "@type": "Service",
+    "name": "Call a Courier - FastlyGo Express Delivery",
+    "description": "Order an express courier in Skopje. Enter pickup and delivery addresses, choose package size, and a courier arrives in 15 minutes.",
+    "url": "https://fastlygo.mk/new-order",
+    "provider": {
+      "@type": "LocalBusiness",
+      "name": "FastlyGo",
+      "url": "https://fastlygo.mk",
+      "telephone": "+389 71 246 766",
+      "address": {
+        "@type": "PostalAddress",
+        "addressLocality": "Skopje",
+        "addressCountry": "MK"
+      }
+    },
+    "serviceType": "Courier Delivery",
+    "areaServed": {
+      "@type": "City",
+      "name": "Skopje"
+    },
+    "offers": {
+      "@type": "Offer",
+      "priceCurrency": "EUR",
+      "price": "4.00",
+      "availability": "https://schema.org/InStock"
+    }
+  },
+  getBreadcrumbSchema([
+    { position: 1, name: "Home", item: "https://fastlygo.mk" },
+    { position: 2, name: "Call a Courier", item: "https://fastlygo.mk/new-order" }
+  ])
+];

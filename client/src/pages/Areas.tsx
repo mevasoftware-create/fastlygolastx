@@ -2,6 +2,7 @@ import { useState, useRef, useEffect, useMemo } from 'react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import SEOHead from '@/components/SEOHead';
+import { getAreasPageSchemas } from '@/lib/structuredData';
 import { MapView } from '@/components/Map';
 import { MapPin, Search, ArrowRight, Loader2, Zap, X, Navigation, Clock, ChevronDown, ChevronUp } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
@@ -176,6 +177,7 @@ export default function Areas() {
         description={seoData.description || ''}
         keywords={seoData.keywords || ''}
         isLoading={isPageLoading}
+        structuredData={getAreasPageSchemas(areas || [])}
       />
 
       <div className="min-h-screen flex flex-col bg-gradient-to-b from-orange-50/30 via-white to-amber-50/20">

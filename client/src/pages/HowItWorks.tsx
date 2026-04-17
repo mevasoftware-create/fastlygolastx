@@ -2,6 +2,7 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import SEOHead from "@/components/SEOHead";
+import { getHowItWorksSchemas } from "@/lib/structuredData";
 import { Link } from "wouter";
 import { useEffect, useRef, useState } from "react";
 import { Zap, ArrowRight, CheckCircle2, Star } from "lucide-react";
@@ -355,6 +356,7 @@ export default function HowItWorks() {
           title={isSeoLoading ? "" : (dbSeo.title || t("title"))}
           description={isSeoLoading ? "" : (dbSeo.description || t("description"))}
           keywords={isSeoLoading ? "" : (dbSeo.keywords || undefined)}
+          structuredData={getHowItWorksSchemas()}
         />
         <Header />
 

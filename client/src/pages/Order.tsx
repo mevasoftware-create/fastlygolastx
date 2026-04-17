@@ -16,6 +16,7 @@ import { useLanguage } from "@/contexts/LanguageContext";
 
 import { AddressMapPicker } from "@/components/AddressMapPicker";
 import SEOHead from "@/components/SEOHead";
+import { getOrderPageSchemas } from "@/lib/structuredData";
 import { BASE_URL } from "@/const";
 import { useSeoFromDatabase } from "@/hooks/useSeoFromDatabase";
 import { PageHeader } from "@/components/PageHeader";
@@ -361,6 +362,7 @@ export default function Order() {
         title={seoData.title}
         description={seoData.description}
         keywords={seoData.keywords}
+        structuredData={getOrderPageSchemas()}
       />
       <div className="min-h-screen bg-gradient-to-b from-orange-50/30 via-white to-amber-50/20">
         <Header />
