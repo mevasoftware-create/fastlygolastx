@@ -428,3 +428,7 @@
 - [x] FAQPage/Services şeması çok dilli yapıldı (6 soru × 4 dil)
 - [x] BreadcrumbList'ler çok dilli yapıldı (bcHome, bcServices, bcAreas vb. 4 dil) + breadcrumb() helper fonksiyonu
 - [x] Dil bazlı doğrulama tamamlandı: TR (Nasıl Çalışır/Ana Sayfa), MK (Доставни Услуги/Почетна), SQ (Rreth Nesh/Kryefaqja) doğrulandı
+
+## İstatistik Kartı Değişikliği (17.04.2026)
+
+- [x] Home.tsx'teki "41+ Tamamlanan Teslimat" kartı "38+ Hizmet Bölgesi" olarak değiştirildi (4 dil desteği: EN/TR/MK/SQ)

@@ -120,8 +120,8 @@ export default function Home() {
                   <div className="text-sm text-gray-600 font-medium mt-1">{t('activeCouriers')}</div>
                 </div>
                 <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-4 border-2 border-amber-100 hover:border-amber-300 transition-[transform,border-color] hover:scale-105">
-                  <div className="text-3xl font-bold text-amber-600">{stats?.completedOrders || '20K'}+</div>
-                  <div className="text-sm text-gray-600 font-medium mt-1">{t('deliveriesCompleted')}</div>
+                  <div className="text-3xl font-bold text-amber-600">38+</div>
+                  <div className="text-sm text-gray-600 font-medium mt-1">{t('serviceAreas')}</div>
                 </div>
                 <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-4 border-2 border-green-100 hover:border-green-300 transition-[transform,border-color] hover:scale-105">
                   <div className="text-3xl font-bold text-green-600">15</div>
