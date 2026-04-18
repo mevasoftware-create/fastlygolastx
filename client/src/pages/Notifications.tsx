@@ -13,12 +13,14 @@ export default function Notifications() {
   const [filter, setFilter] = useState<"all" | "unread">("all");
 
   // Fetch notifications
+  const utils = trpc.useUtils();
   const { data: notifications, isLoading, refetch } = trpc.notifications.list.useQuery({});
   
   // Mark as read mutation
   const markAsRead = trpc.notifications.markAsRead.useMutation({
     onSuccess: () => {
       refetch();
+      utils.notifications.unreadCount.invalidate();
       toast.success("Bildirim okundu olarak işaretlendi");
     },
   });
@@ -27,6 +29,7 @@ export default function Notifications() {
   const markAllAsRead = trpc.notifications.markAllAsRead.useMutation({
     onSuccess: () => {
       refetch();
+      utils.notifications.unreadCount.invalidate();
       toast.success("Tüm bildirimler okundu olarak işaretlendi");
     },
   });
@@ -35,6 +38,7 @@ export default function Notifications() {
   const deleteNotification = trpc.notifications.delete.useMutation({
     onSuccess: () => {
       refetch();
+      utils.notifications.unreadCount.invalidate();
       toast.success("Bildirim silindi");
     },
   });

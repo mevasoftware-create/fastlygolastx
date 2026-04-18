@@ -25,13 +25,21 @@ let cronInterval: ReturnType<typeof setInterval> | null = null;
  * Her dakika çalışır.
  */
 export async function processScheduledNotifications() {
-  const dbInstance = await getDb();
+  let dbInstance;
+  try {
+    dbInstance = await getDb();
+  } catch (connErr: unknown) {
+    console.error("[Scheduler] DB bağlantısı kurulamadı, sonraki dakika tekrar denenecek:", (connErr as Error).message);
+    return;
+  }
   if (!dbInstance) return;
 
   const now = new Date();
 
-  // Gönderilmesi gereken bekleyen bildirimleri bul
-  const pending = await dbInstance
+  let pending;
+  try {
+    // Gönderilmesi gereken bekleyen bildirimleri bul
+    pending = await dbInstance
     .select()
     .from(scheduledNotifications)
     .where(
@@ -41,6 +49,10 @@ export async function processScheduledNotifications() {
       )
     )
     .limit(20); // Aynı anda max 20 bildirim işle
+  } catch (queryErr: unknown) {
+    console.error("[Scheduler] DB sorgusu başarısız (ECONNRESET?), sonraki dakika tekrar denenecek:", (queryErr as Error).message);
+    return;
+  }
 
   if (pending.length === 0) return;
 

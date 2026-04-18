@@ -437,3 +437,10 @@
 
 - [x] 4 dil dosyasına "minute" anahtarı eklendi (EN: Minute, TR: Dakika, MK: Минута, SQ: Minutë)
 - [x] Home.tsx'te sabit "Minute" metni t('minute') ile değiştirildi
+
+## Manuel Test Bulguları (18.04.2026)
+
+- [x] Bildirim sayıcı güncellemiyor - markAsRead/markAllAsRead/delete mutation'larına utils.notifications.unreadCount.invalidate() eklendi
+- [x] Şablon seçimi incelendi - TEMPLATES dizisi doğru sıralanmış, applyTemplate fonksiyonu doğru çalışıyor (index kayması yok)
+- [x] hero-poster.webp preload kaldırıldı - hiçbir kaynak dosyada kullanılmıyordu
+- [x] Zamanlı bildirim scheduler ECONNRESET hatası düzeltildi - DB bağlantısı ve sorgu için ayrı try/catch eklendi, hata sonrası otomatik retry (60s)
