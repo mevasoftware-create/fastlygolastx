@@ -444,3 +444,7 @@
 - [x] Şablon seçimi incelendi - TEMPLATES dizisi doğru sıralanmış, applyTemplate fonksiyonu doğru çalışıyor (index kayması yok)
 - [x] hero-poster.webp preload kaldırıldı - hiçbir kaynak dosyada kullanılmıyordu
 - [x] Zamanlı bildirim scheduler ECONNRESET hatası düzeltildi - DB bağlantısı ve sorgu için ayrı try/catch eklendi, hata sonrası otomatik retry (60s)
+
+## Title Yenilenme Sorunu (18.04.2026)
+
+- [x] Ana sayfada title 3 kez yenileniyor - isSeoLoading ? "" pattern'i kaldırıldı (Home, AboutUs, HowItWorks, Services). DB verisi gelene kadar i18n fallback kullanılıyor, title sadece 1 kez güncelleniyor.

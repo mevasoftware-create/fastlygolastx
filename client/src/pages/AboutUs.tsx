@@ -85,9 +85,9 @@ export default function AboutUs() {
   return (
     <>
       <SEOHead
-        title={isSeoLoading ? "" : seoData.title}
-        description={isSeoLoading ? "" : seoData.description}
-        keywords={isSeoLoading ? "" : seoData.keywords}
+        title={seoData.title || undefined}
+        description={seoData.description || undefined}
+        keywords={seoData.keywords || undefined}
         structuredData={structuredData}
       />
 

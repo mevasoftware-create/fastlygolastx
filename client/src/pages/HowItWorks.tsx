@@ -353,9 +353,9 @@ export default function HowItWorks() {
 
       <div className="min-h-screen bg-white">
         <SEOHead
-          title={isSeoLoading ? "" : (dbSeo.title || t("title"))}
-          description={isSeoLoading ? "" : (dbSeo.description || t("description"))}
-          keywords={isSeoLoading ? "" : (dbSeo.keywords || undefined)}
+          title={dbSeo.title || undefined}
+          description={dbSeo.description || undefined}
+          keywords={dbSeo.keywords || undefined}
           structuredData={getHowItWorksSchemas()}
         />
         <Header />

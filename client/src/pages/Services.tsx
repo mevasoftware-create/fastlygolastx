@@ -296,9 +296,9 @@ export default function Services() {
   return (
     <div className="min-h-screen bg-white">
       <SEOHead
-        title={isSeoLoading ? "" : dbSeo.title}
-        description={isSeoLoading ? "" : dbSeo.description}
-        keywords={isSeoLoading ? "" : dbSeo.keywords}
+        title={dbSeo.title || undefined}
+        description={dbSeo.description || undefined}
+        keywords={dbSeo.keywords || undefined}
         structuredData={getServicesSchemas()}
       />
       <Header />

@@ -63,9 +63,9 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-orange-50/30 via-white to-amber-50/20">
       <SEOHead 
-        title={isSeoLoading ? "" : (seoData.title || undefined)}
-        description={isSeoLoading ? "" : (seoData.description || undefined)}
-        keywords={isSeoLoading ? "" : (seoData.keywords || undefined)}
+        title={seoData.title || undefined}
+        description={seoData.description || undefined}
+        keywords={seoData.keywords || undefined}
         titleKey="seoTitle"
         descriptionKey="seoDescription"
         keywordsKey="seoKeywords"
