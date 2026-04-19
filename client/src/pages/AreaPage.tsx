@@ -219,9 +219,6 @@ export default function AreaPage() {
       <>
         <meta name="prerender-status-code" content="200" />
         <SEOHead 
-          title=""
-          description=""
-          keywords=""
           canonical={currentUrl}
           noindex={false}
         />

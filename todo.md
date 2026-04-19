@@ -448,3 +448,9 @@
 ## Title Yenilenme Sorunu (18.04.2026)
 
 - [x] Ana sayfada title 3 kez yenileniyor - isSeoLoading ? "" pattern'i kaldırıldı (Home, AboutUs, HowItWorks, Services). DB verisi gelene kadar i18n fallback kullanılıyor, title sadece 1 kez güncelleniyor.
+
+## Title Flicker - Kalan Sayfalar (19.04.2026)
+
+- [x] Categories.tsx - isSeoLoading ? '' pattern'i düzeltildi (pageSeo.title || undefined)
+- [x] AreaPage.tsx - isLoading skeleton'da title="" kaldırıldı
+- [x] CategoryPage.tsx - isLoading skeleton'da title="" kaldırıldı

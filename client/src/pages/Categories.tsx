@@ -58,10 +58,9 @@ export default function Categories() {
   return (
     <>
       <SEOHead
-        title={isSeoLoading ? '' : (pageSeo.title || '')}
-        description={isSeoLoading ? '' : (pageSeo.description || '')}
-        keywords={isSeoLoading ? '' : (pageSeo.keywords || '')}
-        isLoading={isSeoLoading}
+        title={pageSeo.title || undefined}
+        description={pageSeo.description || undefined}
+        keywords={pageSeo.keywords || undefined}
       />
       <div className="min-h-screen bg-gradient-to-b from-orange-50 via-white to-orange-50">
         <Header />
