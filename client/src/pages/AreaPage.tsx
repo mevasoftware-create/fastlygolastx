@@ -195,10 +195,7 @@ export default function AreaPage() {
 
   // Redirect to 404 if area not found
   useEffect(() => {
-    if (!isLoading && !area && !error) {
-      setLocation('/404');
-    }
-    if (error) {
+    if (!isLoading && (!area || error)) {
       setLocation('/404');
     }
   }, [isLoading, area, error, setLocation]);

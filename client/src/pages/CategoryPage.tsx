@@ -420,10 +420,7 @@ export default function CategoryPage() {
 
   // Redirect to 404 if category not found
   useEffect(() => {
-    if (!isLoading && !category && !error) {
-      setLocation('/404');
-    }
-    if (error) {
+    if (!isLoading && (!category || error)) {
       setLocation('/404');
     }
   }, [isLoading, category, error, setLocation]);

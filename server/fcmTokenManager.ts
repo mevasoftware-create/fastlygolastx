@@ -27,6 +27,30 @@ let googleAuth: GoogleAuth | null = null;
 let refreshTimer: NodeJS.Timeout | null = null;
 
 /**
+ * Secret olarak saklanan JSON'da literal \n karakterleri olabilir.
+ * Bu fonksiyon bu durumu düzelterek geçerli bir JSON nesnesi döndürür.
+ */
+function parseServiceAccountJson(raw: string): object | null {
+  // Önce doğrudan parse dene
+  try {
+    return JSON.parse(raw);
+  } catch {
+    // Literal \n karakterlerini gerçek newline'lara çevir,
+    // ardından string değerleri içindeki newline'ları tekrar escape et
+    try {
+      const step1 = raw.replace(/\\n/g, "\n");
+      const fixed = step1.replace(/"([^"]*)"/g, (_match: string, inner: string) => {
+        return '"' + inner.replace(/\n/g, "\\n") + '"';
+      });
+      return JSON.parse(fixed);
+    } catch (err2) {
+      console.error("[FCM TokenManager] Failed to parse FCM_SERVICE_ACCOUNT_JSON (both attempts):", err2);
+      return null;
+    }
+  }
+}
+
+/**
  * Service Account JSON'dan GoogleAuth instance oluştur
  */
 function initGoogleAuth(): GoogleAuth | null {
@@ -36,13 +60,14 @@ function initGoogleAuth(): GoogleAuth | null {
   }
 
   try {
-    const credentials = JSON.parse(serviceAccountJson);
+    const credentials = parseServiceAccountJson(serviceAccountJson);
+    if (!credentials) return null;
     return new GoogleAuth({
       credentials,
       scopes: FCM_SCOPES,
     });
   } catch (err) {
-    console.error("[FCM TokenManager] Failed to parse FCM_SERVICE_ACCOUNT_JSON:", err);
+    console.error("[FCM TokenManager] Failed to initialize GoogleAuth:", err);
     return null;
   }
 }
@@ -144,6 +169,8 @@ export async function initFcmTokenManager(): Promise<void> {
       // Otomatik yenilemeyi başlat
       startAutoRefresh();
       console.log("[FCM TokenManager] ✅ Auto-refresh active - tokens will renew every 45 minutes");
+    } else {
+      console.error("[FCM TokenManager] ❌ Failed to initialize GoogleAuth from Service Account JSON");
     }
   } else if (process.env.FCM_ACCESS_TOKEN) {
     console.log("[FCM TokenManager] ⚠️  Using manual FCM_ACCESS_TOKEN (no Service Account configured)");

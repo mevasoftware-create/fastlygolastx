@@ -454,3 +454,21 @@
 - [x] Categories.tsx - isSeoLoading ? '' pattern'i düzeltildi (pageSeo.title || undefined)
 - [x] AreaPage.tsx - isLoading skeleton'da title="" kaldırıldı
 - [x] CategoryPage.tsx - isLoading skeleton'da title="" kaldırıldı
+
+## 3 Kritik Görev (19.04.2026)
+
+- [ ] AreaPage geçersiz slug → /404 yönlendirmesi
+- [ ] CategoryPage geçersiz slug → /404 yönlendirmesi
+- [ ] Para çekme: createPaymentRequest, listPaymentRequests backend endpoint'leri
+- [ ] Para çekme: approvePaymentRequest, rejectPaymentRequest admin endpoint'leri
+- [ ] Para çekme: çekilebilir bakiye hesaplama (toplam kazanç - onaylanan çekimler)
+- [ ] Para çekme: CourierPayments sayfası aktif (IBAN, miktar, talep geçmişi)
+- [ ] Para çekme: Admin paneli onay/red akışı
+- [ ] FCM push bildirimi token yenileme mekanizması
+
+## FCM Push Bildirimi Kalıcı Düzeltme (28.04.2026)
+- [x] FCM_SERVICE_ACCOUNT_JSON secret'ı eklendi (fresh-park-191813 projesi)
+- [x] fcmTokenManager.ts'e parseServiceAccountJson() fonksiyonu eklendi (literal \\n encoding düzeltmesi)
+- [x] Service Account ile otomatik token yenileme aktif (her 45 dakikada bir)
+- [x] fcmTokenManager.test.ts yazıldı - 4 test geçiyor
+- [x] Tüm testler: 67/67 geçiyor, TypeScript: 0 hata
