@@ -16,12 +16,41 @@ const CACHE_TTL = 10 * 60 * 1000; // 10 minutes
 const SUPPORTED_LANGS = ["en", "tr", "mk", "sq"] as const;
 type SupportedLang = typeof SUPPORTED_LANGS[number];
 
-function detectLanguageFromUrl(url: string, acceptLanguage?: string): string {
+/**
+ * Domain → varsayılan dil eşleştirmesi
+ * fastlygo.al → sq (Arnavutça)
+ * fastlygo.mk → mk (Makedonca) — kullanıcı tercihine göre override edilebilir
+ */
+const DOMAIN_DEFAULT_LANG: Record<string, SupportedLang> = {
+  "fastlygo.al": "sq",
+  "www.fastlygo.al": "sq",
+  "fastlygo.mk": "mk",
+  "www.fastlygo.mk": "mk",
+};
+
+/**
+ * Domain'e göre canonical base URL döndür
+ * fastlygo.al → https://fastlygo.al
+ * diğer → https://fastlygo.mk
+ */
+function getBaseUrlForHost(host: string): string {
+  const cleanHost = host.replace(/^www\./, "");
+  if (cleanHost === "fastlygo.al") return "https://fastlygo.al";
+  return "https://fastlygo.mk";
+}
+
+function detectLanguageFromUrl(url: string, acceptLanguage?: string, host?: string): string {
   // 1. ?lang= query param takes priority
   const params = new URLSearchParams(url.includes("?") ? url.split("?")[1] : "");
   const lang = params.get("lang");
   if (lang && SUPPORTED_LANGS.includes(lang as SupportedLang)) return lang;
-  // 2. Accept-Language header fallback
+  // 2. Domain-based default language (fastlygo.al → sq, fastlygo.mk → mk)
+  if (host) {
+    const cleanHost = host.split(":")[0]; // port varsa çıkar
+    const domainLang = DOMAIN_DEFAULT_LANG[cleanHost];
+    if (domainLang) return domainLang;
+  }
+  // 3. Accept-Language header fallback
   if (acceptLanguage) {
     const preferred = acceptLanguage.split(",")[0].split("-")[0].toLowerCase();
     if (SUPPORTED_LANGS.includes(preferred as SupportedLang)) return preferred;
@@ -39,9 +68,9 @@ function parseSeoMeta(seoMetaRaw: any, language: string): { title: string; descr
   }
 }
 
-async function getSeoForUrl(url: string, acceptLanguage?: string): Promise<{ title: string; description: string } | null> {
+async function getSeoForUrl(url: string, acceptLanguage?: string, host?: string): Promise<{ title: string; description: string } | null> {
   const pathname = url.split("?")[0];
-  const language = detectLanguageFromUrl(url, acceptLanguage);
+  const language = detectLanguageFromUrl(url, acceptLanguage, host);
   const cacheKey = `${pathname}:${language}`;
   const cached = seoCache.get(cacheKey);
   if (cached && cached.expiry > Date.now()) return { title: cached.title, description: cached.description };
@@ -308,16 +337,16 @@ const SCHEMA_I18N: Record<string, {
  * These are injected server-side so Google bot sees them before JS runs.
  * All text content is localized based on the `language` parameter.
  */
-function getJsonLdForPath(pathname: string, language: string, title: string, description: string): Record<string, unknown>[] {
+function getJsonLdForPath(pathname: string, language: string, title: string, description: string, host?: string): Record<string, unknown>[] {
   const lang = (language && SCHEMA_I18N[language]) ? language : "en";
   const t = SCHEMA_I18N[lang];
-
+  const pageBaseUrl = host ? getBaseUrlForHost(host) : BASE_URL;
   const localBusinessBase = {
     "@context": "https://schema.org",
     "@type": "LocalBusiness",
     "name": "FastlyGo",
     "description": t.lbDescription,
-    "url": BASE_URL,
+    "url": pageBaseUrl,
     "telephone": "+38978123456",
     "email": "info@fastlygo.mk",
     "image": OG_IMAGE,
@@ -353,7 +382,7 @@ function getJsonLdForPath(pathname: string, language: string, title: string, des
     "@context": "https://schema.org",
     "@type": "Organization",
     "name": "FastlyGo",
-    "url": BASE_URL,
+    "url": pageBaseUrl,
     "logo": `${BASE_URL}/logo.png`,
     "description": t.orgDescription,
     "foundingDate": "2023",
@@ -365,6 +394,8 @@ function getJsonLdForPath(pathname: string, language: string, title: string, des
       "availableLanguage": ["English", "Macedonian", "Albanian", "Turkish"]
     },
     "sameAs": [
+      "https://fastlygo.mk",
+      "https://fastlygo.al",
       "https://www.facebook.com/fastlygo",
       "https://www.instagram.com/fastlygo"
     ]
@@ -564,7 +595,8 @@ function injectSeoIntoHtml(
   title: string,
   description: string,
   pathname: string,
-  language: string
+  language: string,
+  host?: string
 ): string {
   const esc = (s: string) => s.replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
   // Fallback SEO data for pages not in DB - multi-language
@@ -644,27 +676,37 @@ function injectSeoIntoHtml(
   };
   const fbLang = fallbackSeoAll[pathname];
   const fb = fbLang ? (fbLang[language] || fbLang.en) : null;
-  const safeTitle = title ? esc(title) : (fb ? esc(fb.title) : "FastlyGo");
+    const safeTitle = title ? esc(title) : (fb ? esc(fb.title) : "FastlyGo");
   const safeDesc = esc(description || fb?.description || "");
-
-  // Canonical URL: always BASE_URL, clean path (no ?lang= in canonical)
-  const canonicalUrl = `${BASE_URL}${pathname}`;
-
-  // hreflang URLs
-  const hrefEn = `${BASE_URL}${pathname}`;
-  const hrefTr = `${BASE_URL}${pathname}?lang=tr`;
-  const hrefMk = `${BASE_URL}${pathname}?lang=mk`;
-  const hrefSq = `${BASE_URL}${pathname}?lang=sq`;
-
+  // Domain-aware base URL: fastlygo.al → https://fastlygo.al, others → https://fastlygo.mk
+  const pageBaseUrl = host ? getBaseUrlForHost(host) : BASE_URL;
+  const mkBaseUrl = "https://fastlygo.mk";
+  const alBaseUrl = "https://fastlygo.al";
+  // Canonical URL: domain'e göre (fastlygo.al'dan gelince canonical fastlygo.al olur)
+  const canonicalUrl = `${pageBaseUrl}${pathname}`;
+  // hreflang URLs: her dil kendi canonical domain'ini gösterir
+  // sq → fastlygo.al (Arnavutça canonical domain)
+  // mk → fastlygo.mk?lang=mk
+  // en, tr → fastlygo.mk
+  const hrefEn = `${mkBaseUrl}${pathname}`;
+  const hrefTr = `${mkBaseUrl}${pathname}?lang=tr`;
+  const hrefMk = `${mkBaseUrl}${pathname}?lang=mk`;
+  const hrefSq = `${alBaseUrl}${pathname}`;
   // OG locale map
   const ogLocale: Record<string, string> = { en: "en_US", tr: "tr_TR", mk: "mk_MK", sq: "sq_AL" };
   const locale = ogLocale[language] || "en_US";
-
-  // Current page URL (with lang param if non-English)
-  const currentUrl = language !== "en" ? `${BASE_URL}${pathname}?lang=${language}` : canonicalUrl;
+  // Current page URL
+  let currentUrl: string;
+  if (language === "sq") {
+    currentUrl = `${alBaseUrl}${pathname}`;
+  } else if (language === "en") {
+    currentUrl = `${mkBaseUrl}${pathname}`;
+  } else {
+    currentUrl = `${mkBaseUrl}${pathname}?lang=${language}`;
+  }
 
   // Build JSON-LD structured data for this page
-  const jsonLdSchemas = getJsonLdForPath(pathname, language, safeTitle, safeDesc);
+  const jsonLdSchemas = getJsonLdForPath(pathname, language, safeTitle, safeDesc, host);
   const jsonLdBlock = jsonLdSchemas.length > 0
     ? jsonLdSchemas.map(schema => `  <script type="application/ld+json">${JSON.stringify(schema)}</script>`).join("\n")
     : "";
@@ -773,12 +815,13 @@ export async function setupVite(app: Express, server: Server) {
       );
       let page = await vite.transformIndexHtml(url, template);
       // Server-side SEO injection - inject correct title/description for Google bot
-      // Language detection: ?lang= param → Accept-Language header → default EN
+      // Language detection: ?lang= param → domain default → Accept-Language header → EN
       const acceptLang = req.headers["accept-language"] as string | undefined;
-      const seoData = await getSeoForUrl(url, acceptLang);
+      const _host = (req.headers["x-forwarded-host"] as string || req.headers.host || "").split(",")[0].trim();
+      const seoData = await getSeoForUrl(url, acceptLang, _host);
       const _pathname = url.split("?")[0];
-      const _language = detectLanguageFromUrl(url, acceptLang);
-      page = injectSeoIntoHtml(page, seoData?.title || "", seoData?.description || "", _pathname, _language);
+      const _language = detectLanguageFromUrl(url, acceptLang, _host);
+      page = injectSeoIntoHtml(page, seoData?.title || "", seoData?.description || "", _pathname, _language, _host);
       res.status(200).set({ "Content-Type": "text/html" }).end(page);
     } catch (e) {
       vite.ssrFixStacktrace(e as Error);
@@ -836,9 +879,10 @@ export function serveStatic(app: Express) {
     fs.readFile(indexPath, "utf-8", async (err, html) => {
       if (err) { res.sendFile(indexPath); return; }
       const acceptLang = req.headers?.["accept-language"] as string | undefined;
-      const seoData = await getSeoForUrl(url, acceptLang).catch(() => null);
+      const _host = (req.headers?.["x-forwarded-host"] as string || req.headers?.host || "").split(",")[0].trim();
+      const seoData = await getSeoForUrl(url, acceptLang, _host).catch(() => null);
       const _pathname = url.split("?")[0];
-      const _language = detectLanguageFromUrl(url, acceptLang);
+      const _language = detectLanguageFromUrl(url, acceptLang, _host);
       
       // Check if this is a dynamic route with no matching data - return 404 status
       const isAreaPage = _pathname.match(/^\/areas\/([^/?]+)$/);
@@ -846,7 +890,7 @@ export function serveStatic(app: Express) {
       const isDynamicNotFound = (isAreaPage || isCategoryPage) && !seoData;
       const statusCode = isDynamicNotFound ? 404 : 200;
       
-      html = injectSeoIntoHtml(html, seoData?.title || "", seoData?.description || "", _pathname, _language);
+      html = injectSeoIntoHtml(html, seoData?.title || "", seoData?.description || "", _pathname, _language, _host);
       res.status(statusCode).set({ "Content-Type": "text/html", "X-SEO-Injected": "true" }).end(html);
     });
   };
@@ -863,10 +907,11 @@ export function serveStatic(app: Express) {
       if (err) { res.sendFile(indexPath); return; }
       // Server-side SEO injection
       const acceptLang = (req as any).headers?.["accept-language"] as string | undefined;
-      const seoData = await getSeoForUrl(url, acceptLang).catch(() => null);
+      const _host = ((req as any).headers?.["x-forwarded-host"] as string || (req as any).headers?.host || "").split(",")[0].trim();
+      const seoData = await getSeoForUrl(url, acceptLang, _host).catch(() => null);
       const _pathname = url.split("?")[0];
-      const _language = detectLanguageFromUrl(url, acceptLang);
-      html = injectSeoIntoHtml(html, seoData?.title || "", seoData?.description || "", _pathname, _language);
+      const _language = detectLanguageFromUrl(url, acceptLang, _host);
+      html = injectSeoIntoHtml(html, seoData?.title || "", seoData?.description || "", _pathname, _language, _host);
       res.status(200).set({ "Content-Type": "text/html", "X-SEO-Injected": "true" }).end(html);
     });
   });

@@ -472,3 +472,11 @@
 - [x] Service Account ile otomatik token yenileme aktif (her 45 dakikada bir)
 - [x] fcmTokenManager.test.ts yazıldı - 4 test geçiyor
 - [x] Tüm testler: 67/67 geçiyor, TypeScript: 0 hata
+
+## fastlygo.al Domain Entegrasyonu (28.04.2026)
+- [x] Domain bazlı dil tespiti: fastlygo.al → sq, fastlygo.mk → mk (server + client)
+- [x] i18n init: domain'e göre varsayılan dil ayarla (fastlygo.al → sq)
+- [x] Canonical etiketleri: fastlygo.al'dan gelince canonical https://fastlygo.al/... olsun
+- [x] hreflang etiketleri: fastlygo.al için sq canonical + çapraz referanslar
+- [x] Server-side JSON-LD: fastlygo.al için url/sameAs alanları güncellenmeli
+- [x] sitemap.xml: fastlygo.al URL'leri eklenmeli (sq dil bloğu)

@@ -1,8 +1,22 @@
 import { useEffect } from 'react';
 import { useLocation } from 'wouter';
-import { BASE_URL } from '@/const';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { t, Language } from '@/lib/i18n';
+
+const MK_BASE_URL = 'https://fastlygo.mk';
+const AL_BASE_URL = 'https://fastlygo.al';
+
+/**
+ * Domain'e göre canonical base URL döndür.
+ * fastlygo.al → https://fastlygo.al
+ * diğer → https://fastlygo.mk
+ */
+function getCanonicalBaseUrl(): string {
+  if (typeof window === 'undefined') return MK_BASE_URL;
+  const hostname = window.location.hostname.replace(/^www\./, '');
+  if (hostname === 'fastlygo.al') return AL_BASE_URL;
+  return MK_BASE_URL;
+}
 
 interface SEOHeadProps {
   titleKey?: string;
@@ -26,7 +40,8 @@ interface SEOHeadProps {
  * Generates SEO meta tags using React 19's built-in <head> hoisting.
  *
  * Key rules:
- * - Canonical always uses BASE_URL (fastlygo.mk), never window.location.host
+ * - fastlygo.al → canonical https://fastlygo.al/..., hreflang sq = fastlygo.al
+ * - fastlygo.mk → canonical https://fastlygo.mk/..., hreflang mk = fastlygo.mk?lang=mk
  * - hreflang: x-default + en first, then tr/mk/sq
  * - English version has no ?lang= param (clean URL is canonical)
  * - NO manual DOM manipulation — React 19 handles <head> tag deduplication
@@ -58,27 +73,24 @@ export default function SEOHead({
 
   const { language } = useLanguage();
 
-  // ALWAYS use BASE_URL for canonical/hreflang — never window.location.host
-  const baseUrl = BASE_URL; // "https://fastlygo.mk"
-
   const pathname = location.split('?')[0];
 
-  // Read lang parameter from URL
-  const urlParams =
-    typeof window !== 'undefined'
-      ? new URLSearchParams(window.location.search)
-      : new URLSearchParams();
-  const langFromUrl = urlParams.get('lang') as Language | null;
+  // Domain-aware canonical base URL
+  const canonicalBaseUrl = getCanonicalBaseUrl();
 
-  // Canonical URL: always the clean path without ?lang= parameter
-  // Google recommends canonical to be the language-neutral URL; hreflang handles language variants
-  const defaultCanonicalUrl = `${baseUrl}${pathname}`;
+  // Canonical URL: domain'e göre (fastlygo.al'dan gelince canonical fastlygo.al olur)
+  const defaultCanonicalUrl = `${canonicalBaseUrl}${pathname}`;
 
+  // hreflang URLs:
+  // sq → fastlygo.al (Arnavutça canonical domain, temiz URL)
+  // mk → fastlygo.mk?lang=mk
+  // en → fastlygo.mk (temiz URL)
+  // tr → fastlygo.mk?lang=tr
   const hreflangs = {
-    en: `${baseUrl}${pathname}`,
-    tr: `${baseUrl}${pathname}?lang=tr`,
-    mk: `${baseUrl}${pathname}?lang=mk`,
-    sq: `${baseUrl}${pathname}?lang=sq`,
+    en: `${MK_BASE_URL}${pathname}`,
+    tr: `${MK_BASE_URL}${pathname}?lang=tr`,
+    mk: `${MK_BASE_URL}${pathname}?lang=mk`,
+    sq: `${AL_BASE_URL}${pathname}`,
   };
 
   // Title resolution:
@@ -96,6 +108,13 @@ export default function SEOHead({
     : rawDescription;
   const keywords = customKeywords || t(keywordsKey as any, language);
   const finalCanonicalUrl = customCanonical || defaultCanonicalUrl;
+
+  // OG URL: language-specific URL
+  const ogUrl = language === 'sq'
+    ? `${AL_BASE_URL}${pathname}`
+    : language === 'en'
+    ? `${MK_BASE_URL}${pathname}`
+    : `${MK_BASE_URL}${pathname}?lang=${language}`;
 
   // Only update <html lang="..."> — no other DOM manipulation
   // React 19 handles <head> tag hoisting and deduplication automatically
@@ -130,7 +149,7 @@ export default function SEOHead({
         />
       )}
 
-      {/* Canonical URL — always fastlygo.mk (non-www, BASE_URL) */}
+      {/* Canonical URL — domain'e göre (fastlygo.al veya fastlygo.mk) */}
       <link rel="canonical" href={finalCanonicalUrl} />
 
       {/* Hreflang Tags — x-default and en first (Google recommendation) */}
@@ -142,7 +161,7 @@ export default function SEOHead({
 
       {/* Open Graph */}
       <meta property="og:type" content="website" />
-      <meta property="og:url" content={finalCanonicalUrl} />
+      <meta property="og:url" content={ogUrl} />
       <meta property="og:title" content={title ?? ''} />
       <meta property="og:description" content={description} />
       <meta property="og:site_name" content={siteName} />

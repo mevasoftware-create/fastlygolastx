@@ -26,13 +26,38 @@ if (langFromUrl && ['en', 'tr', 'mk', 'sq'].includes(langFromUrl)) {
   localStorage.setItem('fastlygo_language', langFromUrl);
 }
 
+/**
+ * Domain bazlı varsayılan dil tespiti
+ * fastlygo.al → sq (Arnavutça)
+ * fastlygo.mk → mk (Makedonca)
+ *
+ * ?lang= parametresi veya localStorage varsa domain tespiti override edilir.
+ */
+function detectDomainLanguage(): Language | null {
+  if (typeof window === 'undefined') return null;
+  const hostname = window.location.hostname.replace(/^www\./, '');
+  if (hostname === 'fastlygo.al') return 'sq';
+  if (hostname === 'fastlygo.mk') return 'mk';
+  return null;
+}
+
+// Domain bazlı dil: sadece ?lang= yoksa ve localStorage yoksa uygula
+if (!langFromUrl) {
+  const storedLang = localStorage.getItem('fastlygo_language');
+  if (!storedLang) {
+    const domainLang = detectDomainLanguage();
+    if (domainLang) {
+      localStorage.setItem('fastlygo_language', domainLang);
+    }
+  }
+}
+
 i18n
   .use(LanguageDetector) // Detect user language
   .use(initReactI18next) // Pass i18n instance to react-i18next
   .init({
     resources,
     fallbackLng: 'en', // Default language
-    // Remove lng: 'en' to let detection system work
     debug: false,
     
     interpolation: {
@@ -59,7 +84,15 @@ export const setLanguage = (lang: Language) => {
   // Update URL with language parameter
   if (typeof window !== 'undefined') {
     const url = new URL(window.location.href);
+    // fastlygo.al'da sq için ?lang= parametresi ekleme (domain zaten sq canonical)
+    const hostname = url.hostname.replace(/^www\./, '');
     if (lang === 'en') {
+      url.searchParams.delete('lang');
+    } else if (lang === 'sq' && hostname === 'fastlygo.al') {
+      // fastlygo.al'da Arnavutça varsayılan — URL temiz kalır
+      url.searchParams.delete('lang');
+    } else if (lang === 'mk' && hostname === 'fastlygo.mk') {
+      // fastlygo.mk'da Makedonca varsayılan — URL temiz kalır
       url.searchParams.delete('lang');
     } else {
       url.searchParams.set('lang', lang);
