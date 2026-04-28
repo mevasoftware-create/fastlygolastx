@@ -721,6 +721,15 @@ export async function getActiveAreas(): Promise<Area[]> {
   return await db.select().from(areas).where(eq(areas.active, true)).orderBy(areas.displayOrder);
 }
 
+export async function getActiveAreasByCountry(countryCode: string): Promise<Area[]> {
+  const db = await getDb();
+  if (!db) return [];
+  
+  return await db.select().from(areas)
+    .where(and(eq(areas.active, true), eq(areas.countryCode, countryCode)))
+    .orderBy(areas.displayOrder);
+}
+
 export async function getAreaBySlug(slug: string): Promise<Area | undefined> {
   const db = await getDb();
   if (!db) return undefined;

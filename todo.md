@@ -482,8 +482,15 @@
 - [x] sitemap.xml: fastlygo.al URL'leri eklenmeli (sq dil bloğu)
 
 ## fastlygo.al Hreflang Düzeltmesi (28.04.2026)
-- [ ] fastlygo.al'dan mk/tr hreflang'lerini kaldır — sadece sq canonical + x-default (fastlygo.mk) göster
-- [ ] fastlygo.mk'da hreflang sq → fastlygo.al/ olarak kalsın (çapraz referans)
-- [ ] sitemap-al.xml oluştur — sadece fastlygo.al URL'leri, sadece sq hreflang
-- [ ] serveStatic endpoint'lerini domain-aware yap
-- [ ] robots.txt'i domain'e göre dinamik yap
+- [x] fastlygo.al'dan mk/tr hreflang'lerini kaldır — sadece sq canonical + x-default (fastlygo.mk) göster
+- [x] fastlygo.mk'da hreflang sq → fastlygo.al/ olarak kalsın (çapraz referans)
+- [x] sitemap-al.xml oluştur — sadece fastlygo.al URL'leri, sadece sq hreflang
+- [x] serveStatic endpoint'lerini domain-aware yap
+- [x] robots.txt'i domain'e göre dinamik yap
+
+## Arnavutluk Bölgeleri - fastlygo.al (28.04.2026)
+- [x] Bölge tablosuna `countryCode` alanı ekle (MK / AL)
+- [x] Mevcut MK bölgelerini `countryCode: "MK"` ile güncelle
+- [x] Arnavutluk şehir ve bölgelerini DB'ye ekle (14 bölge: Tirana mahalleri + şehirler)
+- [x] tRPC `area.list` prosedürüne `countryCode` filtresi ekle
+- [x] Areas sayfasını domain'e göre filtrele (fastlygo.al → AL, fastlygo.mk → MK)

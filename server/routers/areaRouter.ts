@@ -12,10 +12,15 @@ const adminProcedure = protectedProcedure.use(({ ctx, next }) => {
 });
 
 export const areaRouter = router({
-  // Public: List all active areas
-  list: publicProcedure.query(async () => {
-    return await db.getActiveAreas();
-  }),
+  // Public: List all active areas (filtered by countryCode)
+  list: publicProcedure
+    .input(z.object({ countryCode: z.string().length(2).optional() }).optional())
+    .query(async ({ input }) => {
+      if (input?.countryCode) {
+        return await db.getActiveAreasByCountry(input.countryCode);
+      }
+      return await db.getActiveAreas();
+    }),
   
   // Public: Get area by slug
   getBySlug: publicProcedure

@@ -19,21 +19,41 @@ interface CityConfig {
 }
 
 const cityConfig: Record<string, CityConfig> = {
-  Skopje:   { color: '#f97316', gradient: 'from-orange-500 to-amber-500', lightBg: 'bg-orange-50', emoji: '🏙️' },
-  Tetovo:   { color: '#3b82f6', gradient: 'from-blue-500 to-indigo-500', lightBg: 'bg-blue-50', emoji: '🏔️' },
-  Bitola:   { color: '#a855f7', gradient: 'from-purple-500 to-violet-500', lightBg: 'bg-purple-50', emoji: '🏛️' },
-  Ohrid:    { color: '#14b8a6', gradient: 'from-teal-500 to-emerald-500', lightBg: 'bg-teal-50', emoji: '🌊' },
-  Kumanovo: { color: '#f43f5e', gradient: 'from-rose-500 to-pink-500', lightBg: 'bg-rose-50', emoji: '🌄' },
-  Gostivar: { color: '#22c55e', gradient: 'from-green-500 to-emerald-500', lightBg: 'bg-green-50', emoji: '🌲' },
-  Strumica: { color: '#eab308', gradient: 'from-yellow-500 to-amber-500', lightBg: 'bg-yellow-50', emoji: '☀️' },
-  Veles:    { color: '#6366f1', gradient: 'from-indigo-500 to-blue-500', lightBg: 'bg-indigo-50', emoji: '🌉' },
-  Kocani:   { color: '#f59e0b', gradient: 'from-amber-500 to-orange-500', lightBg: 'bg-amber-50', emoji: '🌾' },
-  Istip:    { color: '#06b6d4', gradient: 'from-cyan-500 to-teal-500', lightBg: 'bg-cyan-50', emoji: '⛰️' },
-  Prilep:   { color: '#d946ef', gradient: 'from-fuchsia-500 to-purple-500', lightBg: 'bg-fuchsia-50', emoji: '🏺' },
+  // Makedonya şehirleri
+  Skopje:       { color: '#f97316', gradient: 'from-orange-500 to-amber-500', lightBg: 'bg-orange-50', emoji: '🏙️' },
+  Tetovo:       { color: '#3b82f6', gradient: 'from-blue-500 to-indigo-500', lightBg: 'bg-blue-50', emoji: '🏔️' },
+  Bitola:       { color: '#a855f7', gradient: 'from-purple-500 to-violet-500', lightBg: 'bg-purple-50', emoji: '🏛️' },
+  Ohrid:        { color: '#14b8a6', gradient: 'from-teal-500 to-emerald-500', lightBg: 'bg-teal-50', emoji: '🌊' },
+  Kumanovo:     { color: '#f43f5e', gradient: 'from-rose-500 to-pink-500', lightBg: 'bg-rose-50', emoji: '🌄' },
+  Gostivar:     { color: '#22c55e', gradient: 'from-green-500 to-emerald-500', lightBg: 'bg-green-50', emoji: '🌲' },
+  Strumica:     { color: '#eab308', gradient: 'from-yellow-500 to-amber-500', lightBg: 'bg-yellow-50', emoji: '☀️' },
+  Veles:        { color: '#6366f1', gradient: 'from-indigo-500 to-blue-500', lightBg: 'bg-indigo-50', emoji: '🌉' },
+  Kocani:       { color: '#f59e0b', gradient: 'from-amber-500 to-orange-500', lightBg: 'bg-amber-50', emoji: '🌾' },
+  Istip:        { color: '#06b6d4', gradient: 'from-cyan-500 to-teal-500', lightBg: 'bg-cyan-50', emoji: '⛰️' },
+  Prilep:       { color: '#d946ef', gradient: 'from-fuchsia-500 to-purple-500', lightBg: 'bg-fuchsia-50', emoji: '🏺' },
+  // Arnavutluk şehirleri
+  Tirana:       { color: '#e11d48', gradient: 'from-red-600 to-rose-500', lightBg: 'bg-red-50', emoji: '🏙️' },
+  'Durrës':     { color: '#0284c7', gradient: 'from-sky-600 to-blue-500', lightBg: 'bg-sky-50', emoji: '⚓' },
+  'Vlorë':      { color: '#0891b2', gradient: 'from-cyan-600 to-teal-500', lightBg: 'bg-cyan-50', emoji: '🌊' },
+  'Shkodër':    { color: '#7c3aed', gradient: 'from-violet-600 to-purple-500', lightBg: 'bg-violet-50', emoji: '🏰' },
+  Elbasan:      { color: '#059669', gradient: 'from-emerald-600 to-green-500', lightBg: 'bg-emerald-50', emoji: '🏭' },
+  Fier:         { color: '#d97706', gradient: 'from-amber-600 to-yellow-500', lightBg: 'bg-amber-50', emoji: '🌾' },
+  'Korçë':      { color: '#db2777', gradient: 'from-pink-600 to-rose-500', lightBg: 'bg-pink-50', emoji: '🏔️' },
+  Berat:        { color: '#92400e', gradient: 'from-amber-800 to-orange-600', lightBg: 'bg-amber-100', emoji: '🏛️' },
+  'Gjirokastër':{ color: '#1d4ed8', gradient: 'from-blue-700 to-indigo-600', lightBg: 'bg-blue-100', emoji: '🏯' },
+  'Lushnjë':    { color: '#15803d', gradient: 'from-green-700 to-emerald-600', lightBg: 'bg-green-100', emoji: '🌿' },
 };
 const defaultConfig: CityConfig = { color: '#6b7280', gradient: 'from-gray-500 to-slate-500', lightBg: 'bg-gray-50', emoji: '📍' };
 
-function getCityForSlug(slug: string): string {
+// Domain'e göre ülke kodu tespit et
+function getCountryCodeFromDomain(): string {
+  if (typeof window !== 'undefined' && window.location.hostname.includes('fastlygo.al')) return 'AL';
+  return 'MK';
+}
+
+function getCityForSlug(slug: string, cityNameFromDb?: string): string {
+  // Önce DB'den gelen cityName'i kullan
+  if (cityNameFromDb) return cityNameFromDb;
   if (slug.includes('tetovo')) return 'Tetovo';
   if (slug.includes('bitola')) return 'Bitola';
   if (slug.includes('ohrid')) return 'Ohrid';
@@ -51,7 +71,9 @@ export default function Areas() {
   const { language } = useLanguage();
   const { t } = useTranslation();
   const [searchQuery, setSearchQuery] = useState('');
-  const [expandedCity, setExpandedCity] = useState<string | null>('Skopje');
+  const countryCode = useMemo(() => getCountryCodeFromDomain(), []);
+  const defaultCity = countryCode === 'AL' ? 'Tirana' : 'Skopje';
+  const [expandedCity, setExpandedCity] = useState<string | null>(defaultCity);
   const [mapInstance, setMapInstance] = useState<any>(null);
   const [showMap, setShowMap] = useState(false);
   const markersRef = useRef<Map<number, any>>(new Map());
@@ -61,7 +83,7 @@ export default function Areas() {
   const pageSeoMeta = pageData?.seoMeta ? (typeof pageData.seoMeta === 'string' ? JSON.parse(pageData.seoMeta) : pageData.seoMeta) : null;
   const seoData = pageSeoMeta?.[language] || pageSeoMeta?.en || {};
 
-  const { data: areas, isLoading } = trpc.areas.list.useQuery();
+  const { data: areas, isLoading } = trpc.areas.list.useQuery({ countryCode });
 
   const getAreaName = (area: any) => {
     const meta = area.seoMeta?.[language] || area.seoMeta?.en || {};
@@ -76,13 +98,13 @@ export default function Areas() {
   const filteredAreas = useMemo(() =>
     (areas || []).filter((area: any) =>
       getAreaName(area).toLowerCase().includes(searchQuery.toLowerCase()) ||
-      getCityForSlug(area.slug).toLowerCase().includes(searchQuery.toLowerCase())
+      getCityForSlug(area.slug, area.cityName).toLowerCase().includes(searchQuery.toLowerCase())
     ), [areas, searchQuery, language]
   );
 
   const groupedAreas = useMemo(() =>
     filteredAreas.reduce((acc: Record<string, any[]>, area: any) => {
-      const city = getCityForSlug(area.slug);
+      const city = getCityForSlug(area.slug, area.cityName);
       if (!acc[city]) acc[city] = [];
       acc[city].push(area);
       return acc;
@@ -91,10 +113,11 @@ export default function Areas() {
 
   const sortedCities = useMemo(() =>
     Object.keys(groupedAreas).sort((a, b) => {
-      if (a === 'Skopje') return -1;
-      if (b === 'Skopje') return 1;
+      // Aktif ülkenin başşehri önce gelsin
+      if (a === defaultCity) return -1;
+      if (b === defaultCity) return 1;
       return a.localeCompare(b);
-    }), [groupedAreas]
+    }), [groupedAreas, defaultCity]
   );
 
   const totalAreas = filteredAreas.length;

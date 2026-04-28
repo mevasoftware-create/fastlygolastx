@@ -462,6 +462,8 @@ export const areas = mysqlTable("areas", {
   seoMeta: text("seoMeta").notNull(), // JSON: {en: {title, subtitle, description, keywords}, tr: {...}, mk: {...}, sq: {...}}
   active: boolean("active").default(true).notNull(),
   displayOrder: int("displayOrder").default(0).notNull(),
+  countryCode: varchar("countryCode", { length: 2 }).default("MK").notNull(), // MK = Makedonya, AL = Arnavutluk
+  cityName: varchar("cityName", { length: 100 }).default("Skopje").notNull(), // Şehir grubu (Skopje, Bitola, Tirana vb.)
   lat: double("lat"),
   lng: double("lng"),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
