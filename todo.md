@@ -494,3 +494,7 @@
 - [x] Arnavutluk şehir ve bölgelerini DB'ye ekle (14 bölge: Tirana mahalleri + şehirler)
 - [x] tRPC `area.list` prosedürüne `countryCode` filtresi ekle
 - [x] Areas sayfasını domain'e göre filtrele (fastlygo.al → AL, fastlygo.mk → MK)
+
+## 3 Öneri Uygulaması (28.04.2026)
+- [x] Ana sayfa hero metni domain'e göre dinamik (fastlygo.al → Tiranë, fastlygo.mk → Skopje) — useTranslation wrapper'a applyLocalTerms eklendi
+- [x] Arnavutluk bölge sayfaları için otomatik Arnavutça SEO meta üret (DB'ye yaz) — seed script'te zaten vardı, AreaPage.tsx seoMeta'dan okuyor

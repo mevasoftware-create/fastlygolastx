@@ -109,14 +109,29 @@ export const t = (key: string, lang?: Language): string => {
 
 // Re-export useTranslation from react-i18next with language property
 import { useTranslation as useI18nextTranslation } from 'react-i18next';
+import { getSiteConfigForHost, applyLocalTerms } from '../../../shared/siteConfig';
+
+// Domain-aware site config (client-side, computed once at module load)
+const _hostname = typeof window !== 'undefined' ? window.location.hostname.replace(/^www\./, '') : 'fastlygo.mk';
+const _siteConfig = getSiteConfigForHost(_hostname);
 
 export const useTranslation = () => {
-  const { t, i18n, ready } = useI18nextTranslation();
+  const { t: rawT, i18n, ready } = useI18nextTranslation();
+  const lang = (i18n.language as Language) || 'en';
+
+  // Wrap t() to apply domain-aware city/country term replacements
+  // e.g. fastlygo.al: "Shkup" → "Tiranë", "Maqedoni" → "Shqipëri"
+  const t = (key: string, options?: Record<string, unknown>): string => {
+    const raw = String(rawT(key, options as never));
+    if (!_siteConfig.referenceTerms) return raw; // reference domain → no change
+    return applyLocalTerms(raw, _siteConfig, lang);
+  };
+
   return {
     t,
     i18n,
     ready,
-    language: (i18n.language as Language) || 'en'
+    language: lang
   };
 };
 
