@@ -852,23 +852,32 @@ export async function setupVite(app: Express, server: Server) {
   });
 
   app.use(vite.middlewares);
-  // Serve sitemap.xml and robots.txt — domain-aware
+  // Serve sitemap.xml, sitemap-al.xml ve robots.txt — domain-aware
+  const devStaticPath = path.resolve(import.meta.dirname, "..", "static");
   app.get("/sitemap.xml", (req, res) => {
     const host = (req.headers["x-forwarded-host"] as string || req.headers.host || "").split(",")[0].trim();
-    const isAlDomain = host.includes("fastlygo.al");
+    const isAlDomain = host.replace(/^www\./, "").split(":")[0] === "fastlygo.al";
     const sitemapFile = isAlDomain ? "sitemap-al.xml" : "sitemap.xml";
-    const sitemapPath = path.resolve(import.meta.dirname, "..", "static", sitemapFile);
+    const sitemapPath = path.resolve(devStaticPath, sitemapFile);
+    res.setHeader("Content-Type", "application/xml; charset=utf-8");
+    res.setHeader("Cache-Control", "public, max-age=86400");
+    res.sendFile(sitemapPath);
+  });
+  // /sitemap-al.xml — doğrudan erişim için
+  app.get("/sitemap-al.xml", (_req, res) => {
+    const sitemapPath = path.resolve(devStaticPath, "sitemap-al.xml");
     res.setHeader("Content-Type", "application/xml; charset=utf-8");
     res.setHeader("Cache-Control", "public, max-age=86400");
     res.sendFile(sitemapPath);
   });
   app.get("/robots.txt", (req, res) => {
     const host = (req.headers["x-forwarded-host"] as string || req.headers.host || "").split(",")[0].trim();
-    const isAlDomain = host.includes("fastlygo.al");
+    const isAlDomain = host.replace(/^www\./, "").split(":")[0] === "fastlygo.al";
     const baseUrl = isAlDomain ? "https://fastlygo.al" : "https://fastlygo.mk";
-    const robotsPath = path.resolve(import.meta.dirname, "..", "static", "robots.txt");
+    const robotsPath = path.resolve(devStaticPath, "robots.txt");
     fs.promises.readFile(robotsPath, "utf-8").then(content => {
-      const dynamic = content.replace(/Sitemap: https:\/\/fastlygo\.mk\/sitemap\.xml/, `Sitemap: ${baseUrl}/sitemap.xml`);
+      // Sitemap satırını domain'e göre dinamik yaz
+      const dynamic = content.replace(/Sitemap:.*$/m, `Sitemap: ${baseUrl}/sitemap.xml`);
       res.setHeader("Content-Type", "text/plain; charset=utf-8");
       res.setHeader("Cache-Control", "public, max-age=86400");
       res.end(dynamic);
@@ -921,17 +930,39 @@ export function serveStatic(app: Express) {
 
   // Serve sitemap.xml and robots.txt from server/static (Manus does not override this directory)
   const staticSourcePath = path.resolve(import.meta.dirname, "..", "static");
-  app.get("/sitemap.xml", (_req, res) => {
-    const sitemapPath = path.join(staticSourcePath, "sitemap.xml");
+  // /sitemap.xml — fastlygo.al için sitemap-al.xml dosyasını döndür
+  app.get("/sitemap.xml", (req, res) => {
+    const host = (req.headers["x-forwarded-host"] as string || req.headers.host || "").split(",")[0].trim();
+    const isAlDomain = host.replace(/^www\./, "").split(":")[0] === "fastlygo.al";
+    const sitemapFile = isAlDomain ? "sitemap-al.xml" : "sitemap.xml";
+    const sitemapPath = path.join(staticSourcePath, sitemapFile);
     res.setHeader("Content-Type", "application/xml; charset=utf-8");
     res.setHeader("Cache-Control", "public, max-age=86400");
     res.sendFile(sitemapPath);
   });
-  app.get("/robots.txt", (_req, res) => {
-    const robotsPath = path.join(staticSourcePath, "robots.txt");
-    res.setHeader("Content-Type", "text/plain; charset=utf-8");
+  // /sitemap-al.xml — doğrudan erişim için de çalışsın
+  app.get("/sitemap-al.xml", (_req, res) => {
+    const sitemapPath = path.join(staticSourcePath, "sitemap-al.xml");
+    res.setHeader("Content-Type", "application/xml; charset=utf-8");
     res.setHeader("Cache-Control", "public, max-age=86400");
-    res.sendFile(robotsPath);
+    res.sendFile(sitemapPath);
+  });
+  // /robots.txt — domain'e göre doğru sitemap URL'ini göster
+  app.get("/robots.txt", (req, res) => {
+    const host = (req.headers["x-forwarded-host"] as string || req.headers.host || "").split(",")[0].trim();
+    const isAlDomain = host.replace(/^www\./, "").split(":")[0] === "fastlygo.al";
+    const baseUrl = isAlDomain ? "https://fastlygo.al" : "https://fastlygo.mk";
+    const robotsPath = path.join(staticSourcePath, "robots.txt");
+    fs.promises.readFile(robotsPath, "utf-8").then(content => {
+      // Sitemap satırını domain'e göre dinamik yaz
+      const dynamic = content.replace(
+        /Sitemap:.*$/m,
+        `Sitemap: ${baseUrl}/sitemap.xml`
+      );
+      res.setHeader("Content-Type", "text/plain; charset=utf-8");
+      res.setHeader("Cache-Control", "public, max-age=86400");
+      res.end(dynamic);
+    }).catch(() => res.status(500).end());
   });
 
   app.use(express.static(distPath));
