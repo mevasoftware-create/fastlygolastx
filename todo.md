@@ -480,3 +480,10 @@
 - [x] hreflang etiketleri: fastlygo.al için sq canonical + çapraz referanslar
 - [x] Server-side JSON-LD: fastlygo.al için url/sameAs alanları güncellenmeli
 - [x] sitemap.xml: fastlygo.al URL'leri eklenmeli (sq dil bloğu)
+
+## fastlygo.al Hreflang Düzeltmesi (28.04.2026)
+- [ ] fastlygo.al'dan mk/tr hreflang'lerini kaldır — sadece sq canonical + x-default (fastlygo.mk) göster
+- [ ] fastlygo.mk'da hreflang sq → fastlygo.al/ olarak kalsın (çapraz referans)
+- [ ] sitemap-al.xml oluştur — sadece fastlygo.al URL'leri, sadece sq hreflang
+- [ ] serveStatic endpoint'lerini domain-aware yap
+- [ ] robots.txt'i domain'e göre dinamik yap

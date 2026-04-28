@@ -1,0 +1,527 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  fastlygo.al sitemap — Arnavutluk pazarı
+  Varsayılan dil: Arnavutça (sq)
+  Desteklenen diller: sq (varsayılan), en, tr
+  Makedonca (mk) bu sitede yok.
+-->
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:xhtml="http://www.w3.org/1999/xhtml">
+
+  <!-- Ana Sayfa -->
+  <url>
+    <loc>https://fastlygo.al/</loc>
+    <lastmod>2026-04-28</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>1.0</priority>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://fastlygo.al/"/>
+    <xhtml:link rel="alternate" hreflang="sq" href="https://fastlygo.al/"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://fastlygo.al/?lang=en"/>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://fastlygo.al/?lang=tr"/>
+  </url>
+
+  <url>
+    <loc>https://fastlygo.al/services</loc>
+    <lastmod>2026-04-28</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://fastlygo.al/services"/>
+    <xhtml:link rel="alternate" hreflang="sq" href="https://fastlygo.al/services"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://fastlygo.al/services?lang=en"/>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://fastlygo.al/services?lang=tr"/>
+  </url>
+
+  <url>
+    <loc>https://fastlygo.al/areas</loc>
+    <lastmod>2026-04-28</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://fastlygo.al/areas"/>
+    <xhtml:link rel="alternate" hreflang="sq" href="https://fastlygo.al/areas"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://fastlygo.al/areas?lang=en"/>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://fastlygo.al/areas?lang=tr"/>
+  </url>
+
+  <url>
+    <loc>https://fastlygo.al/how-it-works</loc>
+    <lastmod>2026-04-28</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://fastlygo.al/how-it-works"/>
+    <xhtml:link rel="alternate" hreflang="sq" href="https://fastlygo.al/how-it-works"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://fastlygo.al/how-it-works?lang=en"/>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://fastlygo.al/how-it-works?lang=tr"/>
+  </url>
+
+  <url>
+    <loc>https://fastlygo.al/about-us</loc>
+    <lastmod>2026-04-28</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://fastlygo.al/about-us"/>
+    <xhtml:link rel="alternate" hreflang="sq" href="https://fastlygo.al/about-us"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://fastlygo.al/about-us?lang=en"/>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://fastlygo.al/about-us?lang=tr"/>
+  </url>
+
+  <url>
+    <loc>https://fastlygo.al/new-order</loc>
+    <lastmod>2026-04-28</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://fastlygo.al/new-order"/>
+    <xhtml:link rel="alternate" hreflang="sq" href="https://fastlygo.al/new-order"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://fastlygo.al/new-order?lang=en"/>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://fastlygo.al/new-order?lang=tr"/>
+  </url>
+
+  <url>
+    <loc>https://fastlygo.al/courier/register</loc>
+    <lastmod>2026-04-28</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://fastlygo.al/courier/register"/>
+    <xhtml:link rel="alternate" hreflang="sq" href="https://fastlygo.al/courier/register"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://fastlygo.al/courier/register?lang=en"/>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://fastlygo.al/courier/register?lang=tr"/>
+  </url>
+
+  <url>
+    <loc>https://fastlygo.al/business/register</loc>
+    <lastmod>2026-04-28</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://fastlygo.al/business/register"/>
+    <xhtml:link rel="alternate" hreflang="sq" href="https://fastlygo.al/business/register"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://fastlygo.al/business/register?lang=en"/>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://fastlygo.al/business/register?lang=tr"/>
+  </url>
+
+  <url>
+    <loc>https://fastlygo.al/privacy-policy</loc>
+    <lastmod>2026-04-28</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://fastlygo.al/privacy-policy"/>
+    <xhtml:link rel="alternate" hreflang="sq" href="https://fastlygo.al/privacy-policy"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://fastlygo.al/privacy-policy?lang=en"/>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://fastlygo.al/privacy-policy?lang=tr"/>
+  </url>
+
+  <url>
+    <loc>https://fastlygo.al/terms-of-service</loc>
+    <lastmod>2026-04-28</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://fastlygo.al/terms-of-service"/>
+    <xhtml:link rel="alternate" hreflang="sq" href="https://fastlygo.al/terms-of-service"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://fastlygo.al/terms-of-service?lang=en"/>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://fastlygo.al/terms-of-service?lang=tr"/>
+  </url>
+
+  <!-- ═══════════════════════════════════════════════════
+       TIRANA — Mahalleler ve Bölgeler
+  ═══════════════════════════════════════════════════ -->
+
+  <url>
+    <loc>https://fastlygo.al/areas/tirana</loc>
+    <lastmod>2026-04-28</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://fastlygo.al/areas/tirana"/>
+    <xhtml:link rel="alternate" hreflang="sq" href="https://fastlygo.al/areas/tirana"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://fastlygo.al/areas/tirana?lang=en"/>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://fastlygo.al/areas/tirana?lang=tr"/>
+  </url>
+
+  <url>
+    <loc>https://fastlygo.al/areas/blloku</loc>
+    <lastmod>2026-04-28</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.85</priority>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://fastlygo.al/areas/blloku"/>
+    <xhtml:link rel="alternate" hreflang="sq" href="https://fastlygo.al/areas/blloku"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://fastlygo.al/areas/blloku?lang=en"/>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://fastlygo.al/areas/blloku?lang=tr"/>
+  </url>
+
+  <url>
+    <loc>https://fastlygo.al/areas/kombinat</loc>
+    <lastmod>2026-04-28</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://fastlygo.al/areas/kombinat"/>
+    <xhtml:link rel="alternate" hreflang="sq" href="https://fastlygo.al/areas/kombinat"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://fastlygo.al/areas/kombinat?lang=en"/>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://fastlygo.al/areas/kombinat?lang=tr"/>
+  </url>
+
+  <url>
+    <loc>https://fastlygo.al/areas/don-bosko</loc>
+    <lastmod>2026-04-28</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://fastlygo.al/areas/don-bosko"/>
+    <xhtml:link rel="alternate" hreflang="sq" href="https://fastlygo.al/areas/don-bosko"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://fastlygo.al/areas/don-bosko?lang=en"/>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://fastlygo.al/areas/don-bosko?lang=tr"/>
+  </url>
+
+  <url>
+    <loc>https://fastlygo.al/areas/laprake</loc>
+    <lastmod>2026-04-28</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://fastlygo.al/areas/laprake"/>
+    <xhtml:link rel="alternate" hreflang="sq" href="https://fastlygo.al/areas/laprake"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://fastlygo.al/areas/laprake?lang=en"/>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://fastlygo.al/areas/laprake?lang=tr"/>
+  </url>
+
+  <url>
+    <loc>https://fastlygo.al/areas/kamez</loc>
+    <lastmod>2026-04-28</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://fastlygo.al/areas/kamez"/>
+    <xhtml:link rel="alternate" hreflang="sq" href="https://fastlygo.al/areas/kamez"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://fastlygo.al/areas/kamez?lang=en"/>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://fastlygo.al/areas/kamez?lang=tr"/>
+  </url>
+
+  <url>
+    <loc>https://fastlygo.al/areas/vore</loc>
+    <lastmod>2026-04-28</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://fastlygo.al/areas/vore"/>
+    <xhtml:link rel="alternate" hreflang="sq" href="https://fastlygo.al/areas/vore"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://fastlygo.al/areas/vore?lang=en"/>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://fastlygo.al/areas/vore?lang=tr"/>
+  </url>
+
+  <url>
+    <loc>https://fastlygo.al/areas/shkoze</loc>
+    <lastmod>2026-04-28</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://fastlygo.al/areas/shkoze"/>
+    <xhtml:link rel="alternate" hreflang="sq" href="https://fastlygo.al/areas/shkoze"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://fastlygo.al/areas/shkoze?lang=en"/>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://fastlygo.al/areas/shkoze?lang=tr"/>
+  </url>
+
+  <url>
+    <loc>https://fastlygo.al/areas/ali-dem</loc>
+    <lastmod>2026-04-28</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://fastlygo.al/areas/ali-dem"/>
+    <xhtml:link rel="alternate" hreflang="sq" href="https://fastlygo.al/areas/ali-dem"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://fastlygo.al/areas/ali-dem?lang=en"/>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://fastlygo.al/areas/ali-dem?lang=tr"/>
+  </url>
+
+  <url>
+    <loc>https://fastlygo.al/areas/tirana-e-re</loc>
+    <lastmod>2026-04-28</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://fastlygo.al/areas/tirana-e-re"/>
+    <xhtml:link rel="alternate" hreflang="sq" href="https://fastlygo.al/areas/tirana-e-re"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://fastlygo.al/areas/tirana-e-re?lang=en"/>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://fastlygo.al/areas/tirana-e-re?lang=tr"/>
+  </url>
+
+  <url>
+    <loc>https://fastlygo.al/areas/kashar</loc>
+    <lastmod>2026-04-28</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://fastlygo.al/areas/kashar"/>
+    <xhtml:link rel="alternate" hreflang="sq" href="https://fastlygo.al/areas/kashar"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://fastlygo.al/areas/kashar?lang=en"/>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://fastlygo.al/areas/kashar?lang=tr"/>
+  </url>
+
+  <!-- ═══════════════════════════════════════════════════
+       DİĞER BÜYÜK ARNAVUTLUK ŞEHİRLERİ
+  ═══════════════════════════════════════════════════ -->
+
+  <url>
+    <loc>https://fastlygo.al/areas/durres</loc>
+    <lastmod>2026-04-28</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.85</priority>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://fastlygo.al/areas/durres"/>
+    <xhtml:link rel="alternate" hreflang="sq" href="https://fastlygo.al/areas/durres"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://fastlygo.al/areas/durres?lang=en"/>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://fastlygo.al/areas/durres?lang=tr"/>
+  </url>
+
+  <url>
+    <loc>https://fastlygo.al/areas/vlore</loc>
+    <lastmod>2026-04-28</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://fastlygo.al/areas/vlore"/>
+    <xhtml:link rel="alternate" hreflang="sq" href="https://fastlygo.al/areas/vlore"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://fastlygo.al/areas/vlore?lang=en"/>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://fastlygo.al/areas/vlore?lang=tr"/>
+  </url>
+
+  <url>
+    <loc>https://fastlygo.al/areas/shkoder</loc>
+    <lastmod>2026-04-28</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://fastlygo.al/areas/shkoder"/>
+    <xhtml:link rel="alternate" hreflang="sq" href="https://fastlygo.al/areas/shkoder"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://fastlygo.al/areas/shkoder?lang=en"/>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://fastlygo.al/areas/shkoder?lang=tr"/>
+  </url>
+
+  <url>
+    <loc>https://fastlygo.al/areas/elbasan</loc>
+    <lastmod>2026-04-28</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://fastlygo.al/areas/elbasan"/>
+    <xhtml:link rel="alternate" hreflang="sq" href="https://fastlygo.al/areas/elbasan"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://fastlygo.al/areas/elbasan?lang=en"/>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://fastlygo.al/areas/elbasan?lang=tr"/>
+  </url>
+
+  <url>
+    <loc>https://fastlygo.al/areas/fier</loc>
+    <lastmod>2026-04-28</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://fastlygo.al/areas/fier"/>
+    <xhtml:link rel="alternate" hreflang="sq" href="https://fastlygo.al/areas/fier"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://fastlygo.al/areas/fier?lang=en"/>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://fastlygo.al/areas/fier?lang=tr"/>
+  </url>
+
+  <url>
+    <loc>https://fastlygo.al/areas/korce</loc>
+    <lastmod>2026-04-28</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.75</priority>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://fastlygo.al/areas/korce"/>
+    <xhtml:link rel="alternate" hreflang="sq" href="https://fastlygo.al/areas/korce"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://fastlygo.al/areas/korce?lang=en"/>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://fastlygo.al/areas/korce?lang=tr"/>
+  </url>
+
+  <url>
+    <loc>https://fastlygo.al/areas/berat</loc>
+    <lastmod>2026-04-28</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.75</priority>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://fastlygo.al/areas/berat"/>
+    <xhtml:link rel="alternate" hreflang="sq" href="https://fastlygo.al/areas/berat"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://fastlygo.al/areas/berat?lang=en"/>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://fastlygo.al/areas/berat?lang=tr"/>
+  </url>
+
+  <url>
+    <loc>https://fastlygo.al/areas/lushnje</loc>
+    <lastmod>2026-04-28</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://fastlygo.al/areas/lushnje"/>
+    <xhtml:link rel="alternate" hreflang="sq" href="https://fastlygo.al/areas/lushnje"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://fastlygo.al/areas/lushnje?lang=en"/>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://fastlygo.al/areas/lushnje?lang=tr"/>
+  </url>
+
+  <url>
+    <loc>https://fastlygo.al/areas/kavaje</loc>
+    <lastmod>2026-04-28</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://fastlygo.al/areas/kavaje"/>
+    <xhtml:link rel="alternate" hreflang="sq" href="https://fastlygo.al/areas/kavaje"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://fastlygo.al/areas/kavaje?lang=en"/>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://fastlygo.al/areas/kavaje?lang=tr"/>
+  </url>
+
+  <url>
+    <loc>https://fastlygo.al/areas/pogradec</loc>
+    <lastmod>2026-04-28</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://fastlygo.al/areas/pogradec"/>
+    <xhtml:link rel="alternate" hreflang="sq" href="https://fastlygo.al/areas/pogradec"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://fastlygo.al/areas/pogradec?lang=en"/>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://fastlygo.al/areas/pogradec?lang=tr"/>
+  </url>
+
+  <url>
+    <loc>https://fastlygo.al/areas/gjirokaster</loc>
+    <lastmod>2026-04-28</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://fastlygo.al/areas/gjirokaster"/>
+    <xhtml:link rel="alternate" hreflang="sq" href="https://fastlygo.al/areas/gjirokaster"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://fastlygo.al/areas/gjirokaster?lang=en"/>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://fastlygo.al/areas/gjirokaster?lang=tr"/>
+  </url>
+
+  <url>
+    <loc>https://fastlygo.al/areas/sarande</loc>
+    <lastmod>2026-04-28</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://fastlygo.al/areas/sarande"/>
+    <xhtml:link rel="alternate" hreflang="sq" href="https://fastlygo.al/areas/sarande"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://fastlygo.al/areas/sarande?lang=en"/>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://fastlygo.al/areas/sarande?lang=tr"/>
+  </url>
+
+  <url>
+    <loc>https://fastlygo.al/areas/permet</loc>
+    <lastmod>2026-04-28</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.65</priority>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://fastlygo.al/areas/permet"/>
+    <xhtml:link rel="alternate" hreflang="sq" href="https://fastlygo.al/areas/permet"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://fastlygo.al/areas/permet?lang=en"/>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://fastlygo.al/areas/permet?lang=tr"/>
+  </url>
+
+  <url>
+    <loc>https://fastlygo.al/areas/kukes</loc>
+    <lastmod>2026-04-28</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.65</priority>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://fastlygo.al/areas/kukes"/>
+    <xhtml:link rel="alternate" hreflang="sq" href="https://fastlygo.al/areas/kukes"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://fastlygo.al/areas/kukes?lang=en"/>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://fastlygo.al/areas/kukes?lang=tr"/>
+  </url>
+
+  <url>
+    <loc>https://fastlygo.al/areas/lezhe</loc>
+    <lastmod>2026-04-28</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.65</priority>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://fastlygo.al/areas/lezhe"/>
+    <xhtml:link rel="alternate" hreflang="sq" href="https://fastlygo.al/areas/lezhe"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://fastlygo.al/areas/lezhe?lang=en"/>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://fastlygo.al/areas/lezhe?lang=tr"/>
+  </url>
+
+  <url>
+    <loc>https://fastlygo.al/areas/peshkopi</loc>
+    <lastmod>2026-04-28</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://fastlygo.al/areas/peshkopi"/>
+    <xhtml:link rel="alternate" hreflang="sq" href="https://fastlygo.al/areas/peshkopi"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://fastlygo.al/areas/peshkopi?lang=en"/>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://fastlygo.al/areas/peshkopi?lang=tr"/>
+  </url>
+
+  <url>
+    <loc>https://fastlygo.al/areas/burrel</loc>
+    <lastmod>2026-04-28</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://fastlygo.al/areas/burrel"/>
+    <xhtml:link rel="alternate" hreflang="sq" href="https://fastlygo.al/areas/burrel"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://fastlygo.al/areas/burrel?lang=en"/>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://fastlygo.al/areas/burrel?lang=tr"/>
+  </url>
+
+  <url>
+    <loc>https://fastlygo.al/areas/gramsh</loc>
+    <lastmod>2026-04-28</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://fastlygo.al/areas/gramsh"/>
+    <xhtml:link rel="alternate" hreflang="sq" href="https://fastlygo.al/areas/gramsh"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://fastlygo.al/areas/gramsh?lang=en"/>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://fastlygo.al/areas/gramsh?lang=tr"/>
+  </url>
+
+  <url>
+    <loc>https://fastlygo.al/areas/tepelene</loc>
+    <lastmod>2026-04-28</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://fastlygo.al/areas/tepelene"/>
+    <xhtml:link rel="alternate" hreflang="sq" href="https://fastlygo.al/areas/tepelene"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://fastlygo.al/areas/tepelene?lang=en"/>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://fastlygo.al/areas/tepelene?lang=tr"/>
+  </url>
+
+  <!-- Kategori sayfaları -->
+  <url>
+    <loc>https://fastlygo.al/categories/food-delivery</loc>
+    <lastmod>2026-04-28</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://fastlygo.al/categories/food-delivery"/>
+    <xhtml:link rel="alternate" hreflang="sq" href="https://fastlygo.al/categories/food-delivery"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://fastlygo.al/categories/food-delivery?lang=en"/>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://fastlygo.al/categories/food-delivery?lang=tr"/>
+  </url>
+
+  <url>
+    <loc>https://fastlygo.al/categories/grocery-delivery</loc>
+    <lastmod>2026-04-28</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://fastlygo.al/categories/grocery-delivery"/>
+    <xhtml:link rel="alternate" hreflang="sq" href="https://fastlygo.al/categories/grocery-delivery"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://fastlygo.al/categories/grocery-delivery?lang=en"/>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://fastlygo.al/categories/grocery-delivery?lang=tr"/>
+  </url>
+
+  <url>
+    <loc>https://fastlygo.al/categories/pharmacy-delivery</loc>
+    <lastmod>2026-04-28</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://fastlygo.al/categories/pharmacy-delivery"/>
+    <xhtml:link rel="alternate" hreflang="sq" href="https://fastlygo.al/categories/pharmacy-delivery"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://fastlygo.al/categories/pharmacy-delivery?lang=en"/>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://fastlygo.al/categories/pharmacy-delivery?lang=tr"/>
+  </url>
+
+  <url>
+    <loc>https://fastlygo.al/categories/cargo-delivery</loc>
+    <lastmod>2026-04-28</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://fastlygo.al/categories/cargo-delivery"/>
+    <xhtml:link rel="alternate" hreflang="sq" href="https://fastlygo.al/categories/cargo-delivery"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://fastlygo.al/categories/cargo-delivery?lang=en"/>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://fastlygo.al/categories/cargo-delivery?lang=tr"/>
+  </url>
+
+  <url>
+    <loc>https://fastlygo.al/categories/document-delivery</loc>
+    <lastmod>2026-04-28</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.75</priority>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://fastlygo.al/categories/document-delivery"/>
+    <xhtml:link rel="alternate" hreflang="sq" href="https://fastlygo.al/categories/document-delivery"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://fastlygo.al/categories/document-delivery?lang=en"/>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://fastlygo.al/categories/document-delivery?lang=tr"/>
+  </url>
+
+  <url>
+    <loc>https://fastlygo.al/categories/flower-delivery</loc>
+    <lastmod>2026-04-28</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.75</priority>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://fastlygo.al/categories/flower-delivery"/>
+    <xhtml:link rel="alternate" hreflang="sq" href="https://fastlygo.al/categories/flower-delivery"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://fastlygo.al/categories/flower-delivery?lang=en"/>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://fastlygo.al/categories/flower-delivery?lang=tr"/>
+  </url>
+
+</urlset>

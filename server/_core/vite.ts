@@ -8,6 +8,7 @@ import viteConfig from "../../vite.config";
 import { getDb } from "../db";
 import { areas, categories, pages } from "../../drizzle/schema";
 import { eq } from "drizzle-orm";
+import { getSiteConfigForHost, applyLocalTerms } from "../../shared/siteConfig";
 
 // SEO cache to avoid DB hits on every request
 const seoCache = new Map<string, { title: string; description: string; expiry: number }>();
@@ -58,11 +59,20 @@ function detectLanguageFromUrl(url: string, acceptLanguage?: string, host?: stri
   return "en";
 }
 
-function parseSeoMeta(seoMetaRaw: any, language: string): { title: string; description: string } {
+function parseSeoMeta(seoMetaRaw: any, language: string, host?: string): { title: string; description: string } {
   try {
     const seoMeta = typeof seoMetaRaw === "string" ? JSON.parse(seoMetaRaw) : seoMetaRaw;
     const data = seoMeta?.[language] || seoMeta?.en || {};
-    return { title: data.title || "", description: data.description || "" };
+    let title: string = data.title || "";
+    let description: string = data.description || "";
+    // siteConfig'deki referenceTerms üzerinden şehir/ülke adı çevirisini uygula
+    // Yeni domain eklenince sadece siteConfig.ts güncellenir, buraya dokunulmaz
+    if (host) {
+      const cfg = getSiteConfigForHost(host);
+      title = applyLocalTerms(title, cfg, language);
+      description = applyLocalTerms(description, cfg, language);
+    }
+    return { title, description };
   } catch {
     return { title: "", description: "" };
   }
@@ -83,12 +93,12 @@ async function getSeoForUrl(url: string, acceptLanguage?: string, host?: string)
     const areaMatch = pathname.match(/^\/areas\/([^/?]+)$/);
     if (areaMatch) {
       const rows = await db.select({ seoMeta: areas.seoMeta }).from(areas).where(eq(areas.slug, areaMatch[1])).limit(1);
-      if (rows[0]) result = parseSeoMeta(rows[0].seoMeta, language);
+      if (rows[0]) result = parseSeoMeta(rows[0].seoMeta, language, host);
     }
     const catMatch = pathname.match(/^\/categories\/([^/?]+)$/);
     if (catMatch) {
       const rows = await db.select({ seoMeta: categories.seoMeta }).from(categories).where(eq(categories.slug, catMatch[1])).limit(1);
-      if (rows[0]) result = parseSeoMeta(rows[0].seoMeta, language);
+      if (rows[0]) result = parseSeoMeta(rows[0].seoMeta, language, host);
     }
     const staticPageSlugs: Record<string, string> = {
       "/": "home", "/areas": "areas", "/categories": "categories",
@@ -101,7 +111,7 @@ async function getSeoForUrl(url: string, acceptLanguage?: string, host?: string)
     };
     if (staticPageSlugs[pathname]) {
       const rows = await db.select({ seoMeta: pages.seoMeta }).from(pages).where(eq(pages.slug, staticPageSlugs[pathname])).limit(1);
-      if (rows[0]) result = parseSeoMeta(rows[0].seoMeta, language);
+      if (rows[0]) result = parseSeoMeta(rows[0].seoMeta, language, host);
     }
     if (result?.title) seoCache.set(cacheKey, { ...result, expiry: Date.now() + CACHE_TTL });
     return result;
@@ -289,46 +299,46 @@ const SCHEMA_I18N: Record<string, {
     svc_a6: "Цените за достава почнуваат од конкурентна основна стапка и варираат во зависност од растојанието, големината на пакетот и типот на возило. Точната цена ја гледаш пред потврда на нарачката.",
   },
   sq: {
-    lbDescription: "Shërbim i shpejtë korrieri dhe dorëzimi në Shkup, Maqedoni. Dorëzim ushqimi, kargo, pako në 15 minuta me gjurmim në kohë reale.",
-    orgDescription: "Shërbim profesional korrieri dhe dorëzimi në Shkup, Maqedoni.",
-    orgAreaServed: "Shkup, Maqedoni",
+    lbDescription: "Shërbim i shpejtë korrieri dhe dorëzimi në Tiranë, Shqipëri. Dorëzim ushqimi, kargo, pako në 15 minuta me gjurmim në kohë reale.",
+    orgDescription: "Shërbim profesional korrieri dhe dorëzimi në Tiranë, Shqipëri.",
+    orgAreaServed: "Tiranë, Shqipëri",
     bcHome: "Kryefaqja", bcAboutUs: "Rreth Nesh", bcHowItWorks: "Si Funksionon",
     bcServices: "Shërbimet", bcAreas: "Zonat", bcDeliveryAreas: "Zonat e Dorëzimit",
     bcOrder: "Porosi", bcOrderNow: "Porosit Tani", bcBecomeACourier: "Bëhu Korrier", bcBusinessReg: "Regjistrimi i Biznesit",
     howToName: "Si Funksionon Dorëzimi i FastlyGo",
     howToDesc: "Dorëzimi i FastlyGo në 4 hapa të thjeshtë",
-    step1Name: "Bëj Porosinë", step1Text: "Hap aplikacionin ose faqen e internetit, fut adresat e marrjes dhe dorëzimit, zgjidh madhësinë e paketës.",
-    step2Name: "Korrierin u Caktua", step2Text: "Algoritmi ynë i zgjuar të lidh menjëherë me korrierën profesionale më të afërt të disponueshme.",
+    step1Name: "Bëj Porosinë", step1Text: "Hap aplikacionin ose faqen e internetit, fut adresat e marrësit dhe dorëzimit, zgjidh madhësinë e paketës.",
+    step2Name: "Korrierin u Caktua", step2Text: "Algoritmi ynë i zgjuar të lidh menjehërsh me korrierën profesionale më të afrët të disponueshme.",
     step3Name: "Ndjekje në Kohë Reale", step3Text: "Shiko korrierën në hartë të drejtpërdrejtë. Merr përditësime ETA dhe njoftime push.",
     step4Name: "Dorëzuar!", step4Text: "Paketa arrin në mënyrë të sigurt. Merr provë fotografike të dorëzimit dhe konfirmim dixhital.",
     serviceName: "Shërbimet e Dorëzimit të FastlyGo",
-    serviceDesc: "Dorëzim ushqimi, market, farmaci, kargo dhe dokumentesh në Shkup",
+    serviceDesc: "Dorëzim ushqimi, market, farmaci, kargo dhe dokumentesh në Tiranë",
     serviceType: "Korrier dhe Dorëzim",
-    orderName: "Porosit Korrier - FastlyGo", orderDesc: "Bëj porosinë e dorëzimit me FastlyGo. Shërbim i shpejtë korrieri në Shkup.",
-    hiw_q1: "Sa shpejt dorëzon FastlyGo në Shkup?",
-    hiw_a1: "FastlyGo dorëzon brenda 15 minutave në Shkup. Sistemi ynë i zgjuar i shpërndarjes cakton korrierën më të afërt të disponueshme menjëherë pas porosisë.",
+    orderName: "Porosit Korrier - FastlyGo", orderDesc: "Bëj porosinë e dorëzimit me FastlyGo. Shërbim i shpejtë korrieri në Tiranë.",
+    hiw_q1: "Sa shpejt dorëzon FastlyGo në Tiranë?",
+    hiw_a1: "FastlyGo dorëzon brenda 15 minutave në Tiranë. Sistemi ynë i zgjuar i shpërndaries cakton korrierën më të afrët të disponueshme menjehërsh pas porosisit.",
     hiw_q2: "Si ta gjurmoj porosinë time në kohë reale?",
-    hiw_a2: "Pasi të caktohet korrieria, mund ta shikosh atë duke lëvizur në hartë të drejtpërdrejtë në aplikacionin ose faqen e FastlyGo. Do të marrësh gjithashtu njoftime push me përditësime ETA.",
-    hiw_q3: "Cilat zona mbulon FastlyGo në Shkup?",
-    hiw_a3: "FastlyGo mbulon 38+ lagje në të gjithë Shkupin, duke përfshirë Qendrën, Karposh, Aerodromin, Kisela Voda, Gazi Baba, Butel dhe shumë të tjera.",
+    hiw_a2: "Pasi të caktohet korrieria, mund ta shikosh atë duke lëvizur në hartë të drejtpërdrejtë në aplikacionin ose faqen e FastlyGo. Do të marrsh gjithashtu njoftime push me përditësime ETA.",
+    hiw_q3: "Cilat zona mbulon FastlyGo në Tiranë?",
+    hiw_a3: "FastlyGo mbulon 38+ lagje në të gjithë Tiranën, duke përfshirë Bllokun, Kombinatin, Don Boskun, Laprakën, Kamëz, Vorë, Shkëzë, Kashar dhe shumë të tjera.",
     hiw_q4: "Si të bëj një porosi dorëzimi me FastlyGo?",
-    hiw_a4: "Hap faqen e internetit ose aplikacionin e FastlyGo, fut adresat e marrjes dhe dorëzimit, zgjidh madhësinë e paketës dhe llojin e automjetit, pastaj konfirmo porosinë. Korrieria caktohet brenda sekondave.",
+    hiw_a4: "Hap faqen e internetit ose aplikacionin e FastlyGo, fut adresat e marrësit dhe dorëzimit, zgjidh madhësinë e paketës dhe llojin e automjetit, pastaj konfirmo porosinë. Korrieria caktohet brenda sekondave.",
     hiw_q5: "Cilat metoda pagese pranon FastlyGo?",
-    hiw_a5: "FastlyGo pranon pagesë me para në dorë dhe pagesë me kartë krediti/debiti. Mund të zgjedhësh metodën e preferuar të pagesës gjatë porosisë.",
+    hiw_a5: "FastlyGo pranon pagesë me para në dorë dhe pagesë me kartë krediti/debiti. Mund të zgjedhsh metodën e preferuar të pagesës gjatë porosisit.",
     hiw_q6: "A mund të marr provë dorëzimi?",
     hiw_a6: "Po. Pas çdo dorëzimi të suksesshëm, FastlyGo ofron konfirmim dixhital dhe provë fotografike të dorëzimit direkt në aplikacion.",
     svc_q1: "Çfarë llojesh dorëzimesh kryen FastlyGo?",
-    svc_a1: "FastlyGo kryen dorëzim ushqimi nga restorantet, ushqime nga supermarketet, ilaçe nga farmacitë, dokumente, lule, dhurata dhe pako kargo të përgjithshme në të gjithë Shkupin.",
-    svc_q2: "A mund të dorëzojë FastlyGo ushqim nga çdo restorant në Shkup?",
-    svc_a2: "Po. Korrierat e FastlyGo mund të marrin ushqim nga çdo restorant, kafe ose fast food në Shkup — jo vetëm nga restorantet partnere.",
+    svc_a1: "FastlyGo kryen dorëzim ushqimi nga restorantet, ushqime nga supermarketet, ilaçe nga farmacitë, dokumente, lule, dhurata dhe pako kargo të përgjithshme në të gjithë Tiranën dhe qytetet e tjera të Shqipërisë.",
+    svc_q2: "A mund të dorëzojë FastlyGo ushqim nga çdo restorant në Tiranë?",
+    svc_a2: "Po. Korrierat e FastlyGo mund të marrin ushqim nga çdo restorant, kafe ose fast food në Tiranë — jo vetëm nga restorantet partnere.",
     svc_q3: "A dorëzon FastlyGo ilaçe dhe produkte farmaceutike?",
-    svc_a3: "Po. FastlyGo ofron dorëzim nga farmacia në Shkup. Korrierat marrin ilaçe dhe produkte shëndetësore dhe i dorëzojnë te dera juaj zakonisht brenda 15-30 minutave.",
+    svc_a3: "Po. FastlyGo ofron dorëzim nga farmacia në Tiranë. Korrierat marrin ilaçe dhe produkte shëndetësore dhe i dorëzojnë te dera juaj zakonisht brenda 15-30 minutave.",
     svc_q4: "A mund të përdorin bizneset FastlyGo për dorëzime të rregullta?",
-    svc_a4: "Absolutisht. FastlyGo ofron Programin e Partnerëve të Biznesit për restorante, dyqane, farmaci dhe biznese të tjera që kanë nevojë për shërbime të rregullta korrieri në Shkup.",
+    svc_a4: "Absolutisht. FastlyGo ofron Programin e Partnerëve të Biznesit për restorante, dyqane, farmaci dhe biznese të tjera që kanë nevojë për shërbimet e rregullta korrieri në Tiranë dhe në të gjithë Shqipërinë.",
     svc_q5: "Cila është madhësia maksimale e paketës që mund të dorëzojë FastlyGo?",
     svc_a5: "FastlyGo mbështet tre madhësi paketash: E vogël (nën 3 kg), Mesatare (3-10 kg) dhe E madhe (10+ kg). Për paketat e mëdha caktohet automatikisht korrier me makinë.",
     svc_q6: "Sa kushton dorëzimi me FastlyGo?",
-    svc_a6: "Çmimet e dorëzimit fillojnë nga një tarifë bazë konkurruese dhe ndryshojnë sipas distancës, madhësisë së paketës dhe llojit të automjetit. Çmimin e saktë e sheh para konfirmimit të porosisë.",
+    svc_a6: "Qmimet e dorëzimit fillojnë nga një tarifë bazë konkurruese dhe ndryshojnë sipas distancës, madhësisë së paketës dhe llojit të automjetit. Qmimin e saktë e sheh para konfirmimit të porosisit.",
   },
 };
 
@@ -341,57 +351,85 @@ function getJsonLdForPath(pathname: string, language: string, title: string, des
   const lang = (language && SCHEMA_I18N[language]) ? language : "en";
   const t = SCHEMA_I18N[lang];
   const pageBaseUrl = host ? getBaseUrlForHost(host) : BASE_URL;
+  // siteConfig'den domain'e özgü lokasyon/dil verilerini al
+  const cfg = getSiteConfigForHost(host || "fastlygo.mk");
+  // Şehir/ülke adını dile göre al (fallback: en)
+  const getCityName = (l: string) => cfg.cityNames[l] ?? cfg.cityNames["en"] ?? Object.values(cfg.cityNames)[0];
+  const getCountryName = (l: string) => cfg.countryNames[l] ?? cfg.countryNames["en"] ?? Object.values(cfg.countryNames)[0];
+  const cityEn = getCityName("en");
+  const countryEn = getCountryName("en");
+  const siteLogo = `${pageBaseUrl}/logo.png`;
+  // Dil listesini insan okunur forma çevir
+  const langNameMap: Record<string, string> = {
+    en: "English", tr: "Turkish", mk: "Macedonian", sq: "Albanian", sr: "Serbian"
+  };
+  const availableLanguages = cfg.supportedLangs.map(l => langNameMap[l] || l);
+  // WebSite schema — her domain kendi URL'ini bildirir
+  const webSiteSchema = {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "name": "FastlyGo",
+    "url": pageBaseUrl,
+    "description": t.orgDescription,
+    "inLanguage": cfg.defaultLang,
+    "potentialAction": {
+      "@type": "SearchAction",
+      "target": `${pageBaseUrl}/new-order?q={search_term_string}`,
+      "query-input": "required name=search_term_string"
+    }
+  };
   const localBusinessBase = {
     "@context": "https://schema.org",
     "@type": "LocalBusiness",
     "name": "FastlyGo",
     "description": t.lbDescription,
     "url": pageBaseUrl,
-    "telephone": "+38978123456",
-    "email": "info@fastlygo.mk",
-    "image": OG_IMAGE,
-    "logo": `${BASE_URL}/logo.png`,
+    "telephone": cfg.telephone,
+    "email": cfg.email,
+    "image": cfg.ogImage,
+    "logo": siteLogo,
     "priceRange": "€€",
-    "currenciesAccepted": "EUR, MKD",
+    "currenciesAccepted": cfg.currencies,
     "paymentAccepted": "Cash, Credit Card",
     "openingHours": "Mo-Su 08:00-23:00",
     "address": {
       "@type": "PostalAddress",
-      "streetAddress": "Skopje",
-      "addressLocality": "Skopje",
-      "addressRegion": "Skopje",
-      "postalCode": "1000",
-      "addressCountry": "MK"
+      "streetAddress": cityEn,
+      "addressLocality": cityEn,
+      "addressRegion": cityEn,
+      "postalCode": cfg.postalCode,
+      "addressCountry": cfg.countryCode
     },
     "geo": {
       "@type": "GeoCoordinates",
-      "latitude": 41.9981,
-      "longitude": 21.4254
+      "latitude": cfg.latitude,
+      "longitude": cfg.longitude
     },
     "sameAs": [
+      "https://fastlygo.mk",
+      "https://fastlygo.al",
       "https://www.facebook.com/fastlygo",
       "https://www.instagram.com/fastlygo"
     ],
     "serviceArea": {
       "@type": "City",
-      "name": "Skopje"
+      "name": cityEn
     }
   };
-
   const organizationSchema = {
     "@context": "https://schema.org",
     "@type": "Organization",
     "name": "FastlyGo",
     "url": pageBaseUrl,
-    "logo": `${BASE_URL}/logo.png`,
+    "logo": siteLogo,
     "description": t.orgDescription,
     "foundingDate": "2023",
-    "areaServed": t.orgAreaServed,
+    "areaServed": `${cityEn}, ${countryEn}`,
     "contactPoint": {
       "@type": "ContactPoint",
-      "telephone": "+38978123456",
+      "telephone": cfg.telephone,
       "contactType": "customer service",
-      "availableLanguage": ["English", "Macedonian", "Albanian", "Turkish"]
+      "availableLanguage": availableLanguages
     },
     "sameAs": [
       "https://fastlygo.mk",
@@ -426,14 +464,14 @@ function getJsonLdForPath(pathname: string, language: string, title: string, des
 
   // Home page
   if (pathname === "/") {
-    return [localBusinessBase, organizationSchema];
+    return [webSiteSchema, localBusinessBase, organizationSchema];
   }
 
   // About Us
   if (pathname === "/about-us") {
     return [organizationSchema, breadcrumb(
-      { name: t.bcHome, url: BASE_URL },
-      { name: t.bcAboutUs, url: `${BASE_URL}/about-us` }
+      { name: t.bcHome, url: pageBaseUrl },
+      { name: t.bcAboutUs, url: `${pageBaseUrl}/about-us` }
     )];
   }
 
@@ -460,8 +498,8 @@ function getJsonLdForPath(pathname: string, language: string, title: string, des
       { q: t.hiw_q6, a: t.hiw_a6 },
     ]),
     breadcrumb(
-      { name: t.bcHome, url: BASE_URL },
-      { name: t.bcHowItWorks, url: `${BASE_URL}/how-it-works` }
+      { name: t.bcHome, url: pageBaseUrl },
+      { name: t.bcHowItWorks, url: `${pageBaseUrl}/how-it-works` }
     )];
   }
 
@@ -473,7 +511,7 @@ function getJsonLdForPath(pathname: string, language: string, title: string, des
       "name": t.serviceName,
       "description": description || t.serviceDesc,
       "provider": { "@type": "LocalBusiness", "name": "FastlyGo" },
-      "areaServed": "Skopje",
+      "areaServed": cityEn,
       "serviceType": t.serviceType
     },
     faqPage([
@@ -485,8 +523,8 @@ function getJsonLdForPath(pathname: string, language: string, title: string, des
       { q: t.svc_q6, a: t.svc_a6 },
     ]),
     breadcrumb(
-      { name: t.bcHome, url: BASE_URL },
-      { name: t.bcServices, url: `${BASE_URL}/services` }
+      { name: t.bcHome, url: pageBaseUrl },
+      { name: t.bcServices, url: `${pageBaseUrl}/services` }
     )];
   }
 
@@ -494,8 +532,8 @@ function getJsonLdForPath(pathname: string, language: string, title: string, des
   if (pathname === "/areas") {
     return [
       breadcrumb(
-        { name: t.bcHome, url: BASE_URL },
-        { name: t.bcDeliveryAreas, url: `${BASE_URL}/areas` }
+        { name: t.bcHome, url: pageBaseUrl },
+        { name: t.bcDeliveryAreas, url: `${pageBaseUrl}/areas` }
       ),
       localBusinessBase
     ];
@@ -510,20 +548,20 @@ function getJsonLdForPath(pathname: string, language: string, title: string, des
       "@context": "https://schema.org",
       "@type": "LocalBusiness",
       "name": `FastlyGo - ${areaName}`,
-      "description": description || `FastlyGo delivery service in ${areaName}, Skopje`,
-      "url": `${BASE_URL}/areas/${slug}`,
+      "description": description || `FastlyGo delivery service in ${areaName}, ${cityEn}`,
+      "url": `${pageBaseUrl}/areas/${slug}`,
       "areaServed": areaName,
       "address": {
         "@type": "PostalAddress",
         "addressLocality": areaName,
-        "addressRegion": "Skopje",
-        "addressCountry": "MK"
+        "addressRegion": cityEn,
+        "addressCountry": cfg.countryCode
       }
     },
     breadcrumb(
-      { name: t.bcHome, url: BASE_URL },
-      { name: t.bcAreas, url: `${BASE_URL}/areas` },
-      { name: areaName, url: `${BASE_URL}/areas/${slug}` }
+      { name: t.bcHome, url: pageBaseUrl },
+      { name: t.bcAreas, url: `${pageBaseUrl}/areas` },
+      { name: areaName, url: `${pageBaseUrl}/areas/${slug}` }
     )];
   }
 
@@ -536,15 +574,15 @@ function getJsonLdForPath(pathname: string, language: string, title: string, des
       "@context": "https://schema.org",
       "@type": "Service",
       "name": title || `${catName} Delivery - FastlyGo`,
-      "description": description || `${catName} delivery service in Skopje by FastlyGo`,
-      "provider": { "@type": "LocalBusiness", "name": "FastlyGo", "url": BASE_URL },
-      "areaServed": "Skopje",
-      "url": `${BASE_URL}/categories/${slug}`
+      "description": description || `${catName} delivery service in ${cityEn} by FastlyGo`,
+      "provider": { "@type": "LocalBusiness", "name": "FastlyGo", "url": pageBaseUrl },
+      "areaServed": cityEn,
+      "url": `${pageBaseUrl}/categories/${slug}`
     },
     breadcrumb(
-      { name: t.bcHome, url: BASE_URL },
-      { name: t.bcServices, url: `${BASE_URL}/services` },
-      { name: catName, url: `${BASE_URL}/categories/${slug}` }
+      { name: t.bcHome, url: pageBaseUrl },
+      { name: t.bcServices, url: `${pageBaseUrl}/services` },
+      { name: catName, url: `${pageBaseUrl}/categories/${slug}` }
     )];
   }
 
@@ -555,28 +593,28 @@ function getJsonLdForPath(pathname: string, language: string, title: string, des
       "@type": "Service",
       "name": t.orderName,
       "description": t.orderDesc,
-      "provider": { "@type": "LocalBusiness", "name": "FastlyGo", "url": BASE_URL },
-      "areaServed": "Skopje"
+      "provider": { "@type": "LocalBusiness", "name": "FastlyGo", "url": pageBaseUrl },
+      "areaServed": cityEn
     },
     breadcrumb(
-      { name: t.bcHome, url: BASE_URL },
-      { name: t.bcOrderNow, url: `${BASE_URL}/new-order` }
+      { name: t.bcHome, url: pageBaseUrl },
+      { name: t.bcOrderNow, url: `${pageBaseUrl}/new-order` }
     )];
   }
 
   // Courier register
   if (pathname === "/courier/register") {
     return [breadcrumb(
-      { name: t.bcHome, url: BASE_URL },
-      { name: t.bcBecomeACourier, url: `${BASE_URL}/courier/register` }
+      { name: t.bcHome, url: pageBaseUrl },
+      { name: t.bcBecomeACourier, url: `${pageBaseUrl}/courier/register` }
     )];
   }
 
   // Business register
   if (pathname === "/business/register") {
     return [breadcrumb(
-      { name: t.bcHome, url: BASE_URL },
-      { name: t.bcBusinessReg, url: `${BASE_URL}/business/register` }
+      { name: t.bcHome, url: pageBaseUrl },
+      { name: t.bcBusinessReg, url: `${pageBaseUrl}/business/register` }
     )];
   }
 
@@ -599,43 +637,49 @@ function injectSeoIntoHtml(
   host?: string
 ): string {
   const esc = (s: string) => s.replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-  // Fallback SEO data for pages not in DB - multi-language
+  // siteConfig'den domain'e özgü lokasyon verilerini al
+  const cfg = getSiteConfigForHost(host || "fastlygo.mk");
+  const city = cfg.cityNames["en"] ?? cfg.cityNames[Object.keys(cfg.cityNames)[0]];       // "Skopje" veya "Tirana"
+  const country = cfg.countryNames["en"] ?? cfg.countryNames[Object.keys(cfg.countryNames)[0]]; // "North Macedonia" veya "Albania"
+  const nb = cfg.neighborhoodCount;  // 38 veya 38
+  const couriers = cfg.activeCouriers; // 56 veya 24
+  // Fallback SEO data for pages not in DB - multi-language, domain-aware
   const fallbackSeoAll: Record<string, Record<string, { title: string; description: string }>> = {
     "/": {
-      en: { title: "FastlyGo - Food Delivery, Courier and Cargo Services in Skopje", description: "Fast courier & delivery service in Skopje. Food, cargo, package delivery in 15 minutes. Real-time tracking, affordable prices." },
-      tr: { title: "FastlyGo - Üsküp Yemek Teslimat, Kurye ve Kargo Hizmetleri", description: "Üsküp'te hızlı kurye ve teslimat hizmeti. Yemek, kargo, paket teslimatı 15 dakikada. Gerçek zamanlı takip, uygun fiyatlar." },
+      en: { title: `FastlyGo - Food Delivery, Courier and Cargo Services in ${city}`, description: `Fast courier & delivery service in ${city}. Food, cargo, package delivery in 15 minutes. Real-time tracking, affordable prices.` },
+      tr: { title: `FastlyGo - ${city === "Tirana" ? "Tiran" : "Üsküp"} Yemek Teslimat, Kurye ve Kargo Hizmetleri`, description: `${city === "Tirana" ? "Tiran'da" : "Üsküp'te"} hızlı kurye ve teslimat hizmeti. Yemek, kargo, paket teslimatı 15 dakikada.` },
       mk: { title: "FastlyGo - Достава на Храна, Курирски Услуги во Скопје", description: "Брза курирска и доставна услуга во Скопје. Храна, карго, пакети за 15 минути." },
-      sq: { title: "FastlyGo - Dorëzim Ushqimi, Shërbime Korrierë në Shkup", description: "Shërbim i shpejtë korrieri në Shkup. Ushqim, kargo, dorëzim pako në 15 minuta." },
+      sq: { title: `FastlyGo - Dorëzim Ushqimi, Shërbimet Korrierë në ${city === "Tirana" ? "Tiranë" : "Shkup"}`, description: `Shërbim i shpejtë korrieri në ${city === "Tirana" ? "Tiranë" : "Shkup"}. Ushqim, kargo, dorëzim pako në 15 minuta.` },
     },
     "/how-it-works": {
-      en: { title: "How It Works - FastlyGo Delivery Process | Skopje", description: "Learn how FastlyGo delivery works. Simple 4-step process: Order online, courier accepts, real-time tracking, delivery in 15 minutes." },
-      tr: { title: "Nasıl Çalışır - FastlyGo Teslimat Süreci | Üsküp", description: "FastlyGo teslimat sürecini öğrenin. 4 basit adım: Online sipariş, kurye kabul, gerçek zamanlı takip, 15 dakikada teslimat." },
+      en: { title: `How It Works - FastlyGo Delivery Process | ${city}`, description: "Learn how FastlyGo delivery works. Simple 4-step process: Order online, courier accepts, real-time tracking, delivery in 15 minutes." },
+      tr: { title: `Nasıl Çalışır - FastlyGo Teslimat Süreci | ${city === "Tirana" ? "Tiran" : "Üsküp"}`, description: "FastlyGo teslimat sürecini öğrenin. 4 basit adım: Online sipariş, kurye kabul, gerçek zamanlı takip, 15 dakikada teslimat." },
       mk: { title: "Како Функционира - FastlyGo Процес на Достава", description: "Научете како функционира FastlyGo доставата. 4 едноставни чекори." },
-      sq: { title: "Si Funksionon - Procesi i Dorëzimit FastlyGo", description: "Mësoni si funksionon dorëzimi FastlyGo. 4 hapa të thjeshtë." },
+      sq: { title: `Si Funksionon - Procesi i Dorëzimit FastlyGo | ${city === "Tirana" ? "Tiranë" : "Shkup"}`, description: "Mësoni si funksionon dorëzimi FastlyGo. 4 hapa të thjeshtë." },
     },
     "/about-us": {
-      en: { title: "About FastlyGo - Courier & Delivery Service in Skopje", description: "FastlyGo is a professional courier and delivery service in Skopje, Macedonia. 53+ active couriers, 15-minute delivery." },
-      tr: { title: "Hakkımızda - FastlyGo Üsküp Kurye Hizmeti", description: "FastlyGo, Üsküp Makedonya'da profesyonel kurye ve teslimat hizmeti. 53+ aktif kurye, 15 dakika teslimat." },
-      mk: { title: "За Нас - FastlyGo Курирска Услуга во Скопје", description: "FastlyGo е професионална курирска услуга во Скопје. 53+ активни курири." },
-      sq: { title: "Rreth Nesh - FastlyGo Shërbim Korrieri në Shkup", description: "FastlyGo është shërbim profesional korrieri në Shkup. 53+ korrierë aktivë." },
+      en: { title: `About FastlyGo - Courier & Delivery Service in ${city}`, description: `FastlyGo is a professional courier and delivery service in ${city}, ${country}. ${couriers}+ active couriers, 15-minute delivery.` },
+      tr: { title: `Hakkımızda - FastlyGo ${city === "Tirana" ? "Tiran" : "Üsküp"} Kurye Hizmeti`, description: `FastlyGo, ${city === "Tirana" ? "Tiran, Arnavutluk" : "Üsküp, Makedonya"}'da profesyonel kurye ve teslimat hizmeti. ${couriers}+ aktif kurye, 15 dakika teslimat.` },
+      mk: { title: "За Нас - FastlyGo Курирска Услуга во Скопје", description: `FastlyGo е професионална курирска услуга во Скопје. ${couriers}+ активни курири.` },
+      sq: { title: `Rreth Nesh - FastlyGo Shërbim Korrieri në ${city === "Tirana" ? "Tiranë" : "Shkup"}`, description: `FastlyGo është shërbim profesional korrieri në ${city === "Tirana" ? "Tiranë" : "Shkup"}. ${couriers}+ korrierë aktivë.` },
     },
     "/services": {
-      en: { title: "Our Services - FastlyGo Delivery Categories | Skopje", description: "Explore FastlyGo delivery services: food, grocery, pharmacy, cargo, document delivery in Skopje." },
-      tr: { title: "Hizmetlerimiz - FastlyGo Teslimat Kategorileri | Üsküp", description: "FastlyGo teslimat hizmetlerini keşfedin: yemek, market, eczane, kargo, evrak teslimatı." },
-      mk: { title: "Наши Услуги - FastlyGo Категории на Достава", description: "Истражете ги услугите на FastlyGo: храна, маркет, аптека, карго." },
-      sq: { title: "Shërbimet Tona - FastlyGo Kategori Dorëzimi", description: "Eksploroni shërbimet e FastlyGo: ushqim, market, farmaci, kargo." },
+      en: { title: `Our Services - FastlyGo Delivery Categories | ${city}`, description: `Explore FastlyGo delivery services: food, grocery, pharmacy, cargo, document delivery in ${city}.` },
+      tr: { title: `Hizmetlerimiz - FastlyGo Teslimat Kategorileri | ${city === "Tirana" ? "Tiran" : "Üsküp"}`, description: `FastlyGo teslimat hizmetlerini keşfedin: yemek, market, eczane, kargo, evrak teslimatı.` },
+      mk: { title: "Naши Услуги - FastlyGo Категории на Достава", description: "Истражете ги услугите на FastlyGo: храна, маркет, аптека, карго." },
+      sq: { title: `Shërbimet Tona - FastlyGo Kategori Dorëzimi | ${city === "Tirana" ? "Tiranë" : "Shkup"}`, description: `Eksploroni shërbimet e FastlyGo në ${city === "Tirana" ? "Tiranë" : "Shkup"}: ushqim, market, farmaci, kargo.` },
     },
     "/areas": {
-      en: { title: "Delivery Areas - FastlyGo Coverage in Skopje", description: "Check FastlyGo delivery coverage areas in Skopje. Fast delivery to 38+ neighborhoods." },
-      tr: { title: "Teslimat Bölgeleri - FastlyGo Üsküp Kapsam Alanı", description: "FastlyGo Üsküp teslimat bölgelerini kontrol edin. 38+ mahalleye hızlı teslimat." },
-      mk: { title: "Области на Достава - FastlyGo Покриеност во Скопје", description: "Проверете ги областите на достава на FastlyGo. 38+ населби." },
-      sq: { title: "Zonat e Dorëzimit - FastlyGo Mbulimi në Shkup", description: "Kontrolloni zonat e dorëzimit të FastlyGo. Dorëzim i shpejtë në 38+ lagje." },
+      en: { title: `Delivery Areas - FastlyGo Coverage in ${city}`, description: `Check FastlyGo delivery coverage areas in ${city}. Fast delivery to ${nb}+ neighborhoods.` },
+      tr: { title: `Teslimat Bölgeleri - FastlyGo ${city === "Tirana" ? "Tiran" : "Üsküp"} Kapsam Alanı`, description: `FastlyGo ${city === "Tirana" ? "Tiran" : "Üsküp"} teslimat bölgelerini kontrol edin. ${nb}+ mahalleye hızlı teslimat.` },
+      mk: { title: "Области на Достава - FastlyGo Покриеност во Скопје", description: `Проверете ги областите на достава на FastlyGo. ${nb}+ населби.` },
+      sq: { title: `Zonat e Dorëzimit - FastlyGo Mbulimi në ${city === "Tirana" ? "Tiranë" : "Shkup"}`, description: `Kontrolloni zonat e dorëzimit të FastlyGo. Dorëzim i shpejtë në ${nb}+ lagje.` },
     },
     "/new-order": {
-      en: { title: "Order Now - FastlyGo Quick Courier | Skopje", description: "Place your delivery order with FastlyGo. Fast courier service in Skopje." },
-      tr: { title: "Hemen Sipariş Ver - FastlyGo Hızlı Kurye | Üsküp", description: "FastlyGo ile teslimat siparişinizi verin. Üsküp'te hızlı kurye hizmeti." },
+      en: { title: `Order Now - FastlyGo Quick Courier | ${city}`, description: `Place your delivery order with FastlyGo. Fast courier service in ${city}.` },
+      tr: { title: `Hemen Sipariş Ver - FastlyGo Hızlı Kurye | ${city === "Tirana" ? "Tiran" : "Üsküp"}`, description: `FastlyGo ile teslimat siparişinizi verin. ${city === "Tirana" ? "Tiran'da" : "Üsküp'te"} hızlı kurye hizmeti.` },
       mk: { title: "Нарачај Сега - FastlyGo Брз Курир", description: "Направете нарачка со FastlyGo. Брза курирска услуга." },
-      sq: { title: "Porosit Tani - FastlyGo Korrier i Shpejtë", description: "Bëni porosi me FastlyGo. Shërbim i shpejtë korrieri në Shkup." },
+      sq: { title: `Porosit Tani - FastlyGo Korrier i Shpejtë | ${city === "Tirana" ? "Tiranë" : "Shkup"}`, description: `Bëni porosi me FastlyGo. Shërbim i shpejtë korrieri në ${city === "Tirana" ? "Tiranë" : "Shkup"}.` },
     },
     "/privacy-policy": {
       en: { title: "Privacy Policy - FastlyGo", description: "FastlyGo privacy policy. How we collect, use, and protect your data." },
@@ -684,25 +728,50 @@ function injectSeoIntoHtml(
   const alBaseUrl = "https://fastlygo.al";
   // Canonical URL: domain'e göre (fastlygo.al'dan gelince canonical fastlygo.al olur)
   const canonicalUrl = `${pageBaseUrl}${pathname}`;
-  // hreflang URLs: her dil kendi canonical domain'ini gösterir
-  // sq → fastlygo.al (Arnavutça canonical domain)
-  // mk → fastlygo.mk?lang=mk
-  // en, tr → fastlygo.mk
-  const hrefEn = `${mkBaseUrl}${pathname}`;
-  const hrefTr = `${mkBaseUrl}${pathname}?lang=tr`;
-  const hrefMk = `${mkBaseUrl}${pathname}?lang=mk`;
-  const hrefSq = `${alBaseUrl}${pathname}`;
+    // Detect which domain we're on
+  const isAlDomain = !!(host && host.includes("fastlygo.al"));
+
   // OG locale map
   const ogLocale: Record<string, string> = { en: "en_US", tr: "tr_TR", mk: "mk_MK", sq: "sq_AL" };
   const locale = ogLocale[language] || "en_US";
-  // Current page URL
+
+  // Current page URL (for og:url)
   let currentUrl: string;
-  if (language === "sq") {
-    currentUrl = `${alBaseUrl}${pathname}`;
+  if (isAlDomain) {
+    // fastlygo.al: URL always on al domain, lang param only when non-default
+    currentUrl = language === "sq" ? `${alBaseUrl}${pathname}` : `${alBaseUrl}${pathname}?lang=${language}`;
   } else if (language === "en") {
     currentUrl = `${mkBaseUrl}${pathname}`;
   } else {
     currentUrl = `${mkBaseUrl}${pathname}?lang=${language}`;
+  }
+
+  // hreflang block — domain-aware
+  // fastlygo.al: independent Albanian-first site, all languages on .al domain, no mk hreflang
+  // fastlygo.mk: sq points to fastlygo.al (canonical Albanian domain), no sq on .mk
+  let hreflangBlock: string;
+  if (isAlDomain) {
+    // fastlygo.al — bağımsız site, varsayılan sq, mk yok
+    const alEn = `${alBaseUrl}${pathname}?lang=en`;
+    const alTr = `${alBaseUrl}${pathname}?lang=tr`;
+    const alSq = `${alBaseUrl}${pathname}`; // sq = canonical (no lang param)
+    hreflangBlock = `
+  <link rel="alternate" hreflang="x-default" href="${alSq}" />
+  <link rel="alternate" hreflang="sq" href="${alSq}" />
+  <link rel="alternate" hreflang="en" href="${alEn}" />
+  <link rel="alternate" hreflang="tr" href="${alTr}" />`;
+  } else {
+    // fastlygo.mk — sq points to fastlygo.al, mk stays on .mk
+    const mkEn = `${mkBaseUrl}${pathname}`;
+    const mkTr = `${mkBaseUrl}${pathname}?lang=tr`;
+    const mkMk = `${mkBaseUrl}${pathname}?lang=mk`;
+    const mkSq = `${alBaseUrl}${pathname}`; // sq → fastlygo.al
+    hreflangBlock = `
+  <link rel="alternate" hreflang="x-default" href="${mkEn}" />
+  <link rel="alternate" hreflang="en" href="${mkEn}" />
+  <link rel="alternate" hreflang="tr" href="${mkTr}" />
+  <link rel="alternate" hreflang="mk" href="${mkMk}" />
+  <link rel="alternate" hreflang="sq" href="${mkSq}" />`;
   }
 
   // Build JSON-LD structured data for this page
@@ -710,24 +779,27 @@ function injectSeoIntoHtml(
   const jsonLdBlock = jsonLdSchemas.length > 0
     ? jsonLdSchemas.map(schema => `  <script type="application/ld+json">${JSON.stringify(schema)}</script>`).join("\n")
     : "";
-
   // Build the full SEO block to inject before </head>
+  // og:locale:alternate — domain'e göre alternatif locale'ler
+  const ogLocaleAlternates = isAlDomain
+    ? ['en_US', 'tr_TR']           // fastlygo.al: sq ana, en+tr alternatif, mk yok
+    : ['tr_TR', 'mk_MK', 'sq_AL']; // fastlygo.mk: en ana, diğerüler alternatif
+  const ogLocaleAlternateBlock = ogLocaleAlternates
+    .map(l => `  <meta property="og:locale:alternate" content="${l}" />`)
+    .join('\n');
+
   const seoBlock = `
   <!-- Server-side SEO injection -->
   <title>${safeTitle}</title>
   <meta name="description" content="${safeDesc}" />
-  <link rel="canonical" href="${canonicalUrl}" />
-  <link rel="alternate" hreflang="x-default" href="${hrefEn}" />
-  <link rel="alternate" hreflang="en" href="${hrefEn}" />
-  <link rel="alternate" hreflang="tr" href="${hrefTr}" />
-  <link rel="alternate" hreflang="mk" href="${hrefMk}" />
-  <link rel="alternate" hreflang="sq" href="${hrefSq}" />
+  <link rel="canonical" href="${canonicalUrl}" />${hreflangBlock}
   <meta property="og:type" content="website" />
   <meta property="og:url" content="${currentUrl}" />
   <meta property="og:title" content="${safeTitle}" />
   <meta property="og:description" content="${safeDesc}" />
   <meta property="og:site_name" content="FastlyGo" />
   <meta property="og:locale" content="${locale}" />
+${ogLocaleAlternateBlock}
   <meta property="og:image" content="${OG_IMAGE}" />
   <meta property="og:image:width" content="1200" />
   <meta property="og:image:height" content="630" />
@@ -780,22 +852,28 @@ export async function setupVite(app: Express, server: Server) {
   });
 
   app.use(vite.middlewares);
-
-  // Serve sitemap.xml and robots.txt from server/static (Manus does not override this directory)
-  app.get("/sitemap.xml", (_req, res) => {
-    const sitemapPath = path.resolve(import.meta.dirname, "..", "static", "sitemap.xml");
+  // Serve sitemap.xml and robots.txt — domain-aware
+  app.get("/sitemap.xml", (req, res) => {
+    const host = (req.headers["x-forwarded-host"] as string || req.headers.host || "").split(",")[0].trim();
+    const isAlDomain = host.includes("fastlygo.al");
+    const sitemapFile = isAlDomain ? "sitemap-al.xml" : "sitemap.xml";
+    const sitemapPath = path.resolve(import.meta.dirname, "..", "static", sitemapFile);
     res.setHeader("Content-Type", "application/xml; charset=utf-8");
     res.setHeader("Cache-Control", "public, max-age=86400");
     res.sendFile(sitemapPath);
   });
-
-  app.get("/robots.txt", (_req, res) => {
+  app.get("/robots.txt", (req, res) => {
+    const host = (req.headers["x-forwarded-host"] as string || req.headers.host || "").split(",")[0].trim();
+    const isAlDomain = host.includes("fastlygo.al");
+    const baseUrl = isAlDomain ? "https://fastlygo.al" : "https://fastlygo.mk";
     const robotsPath = path.resolve(import.meta.dirname, "..", "static", "robots.txt");
-    res.setHeader("Content-Type", "text/plain; charset=utf-8");
-    res.setHeader("Cache-Control", "public, max-age=86400");
-    res.sendFile(robotsPath);
+    fs.promises.readFile(robotsPath, "utf-8").then(content => {
+      const dynamic = content.replace(/Sitemap: https:\/\/fastlygo\.mk\/sitemap\.xml/, `Sitemap: ${baseUrl}/sitemap.xml`);
+      res.setHeader("Content-Type", "text/plain; charset=utf-8");
+      res.setHeader("Cache-Control", "public, max-age=86400");
+      res.end(dynamic);
+    }).catch(() => res.status(500).end());
   });
-
   app.use("*", async (req, res, next) => {
     const url = req.originalUrl;
 
