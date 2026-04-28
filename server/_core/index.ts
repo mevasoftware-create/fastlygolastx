@@ -117,8 +117,9 @@ async function startServer() {
       return res.status(301).end();
     }
     
-    // Force HTTPS
-    if (protocol !== 'https' && cleanHost === 'fastlygo.mk') {
+    // Force HTTPS for all production domains
+    const productionDomains = ['fastlygo.mk', 'fastlygo.al'];
+    if (protocol !== 'https' && productionDomains.includes(cleanHost)) {
       const redirectUrl = `https://${cleanHost}${req.url}`;
       console.log(`[HTTPS Redirect] ${protocol}://${host}${req.url} → ${redirectUrl}`);
       res.setHeader('Location', redirectUrl);
