@@ -541,7 +541,12 @@ export default function Header() {
                 ))}
               </div>
 
-              {isAuthenticated && (
+              {/* Areas bağlantısı */}
+              <MobileNavLink href="/areas" onClick={closeMobileMenu}>
+                {t('areas')}
+              </MobileNavLink>
+
+              {isAuthenticated ? (
                 <>
                   <MobileNavLink href="/my-orders" onClick={closeMobileMenu} icon={<Package className="h-4 w-4" />}>
                     {t('myOrders')}
@@ -556,7 +561,15 @@ export default function Header() {
                       {t('businessPanel')}
                     </MobileNavLink>
                   )}
-                  
+                  {/* Bildirimler */}
+                  <MobileNavLink href="/notifications" onClick={closeMobileMenu} icon={<Bell className="h-4 w-4" />}>
+                    <span className="flex-1">{t('notifications')}</span>
+                    {notifUnreadCount > 0 && (
+                      <span className="bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-bold">
+                        {notifUnreadCount > 9 ? '9+' : notifUnreadCount}
+                      </span>
+                    )}
+                  </MobileNavLink>
                   <a 
                     href="/new-order" 
                     className="mx-2 mt-2 px-6 py-3 rounded-xl btn-primary text-white font-semibold shadow-md text-center"
@@ -564,6 +577,29 @@ export default function Header() {
                   >
                     {t('callCourierNow')}
                   </a>
+                </>
+              ) : (
+                <>
+                  {/* Giriş yapmamış kullanıcılar için Call Courier */}
+                  <a 
+                    href="/new-order" 
+                    className="mx-2 mt-2 px-6 py-3 rounded-xl btn-primary text-white font-semibold shadow-md text-center"
+                    onClick={closeMobileMenu}
+                  >
+                    {t('callCourierNow')}
+                  </a>
+                  {/* Kurye ve işletme kayıt linkleri */}
+                  <div className="px-2 pt-3 border-t border-border/50 mt-2">
+                    <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2 px-2">
+                      {t('joinTeam')}
+                    </div>
+                    <MobileNavLink href="/courier/register" onClick={closeMobileMenu} icon={<Bike className="h-4 w-4" />}>
+                      {t('becomeCourier')}
+                    </MobileNavLink>
+                    <MobileNavLink href="/business/register" onClick={closeMobileMenu} icon={<Building2 className="h-4 w-4" />}>
+                      {t('businessRegistration')}
+                    </MobileNavLink>
+                  </div>
                 </>
               )}
 
