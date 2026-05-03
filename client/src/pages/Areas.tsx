@@ -4,7 +4,7 @@ import Footer from '@/components/Footer';
 import SEOHead from '@/components/SEOHead';
 import { getAreasPageSchemas } from '@/lib/structuredData';
 import { MapView } from '@/components/Map';
-import { MapPin, Search, ArrowRight, Loader2, Zap, X, Navigation, Clock, ChevronDown, ChevronUp } from 'lucide-react';
+import { MapPin, Search, ArrowRight, Loader2, Zap, X, Navigation, Clock } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { Link } from 'wouter';
@@ -73,7 +73,6 @@ export default function Areas() {
   const [searchQuery, setSearchQuery] = useState('');
   const countryCode = useMemo(() => getCountryCodeFromDomain(), []);
   const defaultCity = countryCode === 'AL' ? 'Tirana' : 'Skopje';
-  const [expandedCity, setExpandedCity] = useState<string | null>(defaultCity);
   const [mapInstance, setMapInstance] = useState<any>(null);
   const [showMap, setShowMap] = useState(false);
   const markersRef = useRef<Map<number, any>>(new Map());
@@ -217,7 +216,7 @@ export default function Areas() {
             <div className="text-center max-w-3xl mx-auto">
               {/* Badge */}
               <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-orange-100/70 border border-orange-200/50 mb-6">
-                <Navigation className="w-4 h-4 text-orange-500" />
+                <Navigation className="w-4 h-4 text-orange-600" />
                 <span className="text-sm font-semibold text-orange-700">
                   {t('deliveryNetwork') || 'Delivery Network'}
                 </span>
@@ -271,7 +270,7 @@ export default function Areas() {
           </div>
         </section>
 
-        {/* ── City Cards Section ────────────────────────────── */}
+        {/* ── City + Areas Flat List Section ────────────────── */}
         <section className="py-10 md:py-14">
           <div className="max-w-6xl mx-auto px-4">
             {isLoading ? (
@@ -289,80 +288,66 @@ export default function Areas() {
                 )}
               </div>
             ) : (
-              <div className="space-y-4">
+              <div className="space-y-10">
                 {sortedCities.map(cityName => {
                   const config = cityConfig[cityName] || defaultConfig;
                   const cityAreas = groupedAreas[cityName].sort((a: any, b: any) => (a.displayOrder || 0) - (b.displayOrder || 0));
-                  const isExpanded = expandedCity === cityName;
 
                   return (
-                    <div key={cityName} className="rounded-2xl border border-gray-100 bg-white shadow-sm overflow-hidden transition-all hover:shadow-md">
-                      {/* City Header */}
-                      <button
-                        onClick={() => setExpandedCity(isExpanded ? null : cityName)}
-                        className="w-full flex items-center gap-4 p-4 md:p-5 text-left transition-colors hover:bg-gray-50/50"
-                      >
-                        {/* City Icon */}
+                    <div key={cityName}>
+                      {/* City Header — sadece başlık, tıklanamaz */}
+                      <div className="flex items-center gap-3 mb-4">
                         <div
-                          className={`w-12 h-12 md:w-14 md:h-14 rounded-xl bg-gradient-to-br ${config.gradient} flex items-center justify-center flex-shrink-0 shadow-sm`}
+                          className={`w-10 h-10 rounded-xl bg-gradient-to-br ${config.gradient} flex items-center justify-center flex-shrink-0 shadow-sm`}
                         >
-                          <span className="text-xl md:text-2xl">{config.emoji}</span>
+                          <span className="text-lg">{config.emoji}</span>
                         </div>
+                        <div className="flex items-center gap-2">
+                          <h2 className="text-lg md:text-xl font-bold text-gray-900">{cityName}</h2>
+                          <span
+                            className="text-xs font-bold px-2 py-0.5 rounded-full text-white"
+                            style={{ backgroundColor: config.color }}
+                          >
+                            {cityAreas.length}
+                          </span>
+                          <span className="text-sm text-gray-400 flex items-center gap-1">
+                            <Clock className="w-3 h-3 inline" /> 15 min
+                          </span>
+                        </div>
+                        {/* Ayırıcı çizgi */}
+                        <div className="flex-1 h-px bg-gray-100 ml-2" />
+                      </div>
 
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center gap-2">
-                            <h2 className="text-lg md:text-xl font-bold text-gray-900">{cityName}</h2>
-                            <span
-                              className="text-xs font-bold px-2 py-0.5 rounded-full text-white"
-                              style={{ backgroundColor: config.color }}
+                      {/* Area Grid — her zaman görünür, düz liste */}
+                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                        {cityAreas.map((area: any) => {
+                          const areaName = getAreaName(area);
+                          const subtitle = getAreaSubtitle(area);
+                          return (
+                            <Link
+                              key={area.id}
+                              href={`/areas/${area.slug}`}
+                              className="group flex items-center gap-3 p-3.5 rounded-xl border border-gray-100 bg-white hover:border-orange-200/60 hover:shadow-sm transition-all"
                             >
-                              {cityAreas.length}
-                            </span>
-                          </div>
-                          <p className="text-sm text-gray-500 mt-0.5">
-                            {cityAreas.length} {t('deliveryZones') || 'delivery zones'} · <Clock className="w-3 h-3 inline" /> 15 min
-                          </p>
-                        </div>
-
-                        <div className="flex-shrink-0 text-gray-400 transition-transform">
-                          {isExpanded ? <ChevronUp className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
-                        </div>
-                      </button>
-
-                      {/* Area Grid - Expandable */}
-                      {isExpanded && (
-                        <div className="px-4 pb-4 md:px-5 md:pb-5">
-                          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-                            {cityAreas.map((area: any) => {
-                              const areaName = getAreaName(area);
-                              const subtitle = getAreaSubtitle(area);
-                              return (
-                                <Link
-                                  key={area.id}
-                                  href={`/areas/${area.slug}`}
-                                  className="group flex items-center gap-3 p-3.5 rounded-xl border border-gray-100 bg-gray-50/40 hover:bg-white hover:border-orange-200/60 hover:shadow-sm transition-all"
-                                >
-                                  <div
-                                    className="w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0 transition-transform group-hover:scale-110"
-                                    style={{ backgroundColor: config.color + '14' }}
-                                  >
-                                    <MapPin className="w-4.5 h-4.5" style={{ color: config.color }} />
-                                  </div>
-                                  <div className="flex-1 min-w-0">
-                                    <p className="text-sm font-semibold text-gray-800 group-hover:text-gray-900 truncate">
-                                      {areaName}
-                                    </p>
-                                    {subtitle && (
-                                      <p className="text-xs text-gray-400 mt-0.5 truncate">{subtitle}</p>
-                                    )}
-                                  </div>
-                                  <ArrowRight className="w-4 h-4 text-gray-300 group-hover:text-orange-400 flex-shrink-0 transition-all group-hover:translate-x-0.5" />
-                                </Link>
-                              );
-                            })}
-                          </div>
-                        </div>
-                      )}
+                              <div
+                                className="w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0 transition-transform group-hover:scale-110"
+                                style={{ backgroundColor: config.color + '14' }}
+                              >
+                                <MapPin className="w-4 h-4" style={{ color: config.color }} />
+                              </div>
+                              <div className="flex-1 min-w-0">
+                                <p className="text-sm font-semibold text-gray-800 group-hover:text-gray-900 truncate">
+                                  {areaName}
+                                </p>
+                                {subtitle && (
+                                  <p className="text-xs text-gray-400 mt-0.5 truncate">{subtitle}</p>
+                                )}
+                              </div>
+                              <ArrowRight className="w-4 h-4 text-gray-300 group-hover:text-orange-400 flex-shrink-0 transition-all group-hover:translate-x-0.5" />
+                            </Link>
+                          );
+                        })}
+                      </div>
                     </div>
                   );
                 })}

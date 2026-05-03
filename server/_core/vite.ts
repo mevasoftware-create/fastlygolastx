@@ -81,7 +81,9 @@ function parseSeoMeta(seoMetaRaw: any, language: string, host?: string): { title
 async function getSeoForUrl(url: string, acceptLanguage?: string, host?: string): Promise<{ title: string; description: string } | null> {
   const pathname = url.split("?")[0];
   const language = detectLanguageFromUrl(url, acceptLanguage, host);
-  const cacheKey = `${pathname}:${language}`;
+  // Cache key'e host bilgisini ekle — fastlygo.al ve fastlygo.mk ayrı entry kullanmalı
+  const cleanHost = host ? host.replace(/^www\./, "").split(":")[0].toLowerCase() : "fastlygo.mk";
+  const cacheKey = `${cleanHost}:${pathname}:${language}`;
   const cached = seoCache.get(cacheKey);
   if (cached && cached.expiry > Date.now()) return { title: cached.title, description: cached.description };
   // Also cache all languages at once for this pathname to reduce DB hits
