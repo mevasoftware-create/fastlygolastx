@@ -123,7 +123,7 @@ async function getSeoForUrl(url: string, acceptLanguage?: string, host?: string)
 }
 
 const BASE_URL = "https://fastlygo.mk";
-const OG_IMAGE = "https://fastlygo.mk/og-image.e6740bbc.jpg";
+const OG_IMAGE = "https://d2xsxph8kpxj0f.cloudfront.net/310519663142180542/4KwtmFvvd67FSFhQ5dyp9H/fastlygo-og-universal-FQjXU2VrdYT8YobXcaLM9u.png";
 
 /**
  * Multi-language i18n dictionary for JSON-LD schemas.

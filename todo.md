@@ -500,3 +500,4 @@
 - [x] Arnavutluk bölge sayfaları için otomatik Arnavutça SEO meta üret (DB'ye yaz) — seed script'te zaten vardı, AreaPage.tsx seoMeta'dan okuyor
 - [x] fastlygo.al başlığındaki 'Shkup' → 'Tiranë' düzeltmesi (SEO cache key'e host eklendi)
 - [x] Areas sayfasını accordion'dan düz listeye çevir (ilgili ülke şehirleri üstte)
+- [x] Evrensel FastlyGo OG görseli oluştur ve her iki domain için siteConfig.ts + vite.ts'e entegre et
