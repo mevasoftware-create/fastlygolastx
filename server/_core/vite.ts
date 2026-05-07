@@ -19,14 +19,17 @@ type SupportedLang = typeof SUPPORTED_LANGS[number];
 
 /**
  * Domain → varsayılan dil eşleştirmesi
- * fastlygo.al → sq (Arnavutça)
- * fastlygo.mk → mk (Makedonca) — kullanıcı tercihine göre override edilebilir
+ * fastlygo.al → en (İngilizce) — ana dil İngilizce
+ * fastlygo.mk → en (İngilizce) — ana dil İngilizce
+ * fastlygo.ks → en (İngilizce) — ana dil İngilizce
  */
 const DOMAIN_DEFAULT_LANG: Record<string, SupportedLang> = {
-  "fastlygo.al": "sq",
-  "www.fastlygo.al": "sq",
-  "fastlygo.mk": "mk",
-  "www.fastlygo.mk": "mk",
+  "fastlygo.al": "en",
+  "www.fastlygo.al": "en",
+  "fastlygo.mk": "en",
+  "www.fastlygo.mk": "en",
+  "fastlygo.ks": "en",
+  "www.fastlygo.ks": "en",
 };
 
 /**
@@ -724,50 +727,62 @@ function injectSeoIntoHtml(
   const fb = fbLang ? (fbLang[language] || fbLang.en) : null;
     const safeTitle = title ? esc(title) : (fb ? esc(fb.title) : "FastlyGo");
   const safeDesc = esc(description || fb?.description || "");
-  // Domain-aware base URL: fastlygo.al → https://fastlygo.al, others → https://fastlygo.mk
+  // Domain-aware base URL
   const pageBaseUrl = host ? getBaseUrlForHost(host) : BASE_URL;
   const mkBaseUrl = "https://fastlygo.mk";
   const alBaseUrl = "https://fastlygo.al";
-  // Canonical URL: domain'e göre (fastlygo.al'dan gelince canonical fastlygo.al olur)
+  const ksBaseUrl = "https://fastlygo.ks";
+  // Canonical URL: domain'e göre
   const canonicalUrl = `${pageBaseUrl}${pathname}`;
-    // Detect which domain we're on
-  const isAlDomain = !!(host && host.includes("fastlygo.al"));
+  // Detect which domain we're on
+  const cleanHostForDetect = host ? host.replace(/^www\./, "").split(":")[0].toLowerCase() : "";
+  const isAlDomain = cleanHostForDetect === "fastlygo.al";
+  const isKsDomain = cleanHostForDetect === "fastlygo.ks";
 
   // OG locale map
   const ogLocale: Record<string, string> = { en: "en_US", tr: "tr_TR", mk: "mk_MK", sq: "sq_AL" };
   const locale = ogLocale[language] || "en_US";
 
-  // Current page URL (for og:url)
+  // Current page URL (for og:url) — varsayılan dil en, lang param sadece non-default için
   let currentUrl: string;
   if (isAlDomain) {
-    // fastlygo.al: URL always on al domain, lang param only when non-default
-    currentUrl = language === "sq" ? `${alBaseUrl}${pathname}` : `${alBaseUrl}${pathname}?lang=${language}`;
+    currentUrl = language === "en" ? `${alBaseUrl}${pathname}` : `${alBaseUrl}${pathname}?lang=${language}`;
+  } else if (isKsDomain) {
+    currentUrl = language === "en" ? `${ksBaseUrl}${pathname}` : `${ksBaseUrl}${pathname}?lang=${language}`;
   } else if (language === "en") {
     currentUrl = `${mkBaseUrl}${pathname}`;
   } else {
     currentUrl = `${mkBaseUrl}${pathname}?lang=${language}`;
   }
 
-  // hreflang block — domain-aware
-  // fastlygo.al: independent Albanian-first site, all languages on .al domain, no mk hreflang
-  // fastlygo.mk: sq points to fastlygo.al (canonical Albanian domain), no sq on .mk
+  // hreflang block — domain-aware, varsayılan dil her domain için en
   let hreflangBlock: string;
   if (isAlDomain) {
-    // fastlygo.al — bağımsız site, varsayılan sq, mk yok
-    const alEn = `${alBaseUrl}${pathname}?lang=en`;
+    // fastlygo.al — en canonical, sq+tr alternatif
+    const alEn = `${alBaseUrl}${pathname}`; // en = canonical (no lang param)
     const alTr = `${alBaseUrl}${pathname}?lang=tr`;
-    const alSq = `${alBaseUrl}${pathname}`; // sq = canonical (no lang param)
+    const alSq = `${alBaseUrl}${pathname}?lang=sq`;
     hreflangBlock = `
-  <link rel="alternate" hreflang="x-default" href="${alSq}" />
-  <link rel="alternate" hreflang="sq" href="${alSq}" />
+  <link rel="alternate" hreflang="x-default" href="${alEn}" />
   <link rel="alternate" hreflang="en" href="${alEn}" />
+  <link rel="alternate" hreflang="sq" href="${alSq}" />
   <link rel="alternate" hreflang="tr" href="${alTr}" />`;
+  } else if (isKsDomain) {
+    // fastlygo.ks — en canonical, sq+tr alternatif
+    const ksEn = `${ksBaseUrl}${pathname}`; // en = canonical
+    const ksTr = `${ksBaseUrl}${pathname}?lang=tr`;
+    const ksSq = `${ksBaseUrl}${pathname}?lang=sq`;
+    hreflangBlock = `
+  <link rel="alternate" hreflang="x-default" href="${ksEn}" />
+  <link rel="alternate" hreflang="en" href="${ksEn}" />
+  <link rel="alternate" hreflang="sq" href="${ksSq}" />
+  <link rel="alternate" hreflang="tr" href="${ksTr}" />`;
   } else {
-    // fastlygo.mk — sq points to fastlygo.al, mk stays on .mk
+    // fastlygo.mk — en canonical, sq → fastlygo.al, mk+tr alternatif
     const mkEn = `${mkBaseUrl}${pathname}`;
     const mkTr = `${mkBaseUrl}${pathname}?lang=tr`;
     const mkMk = `${mkBaseUrl}${pathname}?lang=mk`;
-    const mkSq = `${alBaseUrl}${pathname}`; // sq → fastlygo.al
+    const mkSq = `${alBaseUrl}${pathname}?lang=sq`; // sq → fastlygo.al
     hreflangBlock = `
   <link rel="alternate" hreflang="x-default" href="${mkEn}" />
   <link rel="alternate" hreflang="en" href="${mkEn}" />
@@ -782,10 +797,12 @@ function injectSeoIntoHtml(
     ? jsonLdSchemas.map(schema => `  <script type="application/ld+json">${JSON.stringify(schema)}</script>`).join("\n")
     : "";
   // Build the full SEO block to inject before </head>
-  // og:locale:alternate — domain'e göre alternatif locale'ler
+  // og:locale:alternate — domain'e göre alternatif locale'ler (en ana dil her domain için)
   const ogLocaleAlternates = isAlDomain
-    ? ['en_US', 'tr_TR']           // fastlygo.al: sq ana, en+tr alternatif, mk yok
-    : ['tr_TR', 'mk_MK', 'sq_AL']; // fastlygo.mk: en ana, diğerüler alternatif
+    ? ['sq_AL', 'tr_TR']                  // fastlygo.al: en ana, sq+tr alternatif
+    : isKsDomain
+    ? ['sq_AL', 'tr_TR']                  // fastlygo.ks: en ana, sq+tr alternatif
+    : ['tr_TR', 'mk_MK', 'sq_AL'];        // fastlygo.mk: en ana, diğerüler alternatif
   const ogLocaleAlternateBlock = ogLocaleAlternates
     .map(l => `  <meta property="og:locale:alternate" content="${l}" />`)
     .join('\n');

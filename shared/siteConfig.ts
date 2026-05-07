@@ -193,40 +193,40 @@ const SITE_CONFIGS: SiteConfig[] = [
   //   neighborhoodCount: 0,
   //   activeCouriers: 0,
   //   deliveryMinutes: 15,
-  //   areas: [],
-  // },
-
-  // ─── Gelecek: Kosova — Priştine ──────────────────────────────────────────
-  // {
-  //   domain: "fastlygo.ks",
-  //   baseUrl: "https://fastlygo.ks",
-  //   defaultLang: "sq",
-  //   supportedLangs: ["sq", "en"],
-  //   cityNames: { sq: "Prishtinë", en: "Pristina", tr: "Priştine" },
-  //   countryNames: { sq: "Kosovë", en: "Kosovo", tr: "Kosova" },
-  //   referenceTerms: {
-  //     city: [
-  //       { from: { sq: "Shkupit", en: "Skopje's" }, to: { sq: "Prishtinës", en: "Pristina's" } },
-  //       { from: { sq: "Shkupin", en: "Skopje"   }, to: { sq: "Prishtinën", en: "Pristina"   } },
-  //       { from: { sq: "Shkup",   en: "Skopje"   }, to: { sq: "Prishtinë",  en: "Pristina"   } },
-  //     ],
-  //     country: [
-  //       { from: { sq: "Maqedoni", en: "North Macedonia" }, to: { sq: "Kosovë", en: "Kosovo" } },
-  //     ],
-  //   },
-  //   countryCode: "XK",
-  //   postalCode: "10000",
-  //   latitude: 42.6629,
-  //   longitude: 21.1655,
-  //   telephone: "+38344123456",
-  //   email: "info@fastlygo.ks",
-  //   currencies: "EUR",
-  //   ogImage: "https://fastlygo.ks/og-image.e6740bbc.jpg",
-  //   neighborhoodCount: 0,
-  //   activeCouriers: 0,
-  //   deliveryMinutes: 15,
-  //   areas: [],
-  // },
+  //   // ─── Kosovo — Pristina ───────────────────────────────────────────────────────────────────────
+  {
+    domain: "fastlygo.ks",
+    baseUrl: "https://fastlygo.ks",
+    defaultLang: "en",
+    supportedLangs: ["en", "sq", "tr"],
+    cityNames: { sq: "Prishtinë", en: "Pristina", tr: "Priştine" },
+    countryNames: { sq: "Kosovë", en: "Kosovo", tr: "Kosova" },
+    referenceTerms: {
+      city: [
+        { from: { sq: "Shkupit", en: "Skopje's",  tr: "Üsküb'ün" }, to: { sq: "Prishtinës", en: "Pristina's", tr: "Priştine'nin" } },
+        { from: { sq: "Shkupin", en: "Skopje",    tr: "Üskübü"    }, to: { sq: "Prishtinën", en: "Pristina",   tr: "Priştine'yi"  } },
+        { from: { sq: "Shkup",   en: "Skopje",    tr: "Üsküp"      }, to: { sq: "Prishtinë",  en: "Pristina",   tr: "Priştine"     } },
+      ],
+      country: [
+        { from: { sq: "Maqedonisë",  en: "North Macedonia", tr: "Kuzey Makedonya" }, to: { sq: "Kosovës",  en: "Kosovo", tr: "Kosova" } },
+        { from: { sq: "Maqedoninë",  en: "North Macedonia", tr: "Kuzey Makedonya" }, to: { sq: "Kosovën",  en: "Kosovo", tr: "Kosova" } },
+        { from: { sq: "Maqedoni",    en: "North Macedonia", tr: "Kuzey Makedonya" }, to: { sq: "Kosovë",   en: "Kosovo", tr: "Kosova" } },
+        { from: { sq: "Maqedonia",   en: "Macedonia",       tr: "Makedonya"       }, to: { sq: "Kosova",   en: "Kosovo", tr: "Kosova" } },
+      ],
+    },
+    countryCode: "XK",
+    postalCode: "10000",
+    latitude: 42.6629,
+    longitude: 21.1655,
+    telephone: "+38344123456",
+    email: "info@fastlygo.ks",
+    currencies: "EUR",
+    ogImage: "https://d2xsxph8kpxj0f.cloudfront.net/310519663142180542/4KwtmFvvd67FSFhQ5dyp9H/fastlygo-og-universal-FQjXU2VrdYT8YobXcaLM9u.png",
+    neighborhoodCount: 0,
+    activeCouriers: 0,
+    deliveryMinutes: 15,
+    areas: [],
+  },
 ];
 
 /**

@@ -501,3 +501,8 @@
 - [x] fastlygo.al başlığındaki 'Shkup' → 'Tiranë' düzeltmesi (SEO cache key'e host eklendi)
 - [x] Areas sayfasını accordion'dan düz listeye çevir (ilgili ülke şehirleri üstte)
 - [x] Evrensel FastlyGo OG görseli oluştur ve her iki domain için siteConfig.ts + vite.ts'e entegre et
+
+## Google Index Düzeltmesi + Kosovo (06.05.2026)
+- [x] DB'deki fastlygo.al home page SEO meta'sını Tirana + İngilizce öncelikli güncelle
+- [x] fastlygo.al varsayılan dilini İngilizce yap (dil tespiti + hreflang)
+- [x] Kosovo (fastlygo.ks) siteConfig'ini aktif et, İngilizce ana dil
