@@ -506,3 +506,6 @@
 - [x] DB'deki fastlygo.al home page SEO meta'sını Tirana + İngilizce öncelikli güncelle
 - [x] fastlygo.al varsayılan dilini İngilizce yap (dil tespiti + hreflang)
 - [x] Kosovo (fastlygo.ks) siteConfig'ini aktif et, İngilizce ana dil
+
+## SEO Meta Referans Domain Düzeltmesi (07.05.2026)
+- [x] DB'deki tüm sayfa SEO meta'larını Skopje bazlı (referans = .mk) olarak düzelt — applyLocalTerms her domain için doğru çevirecek
