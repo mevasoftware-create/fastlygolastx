@@ -21,34 +21,17 @@ const resources = {
 const urlParams = new URLSearchParams(window.location.search);
 const langFromUrl = urlParams.get('lang') as Language | null;
 
-// If URL has lang parameter, store it in localStorage
+// If URL has a valid lang parameter, store it in localStorage
 if (langFromUrl && ['en', 'tr', 'mk', 'sq'].includes(langFromUrl)) {
   localStorage.setItem('fastlygo_language', langFromUrl);
-}
-
-/**
- * Domain bazlı varsayılan dil tespiti
- * fastlygo.al → sq (Arnavutça)
- * fastlygo.mk → mk (Makedonca)
- *
- * ?lang= parametresi veya localStorage varsa domain tespiti override edilir.
- */
-function detectDomainLanguage(): Language | null {
-  if (typeof window === 'undefined') return null;
-  const hostname = window.location.hostname.replace(/^www\./, '');
-  if (hostname === 'fastlygo.al') return 'sq';
-  if (hostname === 'fastlygo.mk') return 'mk';
-  return null;
-}
-
-// Domain bazlı dil: sadece ?lang= yoksa ve localStorage yoksa uygula
-if (!langFromUrl) {
+} else if (!langFromUrl) {
+  // No ?lang= in URL → default is English for all domains.
+  // Clear any previously stored non-English language so returning visitors
+  // don't get stuck in a non-default language without an explicit URL param.
   const storedLang = localStorage.getItem('fastlygo_language');
-  if (!storedLang) {
-    const domainLang = detectDomainLanguage();
-    if (domainLang) {
-      localStorage.setItem('fastlygo_language', domainLang);
-    }
+  if (!storedLang || storedLang === 'mk' || storedLang === 'sq') {
+    // Only reset if it was a domain-default that is no longer the default
+    localStorage.removeItem('fastlygo_language');
   }
 }
 
@@ -57,15 +40,16 @@ i18n
   .use(initReactI18next) // Pass i18n instance to react-i18next
   .init({
     resources,
-    fallbackLng: 'en', // Default language
+    fallbackLng: 'en', // Default language is English
+    lng: langFromUrl || undefined, // Use URL param if present, otherwise let detector decide
     debug: false,
-    
+
     interpolation: {
       escapeValue: false // React already escapes values
     },
-    
+
     detection: {
-      order: ['querystring', 'localStorage', 'navigator', 'htmlTag'],
+      order: ['querystring', 'localStorage'],
       caches: ['localStorage'],
       lookupQuerystring: 'lang',
       lookupLocalStorage: 'fastlygo_language'
@@ -77,24 +61,23 @@ export const getCurrentLanguage = (): Language => {
   return (i18n.language as Language) || 'en';
 };
 
-// Helper function to change language
+/**
+ * Change language and update URL accordingly.
+ * English is the canonical language for all domains — no ?lang= param needed.
+ * All other languages require ?lang=<code> in the URL.
+ */
 export const setLanguage = (lang: Language) => {
   i18n.changeLanguage(lang);
-  
-  // Update URL with language parameter
+  localStorage.setItem('fastlygo_language', lang);
+
   if (typeof window !== 'undefined') {
     const url = new URL(window.location.href);
-    // fastlygo.al'da sq için ?lang= parametresi ekleme (domain zaten sq canonical)
-    const hostname = url.hostname.replace(/^www\./, '');
     if (lang === 'en') {
+      // English is default — clean URL, no ?lang= param
       url.searchParams.delete('lang');
-    } else if (lang === 'sq' && hostname === 'fastlygo.al') {
-      // fastlygo.al'da Arnavutça varsayılan — URL temiz kalır
-      url.searchParams.delete('lang');
-    } else if (lang === 'mk' && hostname === 'fastlygo.mk') {
-      // fastlygo.mk'da Makedonca varsayılan — URL temiz kalır
-      url.searchParams.delete('lang');
+      localStorage.removeItem('fastlygo_language');
     } else {
+      // All non-English languages need ?lang= param
       url.searchParams.set('lang', lang);
     }
     window.history.replaceState({}, '', url.toString());
@@ -120,7 +103,7 @@ export const useTranslation = () => {
   const lang = (i18n.language as Language) || 'en';
 
   // Wrap t() to apply domain-aware city/country term replacements
-  // e.g. fastlygo.al: "Shkup" → "Tiranë", "Maqedoni" → "Shqipëri"
+  // e.g. fastlygo.al: "Skopje" → "Tirana", "North Macedonia" → "Albania"
   const t = (key: string, options?: Record<string, unknown>): string => {
     const raw = String(rawT(key, options as never));
     if (!_siteConfig.referenceTerms) return raw; // reference domain → no change

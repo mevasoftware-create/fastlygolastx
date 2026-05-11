@@ -509,3 +509,6 @@
 
 ## SEO Meta Referans Domain Düzeltmesi (07.05.2026)
 - [x] DB'deki tüm sayfa SEO meta'larını Skopje bazlı (referans = .mk) olarak düzelt — applyLocalTerms her domain için doğru çevirecek
+
+## Frontend Varsayılan Dil Düzeltmesi (07.05.2026)
+- [x] i18n.ts'teki detectDomainLanguage ve setLanguage'ı İngilizce varsayılan olacak şekilde düzelt
