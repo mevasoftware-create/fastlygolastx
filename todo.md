@@ -512,3 +512,6 @@
 
 ## Frontend Varsayılan Dil Düzeltmesi (07.05.2026)
 - [x] i18n.ts'teki detectDomainLanguage ve setLanguage'ı İngilizce varsayılan olacak şekilde düzelt
+
+## Merchant Structured Data Düzeltmesi (12.05.2026)
+- [x] JSON-LD Offer schema'sına shippingDetails, hasMerchantReturnPolicy ve brand ekle

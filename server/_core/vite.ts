@@ -419,6 +419,64 @@ function getJsonLdForPath(pathname: string, language: string, title: string, des
     "serviceArea": {
       "@type": "City",
       "name": cityEn
+    },
+    "brand": {
+      "@type": "Brand",
+      "name": "FastlyGo"
+    },
+    "hasOfferCatalog": {
+      "@type": "OfferCatalog",
+      "name": "Delivery Services",
+      "itemListElement": [{
+        "@type": "Offer",
+        "itemOffered": {
+          "@type": "Service",
+          "name": "Courier & Delivery Service"
+        },
+        "priceCurrency": cfg.currencies || "EUR",
+        "price": "0",
+        "priceSpecification": {
+          "@type": "PriceSpecification",
+          "price": "0",
+          "priceCurrency": cfg.currencies || "EUR",
+          "description": "Price varies by distance and package size"
+        },
+        "shippingDetails": {
+          "@type": "OfferShippingDetails",
+          "shippingRate": {
+            "@type": "MonetaryAmount",
+            "currency": cfg.currencies || "EUR",
+            "value": "1.99"
+          },
+          "deliveryTime": {
+            "@type": "ShippingDeliveryTime",
+            "handlingTime": {
+              "@type": "QuantitativeValue",
+              "minValue": 0,
+              "maxValue": 5,
+              "unitCode": "MIN"
+            },
+            "transitTime": {
+              "@type": "QuantitativeValue",
+              "minValue": 10,
+              "maxValue": 30,
+              "unitCode": "MIN"
+            }
+          },
+          "shippingDestination": {
+            "@type": "DefinedRegion",
+            "addressCountry": cfg.countryCode
+          }
+        },
+        "hasMerchantReturnPolicy": {
+          "@type": "MerchantReturnPolicy",
+          "applicableCountry": cfg.countryCode,
+          "returnPolicyCategory": "https://schema.org/MerchantReturnNotPermitted",
+          "merchantReturnDays": 0,
+          "returnMethod": "https://schema.org/ReturnByMail",
+          "returnFees": "https://schema.org/FreeReturn"
+        }
+      }]
     }
   };
   const organizationSchema = {
