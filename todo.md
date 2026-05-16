@@ -521,3 +521,7 @@
 
 ## Cross-Domain hreflang Düzeltmesi (16.05.2026)
 - [x] fastlygo.mk'daki sq hreflang → https://fastlygo.al/ olarak güncelle
+
+## SEOHead + hreflang Cross-Domain Düzeltmesi (16.05.2026)
+- [x] SEOHead.tsx'teki sq hreflang URL'ini fastlygo.al/sq/{path} formatına güncelle
+- [x] vite.ts'teki sq hreflang'ı fastlygo.al/sq/{path} formatına güncelle
