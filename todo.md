@@ -515,3 +515,9 @@
 
 ## Merchant Structured Data Düzeltmesi (12.05.2026)
 - [x] JSON-LD Offer schema'sına shippingDetails, hasMerchantReturnPolicy ve brand ekle
+
+## Cross-Domain hreflang Düzeltmesi (16.05.2026)
+- [ ] hreflang etiketlerini cross-domain yap — fastlygo.mk'daki sq → fastlygo.al, fastlygo.al'daki mk → fastlygo.mk
+
+## Cross-Domain hreflang Düzeltmesi (16.05.2026)
+- [x] fastlygo.mk'daki sq hreflang → https://fastlygo.al/ olarak güncelle

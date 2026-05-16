@@ -836,11 +836,12 @@ function injectSeoIntoHtml(
   <link rel="alternate" hreflang="sq" href="${ksSq}" />
   <link rel="alternate" hreflang="tr" href="${ksTr}" />`;
   } else {
-    // fastlygo.mk — en canonical, sq → fastlygo.al, mk+tr alternatif
+    // fastlygo.mk — en canonical, sq → fastlygo.al (cross-domain), mk+tr alternatif
     const mkEn = `${mkBaseUrl}${pathname}`;
     const mkTr = `${mkBaseUrl}${pathname}?lang=tr`;
     const mkMk = `${mkBaseUrl}${pathname}?lang=mk`;
-    const mkSq = `${alBaseUrl}${pathname}?lang=sq`; // sq → fastlygo.al
+    // sq hreflang → fastlygo.al (farklı domain, Arnavutça canonical orada)
+    const mkSq = `${alBaseUrl}/`;
     hreflangBlock = `
   <link rel="alternate" hreflang="x-default" href="${mkEn}" />
   <link rel="alternate" hreflang="en" href="${mkEn}" />
