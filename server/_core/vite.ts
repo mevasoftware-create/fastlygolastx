@@ -840,10 +840,9 @@ function injectSeoIntoHtml(
     const mkEn = `${mkBaseUrl}${pathname}`;
     const mkTr = `${mkBaseUrl}${pathname}?lang=tr`;
     const mkMk = `${mkBaseUrl}${pathname}?lang=mk`;
-    // sq hreflang → fastlygo.al/sq/{path} (Arnavutça canonical: fastlygo.al'da /sq/ prefix'i)
-    // Ana sayfa: fastlygo.al/sq | Alt sayfalar: fastlygo.al/sq/about-us vb.
-    const sqPath = pathname === '/' ? '/sq' : `/sq${pathname}`;
-    const mkSq = `${alBaseUrl}${sqPath}`;
+    // sq hreflang → fastlygo.al/{path} (fastlygo.al EN canonical, sq prefix yok)
+    // Ana sayfa: https://fastlygo.al/ | Alt sayfalar: https://fastlygo.al/about-us vb.
+    const mkSq = `${alBaseUrl}${pathname}`;
     hreflangBlock = `
   <link rel="alternate" hreflang="x-default" href="${mkEn}" />
   <link rel="alternate" hreflang="en" href="${mkEn}" />

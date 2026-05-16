@@ -82,17 +82,15 @@ export default function SEOHead({
   const defaultCanonicalUrl = `${canonicalBaseUrl}${pathname}`;
 
   // hreflang URLs:
-  // sq → fastlygo.al/sq/{path} (Arnavutça canonical: fastlygo.al'da /sq/ prefix'i ile)
+  // sq → fastlygo.al/{path} (fastlygo.al EN canonical, sq prefix yok)
   // mk → fastlygo.mk?lang=mk
   // en → fastlygo.mk (temiz URL, canonical)
   // tr → fastlygo.mk?lang=tr
-  // Ana sayfa için: fastlygo.al/sq (pathname = '/' → /sq)
-  const sqPath = pathname === '/' ? '/sq' : `/sq${pathname}`;
   const hreflangs = {
     en: `${MK_BASE_URL}${pathname}`,
     tr: `${MK_BASE_URL}${pathname}?lang=tr`,
     mk: `${MK_BASE_URL}${pathname}?lang=mk`,
-    sq: `${AL_BASE_URL}${sqPath}`,
+    sq: `${AL_BASE_URL}${pathname}`,
   };
 
   // Title resolution:

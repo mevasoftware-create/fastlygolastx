@@ -525,3 +525,6 @@
 ## SEOHead + hreflang Cross-Domain Düzeltmesi (16.05.2026)
 - [x] SEOHead.tsx'teki sq hreflang URL'ini fastlygo.al/sq/{path} formatına güncelle
 - [x] vite.ts'teki sq hreflang'ı fastlygo.al/sq/{path} formatına güncelle
+
+## sq hreflang URL Düzeltmesi (16.05.2026)
+- [x] sq hreflang URL'ini fastlygo.al/{path} olarak düzelt (fastlygo.al Arnavutça canonical = kök URL)
